@@ -1,3 +1,10 @@
 node_modules/
 validation/angular-foundation/generated/
 validation/angular-foundation/dist/
+
+# Generated verification/browser artifacts
+coverage/
+test-results/
+playwright-report/
+blob-report/
+.auth/

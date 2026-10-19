@@ -15,13 +15,14 @@ MDM/Product chỉ là ví dụ. Quy ước này không tự động tạo cơ ch
 | [Routing](routing.md) | Tích hợp module và route list/create/detail/update |
 | [Services](services.md) | Base API service, service/model của feature, asset URL |
 | [Assets](assets.md) | Tài nguyên và CSS/SCSS ở module/feature |
+| [Testing](testing.md) | Vị trí spec/integration/E2E, test support và runner discovery |
 | [UI patterns](ui-patterns.md) | Page/drawer và component nghiệp vụ có sử dụng Core UI |
 
 Trước khi viết code: đọc project-structure, sau đó chỉ đọc các tài liệu liên quan. Không suy API Core UI từ tên component hoặc từ ví dụ Angular thuần.
 
 ## Quy tắc chung
 
-- Module sở hữu toàn bộ code nghiệp vụ và tài nguyên của mình.
+- Module sở hữu toàn bộ code nghiệp vụ, tài nguyên và test nghiệp vụ của mình.
 - Không import environment, app/shared của Portal hoặc private file của module khác.
 - Tái sử dụng Core UI và dependency đã khai báo; phần dùng xuyên module nằm trong package/library có public contract.
 - Mỗi page/drawer phục vụ một tác vụ cụ thể. Màn lớn chia component theo trách nhiệm, có input/output cần thiết.

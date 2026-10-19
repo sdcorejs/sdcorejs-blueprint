@@ -24,6 +24,7 @@ Các mẫu này không nằm trong project-structure hoặc tài liệu nền t�
 | URL và lazy route tới page | routing |
 | DTO, API service, base service và asset URL | services |
 | Tài nguyên, SCSS, build copy | assets |
+| Vị trí spec/E2E, test support và runner discovery | testing |
 | Template/Core components và tương tác màn hình | UI patterns |
 
 ## Contract đích của các route mẫu
@@ -42,6 +43,8 @@ Chỉ tạo page/drawer mà đặc tả thực sự cần. Không mặc định 
 ## Điều kiện khi bổ sung mẫu
 
 Đối chiếu đúng version @sdcorejs/angular của project. Mỗi pattern phải nêu khi dùng, API dữ liệu, input/output, state, permission, URL nếu có, responsive và cách kiểm chứng.
+
+Spec của component đặt cạnh source; E2E của pattern nằm trong scope feature/module theo [Testing](testing.md). Mỗi pattern nêu các case có giá trị như validation, save failure, dirty guard, direct URL, keyboard/focus; không sinh spec rỗng hoặc lặp lại cùng một case ở mọi tầng.
 
 Component route trong validation hiện là fixture không có Core UI. Không copy fixture đó thành page production hoặc coi đó là UI pattern đã có.
 

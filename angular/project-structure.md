@@ -11,6 +11,16 @@ Tổ chức theo **Portal → Module nghiệp vụ → Feature**. Mỗi module t
 ```text
 project/
   public/                                  # Tài nguyên thuộc Portal
+  playwright.config.ts                     # Điều phối E2E của Portal/module
+  tsconfig.app.json                        # Source ứng dụng, loại test khỏi discovery
+  tsconfig.spec.json                       # Unit/component/integration specs
+  e2e/                                     # Chỉ các flow thuộc Portal hoặc xuyên module
+    specs/
+      navigation.e2e-spec.ts
+      cross-module-flow.e2e-spec.ts
+    fixtures/
+    page-objects/
+    support/
   src/
     main.ts
     styles.scss
@@ -20,7 +30,9 @@ project/
       environment.prod.ts
     app/
       app.component.ts
+      app.component.spec.ts
       app.routes.ts
+      app.routes.spec.ts
       components/
         main/                              # Bố cục chính của Portal
       configurations/
@@ -31,19 +43,36 @@ project/
       mdm/                                 # Tên module ví dụ
         index.ts
         routes.ts
+        routes.spec.ts
         configurations/
           mdm.configuration.ts             # Interface + InjectionToken
-          provide-mdm-configuration.ts     # Hàm public đăng ký cấu hình/provider
+          provide-mdm-configuration.ts     # Public configuration/provider
+          provide-mdm-configuration.spec.ts
           api.configuration.ts             # Chỉ khi integration API cần
         services/
           base-api.service.ts
           asset.service.ts
+          asset.service.spec.ts
         components/
         directives/
         pipes/
         utils/
           resource-url.ts
+          resource-url.spec.ts
         guards/
+        testing/                           # Test support dùng chung trong MDM
+          fixtures/
+          mocks/
+          helpers/
+          integration/                     # Tình huống phối hợp ở scope module
+            module-configuration.integration.spec.ts
+        e2e/                               # E2E phối hợp các feature trong MDM
+          playwright.config.ts             # Cho phép chạy suite module riêng
+          specs/
+            cross-feature-flow.e2e-spec.ts
+          fixtures/
+          page-objects/
+          support/
         assets/
           images/
           icons/
@@ -58,11 +87,13 @@ project/
         features/
           product/
             routes.ts
+            routes.spec.ts
             pages/
               list/
                 list.component.ts
                 list.component.html
                 list.component.scss
+                list.component.spec.ts
               detail/
                 detail.component.ts
               create/
@@ -74,10 +105,28 @@ project/
               create-side-drawer/
               update-side-drawer/
               general-information-form/
+                general-information-form.component.ts
+                general-information-form.component.spec.ts
               general-information-view/
             services/
               api.model.ts
               api.service.ts
+              api.service.spec.ts
+            testing/                       # Fixture/mock/helper riêng của Product
+              fixtures/
+              mocks/
+              helpers/
+              integration/
+                record-flow.integration.spec.ts
+            e2e/                           # Flow browser riêng của Product
+              specs/
+                create.e2e-spec.ts
+                update.e2e-spec.ts
+                detail.e2e-spec.ts
+              fixtures/
+              page-objects/
+                record.page.ts
+              support/
             assets/
               images/
               icons/
@@ -87,7 +136,7 @@ project/
               documents/
 ```
 
-Cây minh họa các vị trí được phép, không phải scaffold bắt buộc. Các component khác cũng có TS/HTML/SCSS cùng thư mục khi cần. Test đặt cạnh code được kiểm tra.
+Cây minh họa các vị trí được phép, không phải scaffold bắt buộc. Các component khác cũng có TS/HTML/SCSS và spec cùng thư mục khi cần. Chỉ thêm test có giá trị xác nhận hành vi; không tạo spec rỗng cho mọi file.
 
 Project đang dùng src/libs giữ cấu trúc hiện hữu nếu chưa có yêu cầu migration. Baseline cho project mới là src/modules.
 
@@ -102,6 +151,10 @@ Project đang dùng src/libs giữ cấu trúc hiện hữu nếu chưa có yêu
 | components trong feature | Thành phần thuộc feature, bao gồm drawer và các phần form/view |
 | services/assets/... cấp module | Dùng chung cho các feature của module |
 | services/assets/... cấp feature | Dùng riêng trong feature |
+| *.spec.ts cạnh source | Unit/component/service spec của phần code tương ứng |
+| testing | Fixture/mock/helper và integration spec trong phạm vi module/feature |
+| e2e trong module/feature | Flow browser thuộc nghiệp vụ module/feature đó |
+| e2e ở root | Navigation/shell và flow tích hợp xuyên module của Portal |
 
 Phần dùng chung cho nhiều module phải là package/library có public contract. src/shared của Portal, nếu có, chỉ phục vụ Portal; module nghiệp vụ không phụ thuộc vào đó.
 
@@ -157,6 +210,21 @@ Cả module và feature được có assets với images, icons, fonts, styles, 
 
 Xem [Assets](assets.md).
 
+## Test và test support
+
+- Unit/component/service spec nằm cạnh source: list.component.spec.ts, api.service.spec.ts, provide-mdm-configuration.spec.ts.
+- Integration test một phần code đặt cạnh phần đó với hậu tố .integration.spec.ts; kịch bản phối hợp nhiều phần đặt trong testing/integration của owner gần nhất.
+- E2E dùng hậu tố .e2e-spec.ts và nằm trong e2e/specs của feature/module/Portal sở hữu flow.
+- Module tự chứa test nghiệp vụ và test support; không import fixture/page object riêng của Portal hoặc module khác.
+- Feature test support nằm trong feature/testing hoặc feature/e2e. Khi nhiều feature thật sự dùng chung, chuyển lên scope module.
+- testing/fixtures là dữ liệu/builder test; e2e/fixtures có thể chứa Playwright fixture và dữ liệu cho suite.
+- Không đưa test fixture/mock vào assets hay public entry runtime.
+- Runner discovery và tsconfig phải tách Angular spec với Playwright E2E. Không gom mọi .spec.ts vào Playwright.
+- coverage, test-results, playwright-report, blob-report và auth state sinh ra là output, không phải source.
+- validation/angular-foundation trong repo Blueprint chỉ kiểm chứng code mẫu; không thay thế bộ test của ứng dụng được Blueprint mô tả.
+
+Chi tiết naming, vị trí config, discovery và output: [Testing](testing.md).
+
 ## Kiểm tra trước bàn giao
 
 - [ ] Module không import source riêng của host/module khác.
@@ -166,3 +234,5 @@ Xem [Assets](assets.md).
 - [ ] Model và code dùng chung thuộc đúng owner.
 - [ ] Assets có namespace, styles không rò scope.
 - [ ] Không có thư mục rỗng hoặc abstraction chưa có consumer.
+- [ ] Spec/E2E và test support đúng owner; module không phụ thuộc test nội bộ của host.
+- [ ] Angular spec và Playwright E2E được discover riêng; output không vào source/bundle.
