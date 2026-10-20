@@ -1,8 +1,8 @@
-# Angular Blueprint
+# Angular Portal Blueprint
 
 ## Phạm vi
 
-Dành cho project Angular có module nghiệp vụ tự chứa, hướng đến microfrontend. Module tích hợp với Portal qua public entry, routes và configuration, không phụ thuộc source riêng của host.
+Dành cho ứng dụng Portal/backoffice xây bằng Angular, có module nghiệp vụ tự chứa, hướng đến microfrontend. Module tích hợp với Portal qua public entry, routes và configuration, không phụ thuộc source riêng của host.
 
 MDM/Product chỉ là ví dụ. Quy ước này không tự động tạo cơ chế remote loading, federation hoặc deploy độc lập; phần tích hợp runtime sẽ được đặc tả riêng.
 

@@ -1,4 +1,4 @@
-# Kiểm chứng mẫu Angular nền tảng
+# Kiểm chứng mẫu Angular Portal nền tảng
 
 ## Chạy
 
@@ -13,7 +13,7 @@ Dùng Node theo engines trong package.json. Dependency được pin và có pack
 ## Kiểm tra gì
 
 1. Liên kết Markdown nội bộ và fence.
-2. Trích trực tiếp các block <!-- example: src/... --> từ tài liệu Angular.
+2. Trích trực tiếp các block <!-- example: src/... --> từ tài liệu [Angular Portal](../../angular-portal/README.md).
 3. Type-check TypeScript với Angular/RxJS thật ở chế độ strict.
 4. Compile SCSS qua Sass.
 5. Kiểm tra hai scope module có cấu hình độc lập, feature service không rò ra root.

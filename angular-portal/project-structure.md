@@ -4,7 +4,7 @@ Trạng thái: Quy ước được thống nhất trong phiên review ngày 19/1
 
 ## Mục tiêu
 
-Tổ chức theo **Portal → Module nghiệp vụ → Feature**. Mỗi module tự chứa code và tài nguyên, có thể được host tích hợp qua public configuration.
+Tổ chức ứng dụng Angular Portal/backoffice theo **Portal → Module nghiệp vụ → Feature**. Mỗi module tự chứa code và tài nguyên, có thể được host tích hợp qua public configuration.
 
 ## Cấu trúc tổng thể
 

@@ -10,7 +10,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '../..');
 const generated = path.join(here, 'generated');
 const dist = path.join(here, 'dist');
-const angularDocs = path.join(root, 'angular');
+const angularDocs = path.join(root, 'angular-portal');
 const documents = [
   path.join(root, 'README.md'),
   ...fs.readdirSync(angularDocs).filter(name => name.endsWith('.md')).map(name => path.join(angularDocs, name)),
