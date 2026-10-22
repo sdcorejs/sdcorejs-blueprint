@@ -10,15 +10,10 @@ MDM/Product chỉ là ví dụ. Quy ước này không tự động tạo cơ ch
 
 | Tài liệu | Khi nào đọc |
 | --- | --- |
-| [Project structure](project-structure.md) | Khởi tạo project/module/feature hoặc quyết định vị trí code |
-| [Configuration](configuration.md) | Khai báo token, public provider và scope DI |
-| [Routing](routing.md) | Tích hợp module và route list/create/detail/update |
-| [Services](services.md) | Base API service, service/model của feature, asset URL |
-| [Assets](assets.md) | Tài nguyên và CSS/SCSS ở module/feature |
-| [Testing](testing.md) | Vị trí spec/integration/E2E, test support và runner discovery |
+| [Project structure](project-structure/README.md) | Cấu trúc project/module/feature và các chủ đề configuration, routes, services, assets, testing |
 | [UI patterns](ui-patterns.md) | Page/drawer và component nghiệp vụ có sử dụng Core UI |
 
-Trước khi viết code: đọc project-structure, sau đó chỉ đọc các tài liệu liên quan. Không suy API Core UI từ tên component hoặc từ ví dụ Angular thuần.
+Trước khi viết code: đọc [Project structure](project-structure/README.md), sau đó chọn tài liệu liên quan từ mục lục của nhóm này. Không suy API Core UI từ tên component hoặc từ ví dụ Angular thuần.
 
 ## Quy tắc chung
 
@@ -27,6 +22,9 @@ Trước khi viết code: đọc project-structure, sau đó chỉ đọc các t
 - Tái sử dụng Core UI và dependency đã khai báo; phần dùng xuyên module nằm trong package/library có public contract.
 - Mỗi page/drawer phục vụ một tác vụ cụ thể. Màn lớn chia component theo trách nhiệm, có input/output cần thiết.
 - Tạo thư mục/file khi có nội dung và consumer thực tế.
+- Ưu tiên mặc định và utility của Core; chỉ khai báo cấu hình hoặc custom style khi có nhu cầu cụ thể. Màn list đơn giản chỉ cần TS/HTML, không mặc định tạo SCSS.
+- Private field/method dùng cú pháp `#`. Component chỉ dùng làm route page có thể dùng selector ngắn như `list`.
+- Permission trong template dùng `*sdPermission` với chuỗi quyền; không gọi `permission.hasPermission(...)` trong biểu thức render. Event handler vẫn gọi qua `(click)` hoặc event tương ứng.
 - MUST là yêu cầu của Blueprint trong phạm vi đã áp dụng; SHOULD là mặc định có thể thay đổi với lý do rõ.
 
 ## Code mẫu và kiểm chứng

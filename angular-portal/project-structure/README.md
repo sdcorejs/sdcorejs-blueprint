@@ -1,10 +1,22 @@
 # Project structure
 
-Trạng thái: Quy ước được thống nhất trong phiên review ngày 19/10/2026.
+Trạng thái: Quy ước được thống nhất và cập nhật qua các phiên review ngày 19–22/10/2026.
 
 ## Mục tiêu
 
 Tổ chức ứng dụng Angular Portal/backoffice theo **Portal → Module nghiệp vụ → Feature**. Mỗi module tự chứa code và tài nguyên, có thể được host tích hợp qua public configuration.
+
+## Tài liệu trong nhóm
+
+README này mô tả cây thư mục, ownership, naming và các ranh giới chung. Các chủ đề liên quan được tách thành tài liệu riêng trong cùng thư mục:
+
+| Tài liệu | Khi nào đọc |
+| --- | --- |
+| [Configuration](configuration.md) | Khai báo token, public provider và scope DI |
+| [Routes](routes.md) | Tích hợp module, quyền vào route và tải entity trước khi mở detail/update |
+| [Services](services.md) | Base API service, service/model của feature, asset URL |
+| [Assets](assets.md) | Tài nguyên và CSS/SCSS ở module/feature |
+| [Testing](testing.md) | Vị trí spec/integration/E2E, test support và runner discovery |
 
 ## Cấu trúc tổng thể
 
@@ -92,7 +104,6 @@ project/
               list/
                 list.component.ts
                 list.component.html
-                list.component.scss
                 list.component.spec.ts
               detail/
                 detail.component.ts
@@ -109,7 +120,7 @@ project/
                 general-information-form.component.spec.ts
               general-information-view/
             services/
-              api.model.ts
+              product.model.ts
               api.service.ts
               api.service.spec.ts
             testing/                       # Fixture/mock/helper riêng của Product
@@ -160,7 +171,7 @@ Phần dùng chung cho nhiều module phải là package/library có public cont
 
 ## Tên và trách nhiệm UI
 
-Tên feature đã có trong đường dẫn, không lặp lại trong tên thư mục/file bên trong. Ví dụ product/pages/list/list.component.ts.
+Tên feature đã có trong đường dẫn, không lặp lại trong tên thư mục/file UI bên trong. Ví dụ product/pages/list/list.component.ts. File model dùng tên entity theo quy ước bên dưới.
 
 - Page tách list, detail, create, update để AI dễ xác định phạm vi.
 - Drawer tách detail-side-drawer, create-side-drawer, update-side-drawer.
@@ -171,13 +182,15 @@ Tên feature đã có trong đường dẫn, không lặp lại trong tên thư 
 - Create/update có thể dùng chung component -form; không copy toàn bộ form.
 - Component con khai báo input/output mà phần cha thực sự cần. Page/drawer điều phối tải/lưu/điều hướng.
 
-Implementation có Core UI của các page/drawer nằm ở [UI patterns](ui-patterns.md). Tài liệu cấu trúc không chứa mẫu giao diện đó.
+Implementation có Core UI của các page/drawer nằm ở [UI patterns](../ui-patterns.md). Tài liệu cấu trúc không chứa mẫu giao diện đó.
 
 ## Service và model
 
 - Base service đặt tại services cấp module và đặt tên theo trách nhiệm: base-api.service.ts, không tạo một BaseService chứa mọi thứ.
-- Service riêng của feature đặt trong feature/services.
-- Model/DTO cho service đặt cạnh service, ví dụ api.model.ts.
+- Service riêng của feature đặt trong feature/services; file api.service.ts export class theo entity, ví dụ ProductService.
+- Model/DTO cho service đặt cạnh service và mang tên `<entity>.model.ts`, ví dụ product.model.ts; request/response dùng hậu tố Req/Res, entity giữ tên ProductDto.
+- Const, enum và các type/interface liên quan của feature mặc định đặt chung trong file model. Chỉ tách theo nhóm khi nội dung lớn hoặc trách nhiệm/phạm vi sử dụng khác biệt rõ; tránh chia nhiều file nhỏ cho một feature có ít model.
+- Hàm dùng list/detail/create/update/delete và tên tác vụ approve/reject khi có. delete nhận một ID hoặc mảng ID; approve/reject nhận một Req hoặc mảng Req. Chi tiết ở [Services](services.md).
 - Type chỉ dùng bởi một component đặt cạnh component đó; chỉ tách file khi đủ nội dung.
 - Không mặc định tạo facade/store hoặc bắt mọi service kế thừa base.
 - Không nhân bản helper/API client mà Core hoặc dependency hiện hữu đã cung cấp.
@@ -196,13 +209,15 @@ Mẫu mặc định đặt configuration/service chung tại environment injecto
 
 Drawer tạo động phải nhận injector/environment injector thích hợp của module khi integration API yêu cầu. Cách mở drawer cụ thể thuộc UI patterns.
 
-Xem [Configuration](configuration.md) và [Routing](routing.md).
+Route detail/update có ID phải kiểm tra quyền và tải entity trước khi kích hoạt page. Lỗi tải hoặc thiếu quyền chuyển tới flow/trang lỗi tương ứng của consumer. Page nhận entity đã tải để khởi tạo view/form; xem contract trong Routes.
+
+Xem [Configuration](configuration.md) và [Routes](routes.md).
 
 ## Assets và style
 
 Cả module và feature được có assets với images, icons, fonts, styles, templates, documents. Chỉ tạo nhóm có tài nguyên thực.
 
-- Style riêng của component ở *.component.scss.
+- Ưu tiên utility Core. Chỉ tạo *.component.scss khi cần style riêng mà utility chưa đáp ứng; list đơn giản mặc định chỉ có TS/HTML.
 - assets/styles chứa phần dùng chung trong scope.
 - Biến/mixin không tự phát sinh CSS; utility có namespace/scope rõ.
 - Tài nguyên được xuất bản với namespace module/feature.
@@ -230,6 +245,7 @@ Chi tiết naming, vị trí config, discovery và output: [Testing](testing.md)
 - [ ] Module không import source riêng của host/module khác.
 - [ ] Public entry không export page/component/service private.
 - [ ] Route và service resolve được configuration tại đúng scope.
+- [ ] Detail/update chỉ được kích hoạt sau khi kiểm tra quyền và tải entity thành công; lỗi chuyển đúng trang/flow của consumer.
 - [ ] Page/drawer/component đúng vị trí và không lặp tên feature trong path.
 - [ ] Model và code dùng chung thuộc đúng owner.
 - [ ] Assets có namespace, styles không rò scope.

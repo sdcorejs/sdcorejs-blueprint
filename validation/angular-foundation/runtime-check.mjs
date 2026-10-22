@@ -29,7 +29,7 @@ export async function verifyRuntime(dist) {
   const entry = await read('src/modules/mdm/index.js');
   const { MDM_CONFIGURATION } = await read('src/modules/mdm/configurations/mdm.configuration.js');
   const { AssetService } = await read('src/modules/mdm/services/asset.service.js');
-  const { ApiService } = await read('src/modules/mdm/features/product/services/api.service.js');
+  const { ProductService } = await read('src/modules/mdm/features/product/services/api.service.js');
   const { appRoutes } = await read('src/app/app.routes.js');
   assert.deepEqual(Object.keys(entry).sort(), ['mdmRoutes', 'provideMdmConfiguration']);
 
@@ -46,17 +46,17 @@ export async function verifyRuntime(dist) {
     const original = { apiHost: '/api/a/', assetBaseUrl: 'https://cdn.example.com/a/' };
     const moduleA = child([entry.provideMdmConfiguration(original)], root);
     const moduleB = child([entry.provideMdmConfiguration({ apiHost: '/api/b', assetBaseUrl: '/assets/b' })], root);
-    const featureA = child([ApiService], moduleA);
-    const featureB = child([ApiService], moduleB);
+    const featureA = child([ProductService], moduleA);
+    const featureB = child([ProductService], moduleB);
     original.apiHost = '/changed-after-registration';
     assert.equal(moduleA.get(MDM_CONFIGURATION).apiHost, '/api/a');
     assert.ok(Object.isFrozen(moduleA.get(MDM_CONFIGURATION)));
     assert.equal(root.get(MDM_CONFIGURATION, null), null);
-    assert.equal(root.get(ApiService, null), null);
-    assert.equal(moduleA.get(ApiService, null), null);
+    assert.equal(root.get(ProductService, null), null);
+    assert.equal(moduleA.get(ProductService, null), null);
 
-    const apiA = featureA.get(ApiService);
-    const apiB = featureB.get(ApiService);
+    const apiA = featureA.get(ProductService);
+    const apiB = featureB.get(ProductService);
     const assetsA = moduleA.get(AssetService);
     const assetsB = moduleB.get(AssetService);
     assert.notEqual(assetsA, assetsB);
@@ -65,11 +65,11 @@ export async function verifyRuntime(dist) {
     assert.equal(assetsB.url('icons', 'status.svg'), '/assets/b/icons/status.svg');
 
     let received;
-    apiA.get('id/with ?#').subscribe(value => { received = value; });
-    const get = backend.requests.at(-1);
-    assert.equal(get.request.url, '/api/a/products/id%2Fwith%20%3F%23');
+    apiA.detail('id/with ?#').subscribe(value => { received = value; });
+    const detail = backend.requests.at(-1);
+    assert.equal(detail.request.url, '/api/a/products/id%2Fwith%20%3F%23');
     const product = { id: 'record-1', code: 'SP-001', name: 'Sản phẩm A', status: 'active' };
-    get.respond(product);
+    detail.respond(product);
     assert.equal(received, product);
 
     apiB.list({ pageIndex: 0, pageSize: 20, keyword: '  máy lọc  ' }).subscribe();
@@ -105,7 +105,7 @@ export async function verifyRuntime(dist) {
     const mdmRoutes = mountedModule.children;
     const productRoutes = await mdmRoutes.find(route => route.path === 'product').loadChildren();
     const routeFeature = child(productRoutes[0].providers, routeModule);
-    routeFeature.get(ApiService).get('via-lazy-boundary').subscribe();
+    routeFeature.get(ProductService).detail('via-lazy-boundary').subscribe();
     const lazy = backend.requests.at(-1);
     assert.equal(lazy.request.url, '/api/mdm/products/via-lazy-boundary');
     lazy.respond(product);

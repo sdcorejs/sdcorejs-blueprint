@@ -13,7 +13,7 @@ const dist = path.join(here, 'dist');
 const angularDocs = path.join(root, 'angular-portal');
 const documents = [
   path.join(root, 'README.md'),
-  ...fs.readdirSync(angularDocs).filter(name => name.endsWith('.md')).map(name => path.join(angularDocs, name)),
+  ...walk(angularDocs).filter(name => name.endsWith('.md')),
   path.join(here, 'README.md'),
 ];
 const examples = new Map();

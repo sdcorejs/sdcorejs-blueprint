@@ -36,7 +36,7 @@ features/product/
     general-information-form.component.ts
     general-information-form.component.spec.ts
   services/
-    api.model.ts
+    product.model.ts
     api.service.ts
     api.service.spec.ts
   routes.ts
@@ -68,6 +68,23 @@ mdm/
 ```
 
 Ví dụ có giá trị: token/config resolve đúng qua boundary module/feature; nhiều component phối hợp mà không mất draft; lỗi service được phản ánh đúng. Chỉ viết khi phạm vi cần kiểm chứng tương ứng.
+
+### Route detail/update có ID
+
+Kiểm chứng contract trong [Routes](routes.md) bằng router integration ở feature và những flow browser cần thiết trong E2E của owner. Các case cần chứng minh:
+
+| Case | Kết quả cần xác nhận |
+| --- | --- |
+| API tải entity đang pending | Page đích chưa được kích hoạt; sau khi tải thành công, page nhận đúng entity |
+| Guard route từ chối quyền | Không gọi API tải entity, không kích hoạt page; chuyển đúng flow/trang lỗi |
+| Có quyền detail nhưng thiếu quyền update | Detail được phép; URL update trực tiếp bị từ chối |
+| Entity không tồn tại/404, hết phiên/401, thiếu quyền bản ghi/403, lỗi mạng/5xx | Chuyển đúng đích theo mapping consumer; không chuyển mọi lỗi về not-found |
+| Đổi ID khi route được reuse | Kiểm tra quyền/tải lại theo ID mới; view/form không giữ entity trước |
+| Navigation cũ chậm hoặc bị hủy | Kết quả cũ không kích hoạt page hoặc ghi đè entity của navigation mới |
+| Page nhận entity đã resolve | Form/view khởi tạo từ entity đó; không phát sinh request tải entity trùng |
+| URL trực tiếp, reload và điều hướng từ list | Cùng thực thi contract quyền, tải entity và xử lý lỗi |
+
+Dùng guard/resolver thật của consumer với API điều khiển được trong router integration; kiểm tra trạng thái activation và số request, không chỉ gọi resolver như một hàm riêng. Khi có backend thật, kiểm chứng API từ chối quyền độc lập với guard giao diện. Bảng này quy định case cần có, chưa phải suite đã được triển khai/chạy trong repo Blueprint.
 
 ## Test support
 
@@ -137,7 +154,7 @@ E2E của module nhận baseURL/auth/test data setup qua cấu hình test hoặc
 - Dữ liệu hư cấu có scope/cleanup rõ để các test không phụ thuộc thứ tự.
 - Không đặt mock/fixture trong assets hoặc dùng chúng làm dữ liệu fallback của production.
 
-Các case Core UI như dirty guard, save failure, selection, direct URL, keyboard/focus sẽ được viết cùng [UI patterns](ui-patterns.md). Tài liệu này chưa triển khai những case đó.
+Các case Core UI như dirty guard, save failure, selection, direct URL, keyboard/focus sẽ được viết cùng [UI patterns](../ui-patterns.md). Tài liệu này chưa triển khai những case đó.
 
 ## Config và runner discovery
 

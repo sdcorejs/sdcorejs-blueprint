@@ -95,7 +95,7 @@ Cấu trúc này không mặc định cần mdm.module.ts chỉ để cung cấp
 
 ## Tích hợp
 
-Xem [mẫu host route](routing.md). Portal cấp apiHost/assetBaseUrl; module nhận qua token và không import ngược environment.
+Xem [mẫu host route](routes.md). Portal cấp apiHost/assetBaseUrl; module nhận qua token và không import ngược environment.
 
 ## Nguồn API
 
