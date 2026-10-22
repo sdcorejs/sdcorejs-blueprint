@@ -29,7 +29,7 @@ export async function verifyRuntime(dist) {
   const entry = await read('src/modules/mdm/index.js');
   const { MDM_CONFIGURATION } = await read('src/modules/mdm/configurations/mdm.configuration.js');
   const { AssetService } = await read('src/modules/mdm/services/asset.service.js');
-  const { ProductService } = await read('src/modules/mdm/features/product/services/api.service.js');
+  const { ProductService } = await read('src/modules/mdm/features/product/services/product.service.js');
   const { appRoutes } = await read('src/app/app.routes.js');
   assert.deepEqual(Object.keys(entry).sort(), ['mdmRoutes', 'provideMdmConfiguration']);
 

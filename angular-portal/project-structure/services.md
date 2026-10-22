@@ -10,7 +10,8 @@ Resolver phụ thuộc service của đúng entity, ví dụ ProductService/Cust
 
 ## Convention tên file, class và hàm
 
-- File nằm trong feature/services. Model đặt tên theo entity: `<entity>.model.ts`, ví dụ product.model.ts; service hiện dùng api.service.ts. Class/type mang tên entity: ProductService, ProductDto.
+- File nằm trong feature/services. Model và service đặt tên theo entity: `<entity>.model.ts`, `<entity>.service.ts`, ví dụ `product.model.ts` / `product.service.ts`, `customer.model.ts` / `customer.service.ts`. Class/type mang tên entity: ProductService, ProductDto.
+- Kiểu bất đồng bộ theo contract service của consumer: `Promise` hoặc `Observable` đều được. Không bắt buộc chuyển đổi chỉ để khớp Blueprint; mẫu HTTP bên dưới dùng `Observable` vì đang minh họa Angular HttpClient. Pipe detail giữ kiểu phù hợp với service và dùng cùng `async` trong template.
 - Model request dùng hậu tố Req, response dùng Res: ProductListReq, ProductListRes, ProductSaveReq. DTO entity vẫn là ProductDto; không bắt buộc tạo thêm kiểu Res nếu response chính là DTO hoặc không có body.
 - Mặc định gom const, enum, type/interface, DTO và Req/Res liên quan của entity vào cùng file `<entity>.model.ts`. Với feature có ít model, một file là đủ; có thể nhóm các khai báo liên quan trong file để dễ đọc.
 - Có thể tách file khi nội dung lớn hoặc một nhóm có trách nhiệm/phạm vi sử dụng riêng rõ ràng. Tách theo nhóm liên quan, không mặc định tạo một file cho mỗi model/const/enum hay thêm các thư mục constants/enums/models riêng.
@@ -129,9 +130,9 @@ Mẫu DTO chỉ có các trường cần cho ví dụ. Không suy giới hạn f
 
 ## Feature API service
 
-### src/modules/mdm/features/product/services/api.service.ts
+### src/modules/mdm/features/product/services/product.service.ts
 
-<!-- example: src/modules/mdm/features/product/services/api.service.ts -->
+<!-- example: src/modules/mdm/features/product/services/product.service.ts -->
 ```ts
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -177,7 +178,7 @@ Service trả lỗi HTTP cho consumer/interceptor xử lý, không đổi lỗi 
 
 ## Delete, approve và reject cho một hoặc nhiều bản ghi
 
-Đây là mã giả bổ sung vào service entity, chưa nằm trong các block HTTP được kiểm chứng ở trên. Model đặt trong product.model.ts, các hàm service đặt trong api.service.ts. ID kiểu string, các field note/reason và response void chỉ là minh họa; contract của consumer quyết định kiểu ID, dữ liệu tác vụ và kết quả thực tế.
+Đây là mã giả bổ sung vào service entity, chưa nằm trong các block HTTP được kiểm chứng ở trên. Model đặt trong product.model.ts, các hàm service đặt trong product.service.ts. ID kiểu string, các field note/reason và response void chỉ là minh họa; contract của consumer quyết định kiểu ID, dữ liệu tác vụ và kết quả thực tế.
 
 ```ts
 // product.model.ts
@@ -191,7 +192,7 @@ export interface ProductRejectReq {
   reason: string;
 }
 
-// Chữ ký các hàm trong ProductService ở api.service.ts.
+// Chữ ký các hàm trong ProductService ở product.service.ts.
 delete(ids: string | string[]): Observable<void>;
 approve(req: ProductApproveReq | ProductApproveReq[]): Observable<void>;
 reject(req: ProductRejectReq | ProductRejectReq[]): Observable<void>;

@@ -1,6 +1,29 @@
 # Handoff — Angular Portal Blueprint
 
-Cập nhật: 22/10/2026, Asia/Saigon. Tài liệu bàn giao để tiếp tục Blueprint.
+Cập nhật: 23/10/2026, Asia/Saigon. Tài liệu bàn giao để tiếp tục Blueprint.
+
+## Cập nhật — detail, create/update và side drawer, 23/10/2026
+
+- Đã ghi các bố cục được review vào [UI patterns](angular-portal/ui-patterns.md), đồng bộ [Angular Portal](angular-portal/README.md) và [Project structure](angular-portal/project-structure/README.md). Đây là convention/mã giả, chưa có implementation Angular Core UI.
+- Mỗi nhóm Thông tin chung, Liên hệ và ghi chú… dùng `sd-section`; detail có cả `sd-section` chứa `sd-view` và `sd-section` chứa `sd-section-item`, thêm biến thể 360° nhiều tab và detail có workflow.
+- Header detail: “Chi tiết <entity> #code”, badge cạnh title, tối đa hai dòng identity; page back ở `headerLeft`. Wording Cập nhật/Chỉnh sửa phải đồng nhất, mẫu dùng Cập nhật. Button thường `sm`; Core 22.3.1 đã mặc định `sm` nên không thêm prop lặp lại.
+- Create/update: form gọn, nhiều section dọc, section + `sd-anchor`, chứng từ/table, tabs và steps ngang/dọc. Body có thể giới hạn độ rộng trên màn lớn; mobile vừa khung, ẩn anchor khi chật. Không mặc định chia section chính/phụ thành hai cột; không có nút Hủy thay đổi lặp back. Dùng `sd-inform`/`type="tip"` cho hướng dẫn.
+- Dropdown trong table nhập liệu không có dòng mô tả bổ sung dưới control. Metadata tối đa hai dòng vẫn thuộc option bên trong wrapper. Hạn chế custom SCSS áp dụng cho mọi page/drawer/wrapper.
+- Drawer có header/body/footer, X của Core và action tại `sdFooterRight`. Detail đơn hàng minh họa Duyệt/Từ chối/Cập nhật, permission riêng bằng `*sdPermission` kết hợp điều kiện trạng thái. Lý do bắt buộc trong mockup từ chối là ví dụ workflow, chưa phải luật toàn cục.
+- Detail/update drawer phải kiểm tra quyền và tải entity trước khi mở; method mở drawer không tự chạy route guard/resolver. Dùng `beforeClose`/`requestClose` cho dirty, phân biệt lưu thành công với chỉ đóng, refresh caller khi có thay đổi và giữ ngữ cảnh list; khôi phục focus.
+- Source đã đối chiếu: `portal-template` ở `origin/main` commit `24903b5f8653b84030a3c4400559838248e65201`, Core 22.3.1; các link theo commit nằm trong UI patterns. Review tương tác được thực hiện trên mockup, không phải Angular/Core rendering của Blueprint.
+- Còn cần chốt: điều hướng sau lưu; UX validation/lỗi API; xác nhận và lý do cho từng loại tác vụ; kết quả bulk/partial failure khi có sử dụng. UI patterns ghi rõ các điểm này còn mở, không tự áp dụng business rule của ví dụ đơn hàng cho mọi entity.
+- Kiểm chứng nền tảng chạy lại ngày 23/10: 10 tài liệu Markdown/46 liên kết nội bộ, 13 mẫu TypeScript, 3 SCSS và 5 component fixture; strict type-check, Sass, DI, HTTP và lazy-route boundary PASS. Core UI rendering/AOT/browser của mẫu Angular chưa chạy; các fragment UI không nằm trong 13 mẫu TypeScript này.
+
+## Bổ sung — relation trên màn detail, 23/10/2026
+
+- Đã ghi quy tắc tại [UI patterns](angular-portal/ui-patterns.md) và [Project structure](angular-portal/project-structure/README.md): mỗi entity của feature có pipe `<entity>Detail`, class `<Entity>DetailPipe`, file `pipes/<entity>-detail.pipe.ts`. Ví dụ `@let customer = entity().customerId | customerDetail | async;`; trả object detail, dùng service đúng entity và chia sẻ request/cache. ID rỗng không gọi API; tận dụng relation có sẵn trong response/cache. Entity chính vẫn preload qua resolver; không mặc định preload mọi relation hiển thị. Khi tái sử dụng pipe qua route khác phải cấp service/configuration đúng scope DI.
+- Field `null`/`undefined` hiển thị `--` qua Core, giữ `0`/`false`; không hardcode placeholder ở từng page. Core 22.3.1 hiện dùng `EMPTY_STR` qua `sdEmpty`/`sdView`; không có import `SD_STR_EMPTY` trong version đã đối chiếu. Lỗi/thiếu quyền không đổi thành dữ liệu rỗng thành công.
+- Service mang tên entity: `<entity>.service.ts`, ví dụ `customer.service.ts`; pipe import `CustomerService` từ file này. Kiểu bất đồng bộ linh động theo consumer: Promise hoặc Observable, không bắt buộc chuyển đổi. Mã giả pipe hiện minh họa Promise; mẫu HTTP nền tảng vẫn minh họa Observable.
+- Entity dùng làm lựa chọn ở feature khác cung cấp `<entity>-select`, ví dụ `CustomerSelectComponent` tại `components/customer-select/`. Component sở hữu API qua service entity, filter mặc định, search, custom item/selected template; consumer chỉ truyền model/form và `[filters]` nếu cần. Edit phải tải được ID đã chọn kể cả inactive; tách filter lựa chọn mới khỏi lookup giá trị đã chọn (`SEARCH`/`VALUE` khi dùng Core), giữ model và không biến lỗi lookup thành dữ liệu rỗng. Chi tiết tại UI patterns.
+- Option trong `<entity>-select` nên bổ sung thông tin nhận diện phù hợp và không quá hai dòng text. Ví dụ `user-select`: avatar bên cạnh, tên dòng đầu, role dòng phụ. Text dài/nhiều role rút gọn kèm tooltip; badge không đẩy thành dòng thứ ba. Template/metadata do entity select sở hữu, consumer không phải bận tâm.
+- `components/` chứa cả select của entity và wrapper dropdown enum/const thực sự sử dụng, ví dụ `product-status-select`, `customer-type-select`. Enum/const/options vẫn ở `<entity>.model.ts`; wrapper import và render. Create/update ưu tiên wrapper, hạn chế `sd-select` trực tiếp hoặc tự gọi API lấy option/lookup; page vẫn sở hữu form, validation và API lưu. Wrapper enum tĩnh không gọi API; wrapper dữ liệu động dùng service entity.
+- Phần này chỉ là contract và mã giả dùng pipe/select; chưa triển khai pipe, select, service cache hoặc Angular page. Các kiểm chứng ngày 22/10 bên dưới là kết quả lịch sử.
 
 ## Điểm tiếp tục — màn detail, 22/10/2026
 
@@ -64,7 +87,7 @@ Người dùng yêu cầu tham khảo thêm `portal-template`. Khi triển khai 
 3. **Configuration và DI có scope.** Token/type nằm trong `configurations/mdm.configuration.ts`; hàm provider nằm ở `provide-mdm-configuration.ts` để tránh vòng import. Mẫu đăng ký configuration/service chung ở route module, service riêng ở route feature. Không mặc định dùng `providedIn: 'root'` hoặc tạo NgModule chỉ để đăng ký provider.
 4. **Path không lặp feature.** Dùng `features/product/pages/list`, `detail`, `create`, `update`; tách page theo tác vụ. Drawer nằm ở `components/detail-side-drawer`, `create-side-drawer`, `update-side-drawer`. Không bắt buộc có cả page lẫn drawer cho mỗi tác vụ.
 5. **Component nhỏ theo trách nhiệm.** Màn lớn tách phần nhỏ với input/output thực sự cần. Nhập/sửa dùng hậu tố `-form`, chỉ đọc dùng `-view`, ví dụ `general-information-form`/`general-information-view`. Không dùng tên `facts`.
-6. **Services theo owner.** Base service ở module; feature có `services/api.service.ts` và `<entity>.model.ts` (ví dụ `product.model.ts`), class theo entity như `ProductService`. Mặc định gom const, enum, type/interface, DTO và Req/Res liên quan vào file model; chỉ tách theo nhóm khi nội dung lớn hoặc trách nhiệm/phạm vi sử dụng riêng rõ ràng, tránh nhiều file nhỏ cho feature ít model. Đọc một bản ghi dùng `detail(id)`; model request/response dùng hậu tố `Req`/`Res`. `delete` nhận một ID hoặc mảng ID; `approve`/`reject` nhận một Req hoặc mảng Req chứa ID và dữ liệu tác vụ của từng bản ghi. Endpoint và response bulk theo consumer; phần bulk mới là mã giả, chưa có HTTP implementation trong mẫu kiểm chứng. Không tạo facade/store hoặc abstraction khi chưa có nhu cầu.
+6. **Services theo owner.** Base service ở module; feature có `services/<entity>.service.ts` và `<entity>.model.ts` (ví dụ `product.service.ts`, `product.model.ts`), class theo entity như `ProductService`. Mặc định gom const, enum, type/interface, DTO và Req/Res liên quan vào file model; chỉ tách theo nhóm khi nội dung lớn hoặc trách nhiệm/phạm vi sử dụng riêng rõ ràng, tránh nhiều file nhỏ cho feature ít model. Đọc một bản ghi dùng `detail(id)`; model request/response dùng hậu tố `Req`/`Res`. `delete` nhận một ID hoặc mảng ID; `approve`/`reject` nhận một Req hoặc mảng Req chứa ID và dữ liệu tác vụ của từng bản ghi. Endpoint và response bulk theo consumer; phần bulk mới là mã giả, chưa có HTTP implementation trong mẫu kiểm chứng. Kiểu bất đồng bộ theo consumer (Promise/Observable). Không tạo facade/store hoặc abstraction khi chưa có nhu cầu.
 7. **Assets ở module và feature.** Các nhóm được phép: `images`, `icons`, `fonts`, `styles`, `templates`, `documents`; chỉ tạo khi có nội dung. Style riêng đặt cạnh component. Tài nguyên được namespace và nhận base URL qua configuration; SCSS dùng chung không tự rò CSS global.
 8. **Test tự chứa theo owner.** Unit/component/service `*.spec.ts` cạnh source; integration phối hợp nhiều phần ở `testing/integration`; `testing/{fixtures,mocks,helpers}` cho support. E2E nghiệp vụ ở module/feature, E2E root dành cho Portal và flow xuyên module. Browser suite dùng `*.e2e-spec.ts`, discovery tách khỏi Angular specs. Không đưa fixture/mock vào production assets hoặc runtime public entry.
 9. **Detail/update chuẩn bị entity trước activation.** Kiểm tra quyền vào route theo cơ chế consumer; resolver inject service của đúng entity (ví dụ ProductService), tải theo ID, kiểm tra quyền theo bản ghi nếu có rồi mới kích hoạt page. Không dùng generic API service trực tiếp trong resolver. Lỗi phải chuyển tới flow/trang lỗi tương ứng của consumer. Nếu dùng Core, gán chuỗi quyền trực tiếp vào `data.permission`, dùng guard đã cấu hình ở route cha; với Core 22.3.1, `SdPermissionGuard.canActivateChild` thực thi quyền, còn `canActivate` tải quyền. Contract nằm trong Routes; các block nền tảng chưa triển khai guard/resolver này.
@@ -82,7 +105,7 @@ Chi tiết chính thức nằm ở [Project structure](angular-portal/project-st
 | [Services](angular-portal/project-structure/services.md) | Resource URL, base API, asset service, feature API/DTO |
 | [Assets](angular-portal/project-structure/assets.md) | Namespace, static resource/build-copy và SCSS mẫu |
 | [Testing](angular-portal/project-structure/testing.md) | Naming, colocated spec, test support, E2E ownership, discovery/tsconfig và output |
-| [UI patterns](angular-portal/ui-patterns.md) | Contract và mã giả list TS/HTML theo Core/CRM; header actions/menu có permission riêng, ưu tiên defaults/utility, quick search + inline filter; tabs/score card/external filter optional. Chưa có implementation/browser verification |
+| [UI patterns](angular-portal/ui-patterns.md) | Convention/mã giả list, detail/360°, create/update, side drawer, section/value, workflow actions, pipe/select và style; điểm mở về save/validation/bulk. Chưa có implementation Angular/Core browser verification |
 
 Các mẫu code nền tảng nằm trực tiếp trong block Markdown có marker `<!-- example: src/... -->`. Bộ kiểm chứng trích từ đây; không duy trì một bản source mẫu thứ hai.
 
@@ -114,9 +137,9 @@ Chọn Node phù hợp `engines` trong package.json; dependencies được pin v
 
 ## Phần tiếp theo
 
-- Tiếp tục thảo luận màn detail với người dùng; kế thừa quy ước route resolver/entity preload và permission đã chốt. Không tự coi list là UI đã triển khai.
-- Cụ thể hóa các mẫu detail/create/update, drawer và nhóm form/view trong `angular-portal/ui-patterns.md` theo phản hồi tiếp theo. Đối chiếu `portal-template` cùng API `@sdcorejs/angular` đúng version trước khi viết.
-- Mỗi pattern cần nêu khi dùng, data/input/output, loading/empty/error, validation/save/dirty, permission, responsive và keyboard/focus khi có liên quan. Viết case kiểm chứng có giá trị cùng pattern.
+- Tiếp tục với validation/lỗi API và điều hướng sau lưu; sau đó confirmation và bulk khi cần. Các lựa chọn chưa chốt đã được liệt kê trong UI patterns.
+- Giữ các bố cục detail/create/update/drawer và section vừa được review; phát triển mã giả TS/HTML đầy đủ hoặc implementation kiểm chứng theo yêu cầu tiếp theo. Đối chiếu `portal-template` và API Core đúng version trước khi viết, không sao chép quy tắc khác Blueprint chỉ vì demo đang dùng.
+- Khi triển khai, kiểm chứng loading/empty/error, validation/save/dirty, permission, responsive, scroll và keyboard/focus trên component Core thật. Các case được mô tả trong UI patterns chưa phải suite đã chạy.
 - Khi thêm component mẫu thật, cập nhật boundary của validator: hiện `check.mjs` cố ý báo lỗi nếu component thật trùng route target fixture. Không xóa assertion hoặc giảm kiểm tra chỉ để PASS.
 - HTML diễn giải, cơ chế phân phối/kích hoạt Blueprint, tích hợp microfrontend runtime và Blueprint NestJS/React vẫn là phần chưa triển khai.
 

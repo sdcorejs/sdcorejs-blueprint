@@ -115,7 +115,7 @@ Không đặt prefix mdm lặp lại trong module routes. Default product là v�
 <!-- example: src/modules/mdm/features/product/routes.ts -->
 ```ts
 import type { Routes } from '@angular/router';
-import { ProductService } from './services/api.service';
+import { ProductService } from './services/product.service';
 
 export const routes: Routes = [
   {

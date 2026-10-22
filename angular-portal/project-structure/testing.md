@@ -12,7 +12,7 @@ Các đường dẫn dưới đây là mẫu cấu trúc. Không tạo file spec
 
 | Loại | Hậu tố | Ví dụ |
 | --- | --- | --- |
-| Unit/service/component spec | .spec.ts | api.service.spec.ts, list.component.spec.ts |
+| Unit/service/component spec | .spec.ts | product.service.spec.ts, list.component.spec.ts |
 | Integration spec | .integration.spec.ts | configuration.integration.spec.ts |
 | Browser E2E | .e2e-spec.ts | create.e2e-spec.ts, navigation.e2e-spec.ts |
 | Page object nếu cần | .page.ts | record.page.ts |
@@ -37,8 +37,8 @@ features/product/
     general-information-form.component.spec.ts
   services/
     product.model.ts
-    api.service.ts
-    api.service.spec.ts
+    product.service.ts
+    product.service.spec.ts
   routes.ts
   routes.spec.ts
 ```

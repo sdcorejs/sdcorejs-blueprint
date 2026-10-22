@@ -23,6 +23,8 @@ Trước khi viết code: đọc [Project structure](project-structure/README.md
 - Mỗi page/drawer phục vụ một tác vụ cụ thể. Màn lớn chia component theo trách nhiệm, có input/output cần thiết.
 - Tạo thư mục/file khi có nội dung và consumer thực tế.
 - Ưu tiên mặc định và utility của Core; chỉ khai báo cấu hình hoặc custom style khi có nhu cầu cụ thể. Màn list đơn giản chỉ cần TS/HTML, không mặc định tạo SCSS.
+- Nhóm thông tin/form dùng `sd-section`; detail có thể dùng `sd-view` hoặc `sd-section-item` bên trong. Button thường dùng `sm`, giữ default khi Core đã cung cấp. Header detail có trạng thái cạnh title và tối đa hai dòng.
+- Page dùng back ở `headerLeft`, drawer dùng X của Core; không thêm nút Hủy/Đóng lặp lại. Drawer có action nghiệp vụ ở footer và bảo vệ draft qua close guard. Các bố cục, save flow và điểm còn cần chốt nằm trong UI patterns.
 - Private field/method dùng cú pháp `#`. Component chỉ dùng làm route page có thể dùng selector ngắn như `list`.
 - Permission trong template dùng `*sdPermission` với chuỗi quyền; không gọi `permission.hasPermission(...)` trong biểu thức render. Event handler vẫn gọi qua `(click)` hoặc event tương ứng.
 - MUST là yêu cầu của Blueprint trong phạm vi đã áp dụng; SHOULD là mặc định có thể thay đổi với lý do rõ.
