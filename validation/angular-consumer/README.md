@@ -53,10 +53,11 @@ Kết quả local ngày **23/10/2026, Asia/Saigon**, Windows, Chromium headless:
 | --- | --- |
 | Angular specs | 9 tests: configuration copy/freeze, root/feature boundary, hai service/asset instance; HTTP; router pending/cancellation/ID reuse/deny-before-fetch; Core input/view |
 | AOT | Production build + strict template/injection compilation; graph lazy/no-JIT/test exclusion PASS |
-| Playwright | 26 cases gồm Portal + MDM desktop và 2 responsive cases trên Pixel 7 emulation |
+| Playwright | 41 cases gồm Portal + MDM desktop và 2 responsive cases trên Pixel 7 emulation |
 | Preload | Pending chưa activate; đúng một GET mỗi navigation; reload; list/history; hủy navigation cũ; timeout; ID sai; 401/403/404/network/503 |
 | Permission | Core guard thật và `*sdPermission`; quyền detail không cấp update, list-only vẫn thấy mã dạng text một lần nhưng không có hyperlink/create |
 | UI | Table search/paging/empty/error; mã ở cột đầu là hyperlink mở detail bằng keyboard/click, không có action Edit/Detail trên list; section/view, create/update validation/save failure/retry, code khóa khi update, enum select dùng keyboard, dirty cancel/discard/revert |
+| Thoát page create/update | 16 cases trong `unsaved-changes.e2e-spec.ts`: page Back, module navigation, browser Back/Forward cancel/retry, native reload/tab close, pristine/revert và save failure cho cả hai page; các case lưu thành công kiểm tra không còn prompt khi đóng tab |
 | Layout | Desktop/mobile không overflow document; paginator trong viewport, table giữ vùng cuộn; screenshot list/form trong test-results |
 
 Playwright bắt mọi `pageerror`; lỗi HTTP được chủ động giả lập là tình huống test. Không gọi test thất bại là pass nhờ retry: `retries: 0`. Report HTML, screenshot và trace khi lỗi đều là output ignored. [CI](../../.github/workflows/angular-consumer.yml) chạy cả foundation lẫn consumer và lưu artifacts.
@@ -70,6 +71,8 @@ Playwright bắt mọi `pageerror`; lỗi HTTP được chủ động giả lậ
 - **Click lặp của Core có throttle 300 ms.** Các test retry/cancel điều khiển đồng hồ Playwright để vượt cửa sổ đó; không sửa button hoặc thêm sleep tùy ý.
 - **Mobile table cần độ rộng đọc được.** Screenshot cho thấy cột tên bị ép thành vài ký tự mỗi dòng. Consumer dùng `minWidth` của Core trên cột tên, giữ cuộn ngang trong table; không thêm CSS che overflow.
 - **Điều hướng detail trên list qua mã.** Giá trị `product.code` ở cột dữ liệu đầu tiên là link có `href` của route, thay cho nhãn “Chi tiết” riêng. `*sdPermission` bảo vệ link; snapshot quyền sau guard chỉ phục vụ text fallback vì Core 22.3.1 chưa có `sdPermissionElse`. E2E kiểm tra keyboard, mobile click, search/history và list-only không mất/lặp mã.
+- **Hủy Back/Forward phải khôi phục history index.** Với mặc định `canceledNavigationResolution: 'replace'`, Back sau một lần hủy có thể bỏ qua trang trước (create về `about:blank`, update về list thay vì detail). Host dùng `withRouterConfig({ canceledNavigationResolution: 'computed' })`; các regression browser Back/Forward cancel/retry đã qua. Đây là cấu hình host; module/feature không tự can thiệp browser history.
+- **Core đã bảo vệ native unload từ cùng dirty registry.** Không cần thêm listener ở page. Test reload kích hoạt `window.location.reload()` thật; test đóng tab dùng `page.close({ runBeforeUnload: true })`, kiểm tra dialog `beforeunload` và cả cancel/accept. Test đợi effect đăng ký/gỡ listener sau input bằng kiểm tra `defaultPrevented` rồi mới đóng tab thật; không mock `confirm`/`beforeunload`.
 
 Các lựa chọn riêng của host này: sau lưu đi detail; lỗi API lưu dùng thông báo chung và giữ draft; lookup timeout 10 giây; native confirmation của Core cho dirty. Chúng không đặt mặc định nghiệp vụ mới cho Blueprint.
 
@@ -84,11 +87,13 @@ Các lựa chọn riêng của host này: sau lưu đi detail; lỗi API lưu d�
 | `SdInput` | Nhập code/name, validation và business identifier khóa khi update |
 | `SdSelect` | Enum status bên trong `ProductStatusSelectComponent`; options thuộc model |
 | `SdPermissionGuard`, `SdPermissionDirective`, `SdPermissionService` | Thực thi quyền route/action; chọn text fallback cho mã khi thiếu quyền detail |
-| `SdUnsavedChangesService`, `sdUnsavedChangesGuard` | Bảo vệ draft với dirty theo giá trị do page sở hữu |
+| `SdUnsavedChangesService`, `sdUnsavedChangesGuard` | Một dirty registry cho route guard và native unload; page sở hữu baseline/dirty, destroy registration khi rời page |
 
 ## Giới hạn
 
 Chưa xác minh remote/micro-frontend nhiều Angular runtime, backend/auth thật, Firefox/WebKit, drawer, relation pipe/cache, select động/inactive lookup, tabs/steps, bulk/workflow hay mọi fragment UI trong Markdown. Browser API được mock ở HTTP boundary; kiểm tra quyền backend nằm ngoài bằng chứng này.
+
+Unload được kiểm chứng trên desktop Chromium, không suy từ Pixel 7 emulation rằng đóng ứng dụng mobile luôn có confirm. Browser quản lý nội dung dialog và có thể không phát `beforeunload` khi kill/crash. Workspace tab/route cache nhiều editor đồng thời và host dùng partial `UrlHandlingStrategy` chưa được kiểm chứng; cần scope/close hook tương ứng theo [UI patterns](../../angular-portal/ui-patterns.md#bảo-vệ-thay-đổi-chưa-lưu-trên-page-createupdate).
 
 Quy tắc tối đa ba mục tác vụ và gom từ tác vụ thứ ba khi có hơn ba đã được ghi trong [UI patterns](../../angular-portal/ui-patterns.md). Consumer hiện có ít tác vụ, chưa chạy browser coverage cho `command.children`, `selector.actions.children` hoặc popover detail; các fragment minh họa nhóm không phải bằng chứng AOT/E2E. Bộ quyền được nạp trước activation và giữ ổn định; đổi quyền ngay khi page đang mở chưa nằm trong coverage.
 

@@ -156,7 +156,7 @@ E2E của module nhận baseURL/auth/test data setup qua cấu hình test hoặc
 - Dữ liệu hư cấu có scope/cleanup rõ để các test không phụ thuộc thứ tự.
 - Không đặt mock/fixture trong assets hoặc dùng chúng làm dữ liệu fallback của production.
 
-Consumer hiện có dirty guard, save failure, direct URL và keyboard select cùng subset [UI patterns](../ui-patterns.md). Selection, drawer/focus restoration và các flow chưa có trong coverage README vẫn cần suite riêng.
+Consumer hiện có dirty guard, save failure, direct URL và keyboard select cùng subset [UI patterns](../ui-patterns.md). Suite thay đổi chưa lưu kiểm tra cả create/update với page Back, module navigation, browser Back/Forward, reload và đóng tab thật qua `runBeforeUnload`; Hủy giữ draft, Thoát không tự lưu, form sạch/hoàn tác/lưu thành công không còn prompt. Selection, workspace tab nhiều editor, drawer/focus restoration và các flow chưa có trong coverage README vẫn cần suite riêng.
 
 ## Config và runner discovery
 

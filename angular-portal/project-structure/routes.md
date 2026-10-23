@@ -11,6 +11,7 @@
 - Component đích lazy load, không eager import page từ Portal.
 - Drawer thuộc components; không tự tạo page/route drawer nếu đặc tả chưa yêu cầu URL riêng.
 - Guard/permission/unsaved changes phải theo contract project. Các block nền tảng bên dưới minh họa path/lazy loading/DI; phần ghép guard và resolver vào consumer là bắt buộc theo contract dưới đây, chưa được các block đó triển khai.
+- Route create/update có draft phải gắn guard rời trang dùng chung với registry dirty của page; cả điều hướng ứng dụng lẫn browser Back/Forward đều cần được bảo vệ. Host sở hữu việc khôi phục history khi hủy navigation; reload/đóng tab cần `beforeunload` ngoài Router. Xem [contract thay đổi chưa lưu](../ui-patterns.md#bảo-vệ-thay-đổi-chưa-lưu-trên-page-createupdate) để ghép Core, scope editor và các giới hạn trình duyệt.
 
 ## Contract vào route có ID
 

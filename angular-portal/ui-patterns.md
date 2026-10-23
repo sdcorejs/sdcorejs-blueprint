@@ -620,6 +620,38 @@ Fragment mã giả dùng cho create/update, `form`/`model` theo contract consume
 - Khi đã sửa rồi hoàn tác về dữ liệu ban đầu, việc xác định dirty theo giá trị/contract form, không chỉ dựa vào “đã từng gõ”. Chi tiết thời điểm hiển thị validation và điều hướng sau lưu nằm trong các điểm cần chốt tiếp.
 - Core 22.3.1 `registerSdUnsavedChangesForm` theo `form.dirty`, không tự so sánh giá trị với baseline. Để đáp ứng quy tắc hoàn tác trên, consumer dùng `SdUnsavedChangesService.register` với dirty computed theo các field của form; không sửa quy tắc chung thành interaction-only. Khi test click lặp, lưu ý `SdButton` có throttle 300 ms.
 
+### Bảo vệ thay đổi chưa lưu trên page create/update
+
+Đây là **năng lực chung bắt buộc** khi page create/update có draft khác dữ liệu ban đầu hoặc lần lưu thành công gần nhất. Không triển khai chỉ ở nút Quay lại; mọi đường rời page có thể làm mất draft đều phải đi qua cùng trạng thái dirty.
+
+| Đường thoát | Cơ chế và hành vi |
+| --- | --- |
+| Nút Quay lại, menu/link điều hướng, chuyển module trong ứng dụng | Route `canDeactivate` kiểm tra dirty và confirm trước khi rời page |
+| Back/Forward của trình duyệt trong cùng ứng dụng | Đi qua guard; hủy phải giữ page/draft và khôi phục đúng vị trí history để lần Back/Forward tiếp theo không bỏ qua trang |
+| Reload, đóng tab/cửa sổ trình duyệt, điều hướng tải document khác | `beforeunload` yêu cầu hộp thoại gốc của trình duyệt khi còn dirty |
+| Đóng tab workspace bên trong Portal, nếu có | Tab owner nối close hook với cùng registry và scope của page; không chỉ destroy page rồi mới kiểm tra |
+| Đổi tab/bước nội bộ mà draft vẫn được giữ | Không coi là thoát page, không hỏi confirm chỉ vì chuyển bước |
+
+- **Ở lại/Hủy**: không rời page, không reset form, không xóa dirty; giữ nguyên dữ liệu và lỗi validation/lưu để tiếp tục chỉnh sửa.
+- **Thoát/Bỏ thay đổi**: cho phép đường thoát đã yêu cầu; không tự gọi API lưu. Không thêm action Hủy thường trực ở header chỉ để phục vụ confirm.
+- Chưa sửa, đã hoàn tác về baseline hoặc đã lưu thành công: không hỏi lại. Form invalid nhưng đã thay đổi vẫn cần bảo vệ; chỉ focus/touched không đồng nghĩa dirty theo giá trị.
+- Không xóa dirty khi bấm Lưu, khi validation thất bại, khi request đang pending hoặc khi API trả lỗi. Chỉ coi dữ liệu đã lưu sau response thành công; nếu vẫn ở page, cập nhật baseline cho lần chỉnh sửa tiếp theo.
+- Không hỏi hai lần cho cùng một lần thoát. Không gắn confirm riêng vào từng button bên cạnh route guard; dùng chung registry và confirmation adapter của Core/host.
+
+**Ghép với Core UI:**
+
+- Page sở hữu draft và cách so sánh baseline; đăng ký `SdUnsavedChangesService.register({ id, scope, isDirty, ... })` từ `@sdcorejs/angular/services/unsaved-changes`, hủy registration bằng `DestroyRef` khi page thực sự bị destroy.
+- Route create/update gắn `canDeactivate: [sdUnsavedChangesGuard]`. Core 22.3.1 dùng registry chung và tự bật/tắt listener `beforeunload` theo dirty; không tạo thêm listener/service song song trong mỗi feature.
+- `sdUnsavedChangesGuard` mặc định kiểm tra **toàn registry**. Consumer một page hoạt động dùng được trực tiếp. Portal có nhiều editor/tab đồng thời phải dùng scope ổn định theo **instance editor**, rồi gọi `confirmLeave({ scope, reason: 'navigation' })` từ guard phù hợp; không dùng cùng `id`/`scope` cho hai draft độc lập.
+- Đóng tab workspace dùng `createSdUnsavedChangesCloseGuard(service, { scope })`; với Core tab-router, gắn vào `SD_TAB.beforeClose`. Tab bị ẩn nhưng còn giữ draft vẫn phải duy trì registration. Consumer hiện chưa có workspace tab nên chưa kiểm chứng browser flow này.
+- Confirmation adapter có thể tùy biến hộp thoại **trong ứng dụng**. Core mặc định dùng `window.confirm`: đồng ý tương ứng discard, hủy tương ứng cancel. Không suy rằng adapter này thay được hộp thoại unload của trình duyệt.
+
+**Giới hạn trình duyệt:** đóng/reload tab dùng thông báo và nhãn nút do browser quyết định, không tùy biến được bằng `SdConfirmService` hay nội dung Angular. Browser thường yêu cầu tương tác trước đó; `beforeunload` không bảo đảm chạy khi ứng dụng bị kill/crash hoặc trên một số luồng mobile. Không hứa confirm trong mọi trường hợp và không dùng unload để chờ API lưu bất đồng bộ. Đây là giới hạn nền tảng, theo [MDN beforeunload](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event); lưu nháp tự động là yêu cầu riêng khi nghiệp vụ cần.
+
+**History của host:** kiểm thử consumer Angular 22.1.6 tái hiện `canceledNavigationResolution` mặc định `replace` làm lần Back sau khi hủy bỏ qua trang trước đó. Host consumer dùng `withRouterConfig({ canceledNavigationResolution: 'computed' })` để khôi phục history index; feature không tự sửa history. Không áp dụng máy móc cho host có `UrlHandlingStrategy` chỉ xử lý một phần URL, vì Angular ghi rõ hai cấu hình không tương thích; host đó cần cơ chế tích hợp và kiểm chứng tương đương. Xem [Angular RouterConfigOptions](https://angular.dev/api/router/RouterConfigOptions#canceledNavigationResolution).
+
+**Nghiệm thu:** chạy cả create và update với Hủy rồi Thoát cho page Back, menu/chuyển module, browser Back/Forward, reload và đóng tab; xác nhận draft còn nguyên khi hủy, không có API lưu khi discard, không mất vị trí history và không sót registration khi chuyển editor. Kiểm tra form sạch, hoàn tác, lưu thành công và lưu lỗi. Playwright phải dùng `page.close({ runBeforeUnload: true })` để thực sự chạy unload; `page.close()` mặc định không chứng minh được confirm khi đóng tab. Không assert nội dung thông báo native, chỉ kiểm tra loại dialog và kết quả Hủy/Thoát; xem [Playwright dialogs](https://playwright.dev/docs/dialogs#beforeunload-dialog).
+
 ## Side drawer — detail/create/update
 
 ### Phạm vi và bố cục
