@@ -47,7 +47,7 @@ Chỉ ba entry được ghi đè có chủ đích: `src/main.ts`, `src/app/app.r
 
 ## Phạm vi đã kiểm chứng
 
-Kết quả local ngày **23/10/2026, Asia/Saigon**, Windows, Chromium headless:
+Kết quả local ngày **24/10/2026, Asia/Saigon**, Windows, Chromium headless:
 
 | Kiểm tra | Bằng chứng |
 | --- | --- |
@@ -65,7 +65,7 @@ Playwright bắt mọi `pageerror`; lỗi HTTP được chủ động giả lậ
 ## Các điểm được xác minh và sửa
 
 - **`headerLeft` thay thế title mặc định của `sd-page`.** Khi chỉ project nút Back, detail mất identity dù đã truyền `[title]`. Consumer ghép Back + identity trong cùng slot; Blueprint đã bổ sung lưu ý, có component/E2E regression.
-- **Dùng nguyên PagingReq của Core.** Callback `items` truyền tham số thứ hai vào ProductService; base chung `pagingParams` chuyển sang GET query với pageNumber/pageSize và JSON filters/orders/fields. `pageNumber` bắt đầu từ 0. Không tách keyword rồi bỏ mất filter/sort. Fixture BE chỉ sống trong test, dùng `FilterUtilities.match`; E2E độc lập kiểm tra payload và kết quả render.
+- **Dùng nguyên PagingReq của Core.** Callback `items` truyền tham số thứ hai vào ProductService; base chung `buildPagingReq` (tên thống nhất với CRM) chuyển sang GET query với pageNumber/pageSize và JSON filters/orders/fields. `pageNumber` bắt đầu từ 0. Không tách keyword rồi bỏ mất filter/sort. Fixture BE chỉ sống trong test, dùng `FilterUtilities.match`; E2E độc lập kiểm tra payload và kết quả render.
 - **Sort cần bật ở cả table và cột.** `sort.enable` chưa đủ; cột cần `sortable: true` để Core 22.3.1 render nút sort. E2E kiểm tra ASC/DESC, kết quả và giữ orders qua đổi trang; column filter kết hợp quick search và reset page được kiểm tra riêng.
 - **Form Core sở hữu đăng ký control qua `[form]` + `name`.** Consumer dùng FormGroup ban đầu rỗng với type cho các control tùy chọn, không khai lại control cùng tên. Wrapper chỉ chuyển tiếp form/model; page tạo SaveReq tường minh và giữ business code khi update.
 - **Dirty theo giá trị.** `registerSdUnsavedChangesForm` dùng `form.dirty` nên còn prompt sau khi gõ rồi hoàn tác. Consumer đăng ký `SdUnsavedChangesService.register` với computed so sánh ba field với baseline. Không sửa semantics của Core; giữ convention Blueprint và regression browser cho revert.

@@ -7,7 +7,7 @@ import { provideMdmConfiguration } from '../configurations/provide-mdm-configura
 
 @Injectable()
 class MappingProbe extends BaseApiService {
-  params<T>(req: PagingReq<T>) { return this.pagingParams(req); }
+  params<T>(req: PagingReq<T>) { return this.buildPagingReq(req); }
 }
 
 describe('module PagingReq transport mapping', () => {

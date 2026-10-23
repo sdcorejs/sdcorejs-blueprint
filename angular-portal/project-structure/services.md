@@ -71,7 +71,7 @@ export abstract class BaseApiService {
   }
 
   /** Wire format của API mẫu: scalar paging + JSON cho filters/orders/fields. */
-  protected pagingParams<T>(req: PagingReq<T>): HttpParams {
+  protected buildPagingReq<T>(req: PagingReq<T>): HttpParams {
     let params = new HttpParams();
     if (req.pageNumber !== undefined) params = params.set('pageNumber', req.pageNumber);
     if (req.pageSize !== undefined) params = params.set('pageSize', req.pageSize);
@@ -83,7 +83,9 @@ export abstract class BaseApiService {
 }
 ```
 
-Base này cung cấp HttpClient/config, URL và một hàm mapping request dùng chung. `pagingParams` giữ nguyên `Filter` của Core, nhóm AND/OR, operator, data/dataType, `orders`, `fields` và giá trị `0`/`false`; không mutate request. Không đăng ký abstract base làm provider và không đưa toàn bộ CRUD/workflow vào base. Feature có thể không kế thừa nếu không có nhu cầu.
+Base này cung cấp HttpClient/config, URL và một hàm mapping request dùng chung. `buildPagingReq` giữ nguyên `Filter` của Core, nhóm AND/OR, operator, data/dataType, `orders`, `fields` và giá trị `0`/`false`; không mutate request. Không đăng ký abstract base làm provider và không đưa toàn bộ CRUD/workflow vào base. Feature có thể không kế thừa nếu không có nhu cầu.
+
+Tên `buildPagingReq` thống nhất với `#buildPagingReq` trong `portal-crm`, file `src/libs/common/services/base/base.service.ts`. CRM dùng hàm private trả `SdPagingReq` cho POST; mẫu này dùng hàm protected trả `HttpParams` cho GET để entity service kế thừa gọi được. Chỉ thống nhất tên và vai trò chuẩn bị request; chữ ký/transport theo API consumer, DI scope vẫn theo module/feature đã thống nhất.
 
 ### Core filters → PagingReq → HTTP request
 
@@ -180,7 +182,7 @@ import type {
 export class ProductService extends BaseApiService {
   list(req: ProductListReq): Observable<ProductListRes> {
     return this.http.get<ProductListRes>(this.apiUrl('products'), {
-      params: this.pagingParams(req),
+      params: this.buildPagingReq(req),
     });
   }
 
