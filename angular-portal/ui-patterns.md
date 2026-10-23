@@ -46,8 +46,46 @@ Chỉ tạo page/drawer mà đặc tả thực sự cần. Không mặc định 
 - Button thông thường dùng size `sm`. `SdButton` ở Core 22.3.1 mặc định đã là `sm`, nên bỏ thuộc tính này khi giữ mặc định; chỉ gán khi cần ghi đè cấu hình/version consumer. Không khai báo hàng loạt default để làm đầy mẫu.
 - Các vùng như **Thông tin chung**, **Liên hệ và ghi chú**, **Thông tin phê duyệt** dùng `sd-section`. Section sở hữu header/body của nhóm; bên trong chọn `sd-view`, `sd-section-item`, form hoặc table tùy nội dung. Không thay section bằng heading và đường kẻ tự dựng.
 - Permission UI dùng `*sdPermission` với chuỗi quyền của consumer. Điều kiện trạng thái nghiệp vụ được chuẩn bị trong TS bằng state/computed; template không gọi `permission.hasPermission(...)` hoặc hàm lookup/format tùy ý. Signal và event handler vẫn dùng theo Angular.
-- Một action chính nổi bật; action phụ dùng kiểu nhẹ hơn. Nhiều action có thể xuống dòng hoặc gom action ít dùng vào menu; menu có quyền riêng, từng item vẫn có quyền riêng như pattern list.
+- Một action chính nổi bật; action phụ dùng kiểu nhẹ hơn. List/detail có tối đa **ba mục tác vụ cấp ngoài** trong mỗi vùng cùng scope; khi có hơn ba tác vụ, giữ hai tác vụ ưu tiên và gom từ tác vụ thứ ba vào nhóm như quy tắc dưới đây.
 - Dùng wording cập nhật thống nhất trong cùng ứng dụng: `Cập nhật <entity>` hoặc `Chỉnh sửa <entity>`. Mẫu Blueprint dùng `Cập nhật`. Không trộn hai cách gọi cho cùng tác vụ ở page, drawer và menu.
+
+### Giới hạn command/action trên list và detail
+
+Áp dụng cho command của từng dòng (`command.commands` hoặc `commands`), action trên selection (`selector.actions`) và vùng action của list/detail. Đếm riêng theo scope; không gom command một dòng với action của nhiều dòng. Back, search/filter và pagination là điều hướng/control, không thuộc số tác vụ này.
+
+| Số tác vụ có thể hiển thị | Cách trình bày |
+| --- | --- |
+| 0 | Không tạo nhóm/nút tác vụ rỗng |
+| 1–3 | Có thể hiển thị trực tiếp; vẫn có thể gom sớm hơn nếu màn hẹp |
+| Từ 4 trở lên | Hai tác vụ đầu theo thứ tự ưu tiên hiển thị trực tiếp; mục cấp ngoài thứ ba là `Thao tác khác`, chứa tác vụ thứ ba đến hết |
+
+- Với table, nhóm bằng `children` của command/action. Không để ba tác vụ trực tiếp rồi thêm một menu thứ tư; không chỉ chuyển tác vụ thứ tư vào menu.
+- Với detail, dùng **Action Popover của `SdButton`**: đặt `sd-button-item` bên trong `sd-button`. Core tự mở popover; không tự dựng dropdown hoặc lồng các `sd-button` tương tác vào trigger.
+- Thứ tự ưu tiên ổn định theo nghiệp vụ; một action chính nổi bật. Áp dụng quyền và điều kiện trạng thái trước khi xác định tập tác vụ hiển thị; không có nhóm rỗng khi tất cả tác vụ con bị ẩn. Tác vụ đang disabled vẫn chiếm một vị trí nếu còn hiển thị.
+- Nhóm có permission riêng theo convention consumer; từng tác vụ con vẫn giữ permission/điều kiện/handler riêng. Không dùng quyền nhóm thay quyền con, không suy quyền nhóm bằng OR các quyền con.
+- **List không có tác vụ Edit/Cập nhật hoặc Detail/Chi tiết**, kể cả command dòng, `selector.actions`, header hay `children`. Mở detail bằng hyperlink ngay trên giá trị **mã/tên ở cột dữ liệu đầu tiên** (không tính checkbox/STT). Không đặt chữ “Chi tiết” hoặc icon mở detail riêng cạnh mã/tên. Tác vụ cập nhật nằm ở detail và dẫn đến màn update.
+- Khi thiếu quyền detail, mã/tên vẫn hiển thị dạng text; không tạo link giả hoặc click handler trên cả dòng để thay đường điều hướng có quyền.
+
+Ví dụ cấu trúc cho bốn tác vụ đã được phép và xếp ưu tiên (mã giả; các biến command/action là definition nghiệp vụ do consumer chuẩn bị):
+
+```ts
+command: {
+  commands: [
+    sendCommand,
+    exportCommand,
+    { title: 'Thao tác khác', icon: 'more_horiz', children: [syncCommand, archiveCommand] },
+  ],
+},
+selector: {
+  actions: [
+    sendSelectedAction,
+    exportSelectedAction,
+    { title: 'Thao tác khác', icon: 'more_horiz', children: [syncSelectedAction, archiveSelectedAction] },
+  ],
+},
+```
+
+Command handler nhận một dòng; selector action nhận các dòng đã chọn. Fragment chỉ minh họa cách gom, không mặc định thêm gửi/đồng bộ/lưu trữ vào mọi feature. Core 22.3.1 hỗ trợ `children` nhưng không tự áp dụng ngưỡng ba của Blueprint; consumer chuẩn bị cấu hình phù hợp và giữ từng tác vụ đúng một lần.
 
 ## List — bố cục chuẩn
 
@@ -152,7 +190,7 @@ import {
   type SdTableOption,
 } from '@sdcorejs/angular/components/table';
 import { SdPageComponent } from '@sdcorejs/angular/modules/layout';
-import { SdPermissionDirective } from '@sdcorejs/angular/modules/permission';
+import { SdPermissionDirective, SdPermissionService } from '@sdcorejs/angular/modules/permission';
 import { ProductService } from '../../services/product.service';
 import { PRODUCT_STATUS_OPTIONS, type ProductDto } from '../../services/product.model';
 
@@ -167,6 +205,8 @@ import { PRODUCT_STATUS_OPTIONS, type ProductDto } from '../../services/product.
 })
 export class ListComponent {
   readonly #productService = inject(ProductService);
+  // Route guard đã nạp quyền trước khi tạo page; dùng cho text fallback.
+  protected readonly canOpenDetail = inject(SdPermissionService).hasPermission('MDM_PRODUCT_C_DETAIL');
 
   protected readonly tableOption: SdTableOption<ProductDto> = {
     type: 'server',
@@ -211,30 +251,30 @@ export class ListComponent {
   <div class="h-full p-8">
     <sd-table autoId="product-list" [option]="tableOption">
       <ng-template sdTableCellDef="code" let-product="item">
-        <div class="d-flex align-items-center gap-8">
+        <a
+          *sdPermission="'MDM_PRODUCT_C_DETAIL'"
+          [routerLink]="[product.id, 'detail']"
+        >{{ product.code }}</a>
+        @if (!canOpenDetail) {
           <span>{{ product.code }}</span>
-          <a
-            *sdPermission="'MDM_PRODUCT_C_DETAIL'"
-            [routerLink]="[product.id, 'detail']"
-          >Chi tiết</a>
-        </div>
+        }
       </ng-template>
     </sd-table>
   </div>
 </sd-page>
 ```
 
-Mã sản phẩm vẫn hiển thị khi thiếu quyền detail; directive kiểm soát link thao tác. Table quản lý luồng loading, empty, error và phân trang theo Core. Không bắt lỗi API rồi trả danh sách rỗng giả thành công. Với option khởi tạo đồng bộ như trên, không cần `@if (tableOption)`; chỉ thêm khi option thực sự được chuẩn bị bất đồng bộ.
+Mã sản phẩm chính là hyperlink; khi thiếu quyền detail chỉ hiện mã dạng text một lần. Directive kiểm soát link; Core 22.3.1 chưa có `sdPermissionElse`, nên `canOpenDetail` được chuẩn bị trong TS sau khi guard nạp quyền để chọn text fallback. Mẫu giả định bộ quyền ổn định trong lần activation; consumer đổi bộ quyền giữa phiên phải cập nhật trạng thái hoặc tạo lại page theo luồng quyền của host. Table quản lý luồng loading, empty, error và phân trang theo Core. Không bắt lỗi API rồi trả danh sách rỗng giả thành công. Với option khởi tạo đồng bộ như trên, không cần `@if (tableOption)`; chỉ thêm khi option thực sự được chuẩn bị bất đồng bộ.
 
 ### Header có nhiều action và menu
 
 - Dùng một wrapper `headerRight`, bên trong là các button; utility `d-flex align-items-center gap-8 flex-wrap` quản lý khoảng cách/xuống dòng.
 - Một action chính dùng `type="fill"`, đặt ngoài cùng bên phải; action phụ dùng kiểu nhẹ hơn và giữ thứ tự nhất quán.
-- Ba button ngắn như Nhập dữ liệu, Xuất dữ liệu, Tạo mới có thể hiển thị trực tiếp. Khi nhiều action hoặc thiếu không gian, gom các action ít dùng vào menu bằng `SdButtonItem`; không bắt buộc chuyển sang menu ngay khi vượt hai button.
+- Ba button ngắn như Nhập dữ liệu, Xuất dữ liệu, Tạo mới có thể hiển thị trực tiếp. Khi có hơn ba tác vụ, bắt buộc giữ hai tác vụ ưu tiên và gom từ tác vụ thứ ba bằng `SdButtonItem`; không dùng xuống dòng để giữ hơn ba mục cấp ngoài. Có thể gom sớm khi thiếu không gian.
 - Menu có permission riêng do consumer quy định. Không suy quyền hiển thị menu bằng OR các quyền con. Mỗi action bên trong vẫn áp dụng permission nghiệp vụ tương ứng.
 - Dùng `*sdPermission` cho cả menu và action. Các mã quyền dưới đây là ví dụ theo convention, không phải quyền có sẵn của Core.
 
-Fragment thay cho vùng `headerRight`; thêm `SdButtonItem` từ `@sdcorejs/angular/components/button` vào imports. `onImport`/`onExport` là event handler nghiệp vụ của consumer:
+Fragment thay cho vùng `headerRight`, minh họa gom sớm Nhập/Xuất khi màn hẹp; thêm `SdButtonItem` từ `@sdcorejs/angular/components/button` vào imports. `onImport`/`onExport` là event handler nghiệp vụ của consumer:
 
 ```html
 <div headerRight class="d-flex align-items-center gap-8 flex-wrap">
@@ -285,6 +325,8 @@ Tham khảo trực tiếp CRM: repo portal-crm, src/libs/masterdata/modules/prod
 - Nhiều dòng/nhiều cột: chỉ viewport table cuộn; header, filter và pagination giữ trong khung.
 - Loading/empty/error/ít dòng, đổi tab, đổi page size và đóng/mở external filter: không sinh scrollbar ngoài table.
 - Resize/viewport thấp, label dài và vùng điều khiển xuống dòng: control/pagination vẫn truy cập được. Kiểm tra kích thước scrollHeight/clientHeight và scrollWidth/clientWidth ở các wrapper để xác định đúng phần tử cuộn, không chỉ nhìn ảnh tĩnh.
+- Đúng ba tác vụ không bắt buộc có menu; bốn tác vụ thành hai trực tiếp và một nhóm chứa tác vụ 3–4. Kiểm tra command từng dòng và `selector.actions` riêng, kể cả sau khi lọc theo quyền/trạng thái; không mất hoặc lặp tác vụ, không có nhóm rỗng.
+- Mã/tên ở cột dữ liệu đầu tiên là hyperlink có `href` đúng, dùng được bằng bàn phím và mở tab mới; thiếu quyền vẫn thấy text. Không có action Edit/Detail ở bất kỳ vùng nào của list, kể cả menu con.
 
 Các mục trên là contract và case cần kiểm chứng; mã giả TS/HTML ở trên chưa phải implementation page đã chạy hoặc kết quả browser trong repo Blueprint.
 
@@ -300,6 +342,22 @@ Entity chính đã tải và kiểm tra quyền theo [Routes](project-structure/
 - Page dùng nút trở lại ở `headerLeft` của `sd-page`; action ở `headerRight`. Drawer dùng slot riêng của `sd-side-drawer`, mô tả bên dưới.
 - Core 22.3.1 dùng `headerLeft` làm slot **thay thế** title/description mặc định. Khi project Back, phải ghép cả Back và identity vào slot; truyền `[title]` riêng không giữ title trên màn hình. Consumer có AOT/component/E2E regression cho điểm này.
 - Ngoài `Cập nhật <entity>`, detail có thể có Gửi duyệt, Duyệt, Từ chối, Xóa hoặc tác vụ khác của entity. Không yêu cầu đủ mọi action; hiển thị theo permission và trạng thái nghiệp vụ.
+- Tối đa ba mục tác vụ cấp ngoài theo quy tắc chung. Khi có hơn ba, giữ hai tác vụ ưu tiên; từ tác vụ thứ ba nằm trong Action Popover của `SdButton`. Kiểm tra mở bằng click/bàn phím, Escape trả focus về trigger và từng handler chỉ chạy một lần.
+
+Ví dụ detail có bốn tác vụ đã được phép: Cập nhật, Xuất, In và Lưu trữ. Hai tác vụ ưu tiên ở ngoài; In/Lưu trữ nằm trong popover. Vị trí action chính ngoài cùng bên phải giữ convention header; “thứ ba” là thứ tự ưu tiên, không phải tọa độ trái/phải. Đây là fragment minh họa; chỉ triển khai tác vụ có trong đặc tả, với điều kiện trạng thái và handler của consumer:
+
+```html
+<div headerRight class="d-flex align-items-center gap-8 flex-wrap">
+  <sd-button *sdPermission="'MDM_PRODUCT_C_MENU'" title="Thao tác khác" prefixIcon="more_horiz">
+    <sd-button-item *sdPermission="'MDM_PRODUCT_C_PRINT'" (click)="onPrint()">In</sd-button-item>
+    <sd-button-item *sdPermission="'MDM_PRODUCT_C_ARCHIVE'" (click)="onArchive()">Lưu trữ</sd-button-item>
+  </sd-button>
+  <sd-button *sdPermission="'MDM_PRODUCT_C_EXPORT'" title="Xuất dữ liệu" (click)="onExport()" />
+  <sd-button *sdPermission="'MDM_PRODUCT_C_UPDATE'" title="Cập nhật" [routerLink]="['../update']" type="fill" color="primary" />
+</div>
+```
+
+Import `SdButton` và `SdButtonItem` từ `@sdcorejs/angular/components/button`, cùng `RouterLink` và `SdPermissionDirective`. Không gắn handler tác vụ cho nút `Thao tác khác`; nó chỉ mở popover. Nếu tập quyền/trạng thái làm thay đổi số tác vụ, consumer chuẩn bị lại nhóm theo ngưỡng trên và không render trigger khi không còn item được phép.
 
 ### Các bố cục đã chốt
 

@@ -6,10 +6,10 @@
   <div class="h-full p-8">
     <sd-table autoId="product-list" [option]="tableOption">
       <ng-template sdTableCellDef="code" let-product="item">
-        <div class="d-flex align-items-center gap-8">
+        <a *sdPermission="'MDM_PRODUCT_C_DETAIL'" [routerLink]="[product.id, 'detail']">{{ product.code }}</a>
+        @if (!canOpenDetail) {
           <span>{{ product.code }}</span>
-          <a *sdPermission="'MDM_PRODUCT_C_DETAIL'" [routerLink]="[product.id, 'detail']">Chi tiết</a>
-        </div>
+        }
       </ng-template>
     </sd-table>
   </div>

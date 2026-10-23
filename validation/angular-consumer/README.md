@@ -55,8 +55,8 @@ Kết quả local ngày **23/10/2026, Asia/Saigon**, Windows, Chromium headless:
 | AOT | Production build + strict template/injection compilation; graph lazy/no-JIT/test exclusion PASS |
 | Playwright | 26 cases gồm Portal + MDM desktop và 2 responsive cases trên Pixel 7 emulation |
 | Preload | Pending chưa activate; đúng một GET mỗi navigation; reload; list/history; hủy navigation cũ; timeout; ID sai; 401/403/404/network/503 |
-| Permission | Core guard thật và `*sdPermission`; quyền detail không cấp update, list-only vẫn thấy mã nhưng không có link detail/create |
-| UI | Table search/paging/empty/error, section/view, create/update validation/save failure/retry, code khóa khi update, enum select dùng keyboard, dirty cancel/discard/revert |
+| Permission | Core guard thật và `*sdPermission`; quyền detail không cấp update, list-only vẫn thấy mã dạng text một lần nhưng không có hyperlink/create |
+| UI | Table search/paging/empty/error; mã ở cột đầu là hyperlink mở detail bằng keyboard/click, không có action Edit/Detail trên list; section/view, create/update validation/save failure/retry, code khóa khi update, enum select dùng keyboard, dirty cancel/discard/revert |
 | Layout | Desktop/mobile không overflow document; paginator trong viewport, table giữ vùng cuộn; screenshot list/form trong test-results |
 
 Playwright bắt mọi `pageerror`; lỗi HTTP được chủ động giả lập là tình huống test. Không gọi test thất bại là pass nhờ retry: `retries: 0`. Report HTML, screenshot và trace khi lỗi đều là output ignored. [CI](../../.github/workflows/angular-consumer.yml) chạy cả foundation lẫn consumer và lưu artifacts.
@@ -69,6 +69,7 @@ Playwright bắt mọi `pageerror`; lỗi HTTP được chủ động giả lậ
 - **Dirty theo giá trị.** `registerSdUnsavedChangesForm` dùng `form.dirty` nên còn prompt sau khi gõ rồi hoàn tác. Consumer đăng ký `SdUnsavedChangesService.register` với computed so sánh ba field với baseline. Không sửa semantics của Core; giữ convention Blueprint và regression browser cho revert.
 - **Click lặp của Core có throttle 300 ms.** Các test retry/cancel điều khiển đồng hồ Playwright để vượt cửa sổ đó; không sửa button hoặc thêm sleep tùy ý.
 - **Mobile table cần độ rộng đọc được.** Screenshot cho thấy cột tên bị ép thành vài ký tự mỗi dòng. Consumer dùng `minWidth` của Core trên cột tên, giữ cuộn ngang trong table; không thêm CSS che overflow.
+- **Điều hướng detail trên list qua mã.** Giá trị `product.code` ở cột dữ liệu đầu tiên là link có `href` của route, thay cho nhãn “Chi tiết” riêng. `*sdPermission` bảo vệ link; snapshot quyền sau guard chỉ phục vụ text fallback vì Core 22.3.1 chưa có `sdPermissionElse`. E2E kiểm tra keyboard, mobile click, search/history và list-only không mất/lặp mã.
 
 Các lựa chọn riêng của host này: sau lưu đi detail; lỗi API lưu dùng thông báo chung và giữ draft; lookup timeout 10 giây; native confirmation của Core cho dirty. Chúng không đặt mặc định nghiệp vụ mới cho Blueprint.
 
@@ -78,15 +79,17 @@ Các lựa chọn riêng của host này: sau lưu đi detail; lỗi API lưu d�
 | --- | --- |
 | `SdPageComponent` | Header và vùng body cho list/detail/form/error |
 | `SdButton` | Điều hướng, tạo mới và lưu; mặc định size của Core |
-| `SdTable`, `SdTableCellDefDirective` | Danh sách server, search/paging và link detail theo quyền |
+| `SdTable`, `SdTableCellDefDirective` | Danh sách server, search/paging và hyperlink trên mã theo quyền |
 | `SdSection`, `SdSectionItem`, `SdView` | Nhóm thông tin và giá trị chỉ đọc |
 | `SdInput` | Nhập code/name, validation và business identifier khóa khi update |
 | `SdSelect` | Enum status bên trong `ProductStatusSelectComponent`; options thuộc model |
-| `SdPermissionGuard`, `SdPermissionDirective` | Thực thi quyền route và action độc lập |
+| `SdPermissionGuard`, `SdPermissionDirective`, `SdPermissionService` | Thực thi quyền route/action; chọn text fallback cho mã khi thiếu quyền detail |
 | `SdUnsavedChangesService`, `sdUnsavedChangesGuard` | Bảo vệ draft với dirty theo giá trị do page sở hữu |
 
 ## Giới hạn
 
 Chưa xác minh remote/micro-frontend nhiều Angular runtime, backend/auth thật, Firefox/WebKit, drawer, relation pipe/cache, select động/inactive lookup, tabs/steps, bulk/workflow hay mọi fragment UI trong Markdown. Browser API được mock ở HTTP boundary; kiểm tra quyền backend nằm ngoài bằng chứng này.
+
+Quy tắc tối đa ba mục tác vụ và gom từ tác vụ thứ ba khi có hơn ba đã được ghi trong [UI patterns](../../angular-portal/ui-patterns.md). Consumer hiện có ít tác vụ, chưa chạy browser coverage cho `command.children`, `selector.actions.children` hoặc popover detail; các fragment minh họa nhóm không phải bằng chứng AOT/E2E. Bộ quyền được nạp trước activation và giữ ổn định; đổi quyền ngay khi page đang mở chưa nằm trong coverage.
 
 Đã gặp lỗi resolve import Prism của Core khi chạy component specs trong Node/jsdom. Suite dùng browser mode chính thức của Angular/Vitest để chạy Core thật, không mock component hoặc patch `node_modules`. Build còn cảnh báo Sass `if()` deprecated và CommonJS từ dependencies Core; các cảnh báo này không bị tắt. Consumer kiểm chứng correctness và scope, chưa đặt ngân sách performance cho bundle Core.

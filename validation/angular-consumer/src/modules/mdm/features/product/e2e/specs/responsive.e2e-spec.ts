@@ -9,6 +9,8 @@ test('Core list owns scroll and keeps pagination inside the viewport', async ({ 
   const query = api.requests.find(request => request.url.pathname === '/api/alpha/products')?.url.searchParams;
   expect(query?.get('pageIndex')).toBe('0');
   await page.screenshot({ path: test.info().outputPath('list.png'), fullPage: true });
+  await page.getByRole('link', { name: 'ALPHA-one', exact: true }).click();
+  await expect(page.locator('detail')).toContainText('Chi tiết sản phẩm #ALPHA-one');
 });
 
 test('Core form fits narrow screens and keeps required controls visible', async ({ page, api }) => {

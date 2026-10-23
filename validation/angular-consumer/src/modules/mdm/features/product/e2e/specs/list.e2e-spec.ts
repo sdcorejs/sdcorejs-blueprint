@@ -1,22 +1,28 @@
 import { test, expect } from '../../../../e2e/fixtures/api.fixture';
 
-test('quick search reaches the foundation API and preserves the detail action', async ({ page, api }) => {
+test('quick search preserves the code hyperlink without list detail or edit actions', async ({ page, api }) => {
   await page.goto('/alpha/product');
   await expect(page.locator('sd-table')).toContainText('ALPHA-one');
   const search = page.getByRole('textbox', { name: 'Tìm kiếm', exact: true });
   await search.fill('one');
   await search.press('Enter');
   await expect.poll(() => api.requests.some(request => request.url.searchParams.get('keyword') === 'one')).toBe(true);
-  await expect(page.locator('sd-table').getByRole('link', { name: 'Chi tiết', exact: true })).toHaveCount(1);
-  await page.locator('sd-table').getByRole('link', { name: 'Chi tiết', exact: true }).click();
+  const code = page.locator('sd-table').getByRole('link', { name: 'ALPHA-one', exact: true });
+  await expect(code).toHaveAttribute('href', '/alpha/product/one/detail');
+  await expect(page.locator('sd-table').getByRole('link')).toHaveCount(1);
+  await expect(page.getByRole('link', { name: /Chi tiết|Cập nhật|Chỉnh sửa/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /Chi tiết|Cập nhật|Chỉnh sửa/ })).toHaveCount(0);
+  await code.focus();
+  await page.keyboard.press('Enter');
   await expect(page.locator('detail')).toContainText('alpha product one');
 });
 
-test('list-only permission retains identifiers while hiding detail/create actions', async ({ page, api }) => {
+test('list-only permission retains plain identifiers without detail links or create actions', async ({ page, api }) => {
   api.permissions = ['MDM_PRODUCT_C_LIST'];
   await page.goto('/alpha/product');
   await expect(page.locator('sd-table')).toContainText('ALPHA-one');
-  await expect(page.getByRole('link', { name: 'Chi tiết', exact: true })).toHaveCount(0);
+  await expect(page.locator('sd-table').getByRole('link')).toHaveCount(0);
+  await expect(page.locator('sd-table').getByText('ALPHA-one', { exact: true })).toHaveCount(1);
   await expect(page.getByRole('button', { name: 'Tạo mới', exact: true })).toHaveCount(0);
 });
 
@@ -26,7 +32,7 @@ test('empty search is an empty result, not a failed request', async ({ page, api
   await search.fill('no-such-product');
   await search.press('Enter');
   await expect.poll(() => api.requests.some(request => request.url.searchParams.get('keyword') === 'no-such-product')).toBe(true);
-  await expect(page.locator('sd-table').getByRole('link', { name: 'Chi tiết', exact: true })).toHaveCount(0);
+  await expect(page.locator('sd-table').getByRole('link')).toHaveCount(0);
   await expect(page.locator('sd-table')).toContainText('Không có kết quả phù hợp');
 });
 
