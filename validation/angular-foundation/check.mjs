@@ -15,6 +15,7 @@ const documents = [
   path.join(root, 'README.md'),
   ...walk(angularDocs).filter(name => name.endsWith('.md')),
   path.join(here, 'README.md'),
+  path.resolve(here, '../angular-consumer/README.md'),
 ];
 const examples = new Map();
 let localLinks = 0;
@@ -140,5 +141,5 @@ console.log(JSON.stringify({
   typecheck: 'PASS',
   sass: 'PASS',
   ...runtime,
-  coreUiRendering: 'NOT RUN - reserved for UI patterns',
+  coreUiRendering: 'NOT RUN in foundation - run validation/angular-consumer separately',
 }, null, 2));

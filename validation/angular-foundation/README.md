@@ -25,7 +25,7 @@ generated và dist chỉ là dữ liệu sinh ra, được ignore. Không sửa 
 ## Giới hạn
 
 - Component đích của route và AppComponent là fixture tối giản được sinh riêng cho verification.
-- Không render DOM, không AOT template, không chạy browser hoặc kiểm tra Core UI.
+- Bộ foundation không render DOM, không AOT template, không chạy browser hoặc kiểm tra Core UI. Chạy [Angular consumer](../angular-consumer/README.md) để kiểm chứng tập con UI/router bằng AOT và browser thật; kết quả của hai runner được ghi riêng.
 - Mã giả list/detail/create/update/drawer, pipe và select trong UI patterns không có marker example, không thuộc các mẫu TypeScript được type-check; consumer phải tích hợp Core paging, form, guard và event/result theo contract riêng. Mockup được review bên ngoài repo không phải Core UI rendering hay bằng chứng AOT/browser của các mẫu Angular này.
 - Fixture không phải code page nghiệp vụ và không được copy vào UI patterns.
 - Đây không phải một Angular app hoàn chỉnh hay cơ chế microfrontend runtime.

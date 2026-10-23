@@ -33,6 +33,6 @@ Trước khi viết code: đọc [Project structure](project-structure/README.md
 
 Mẫu nền tảng dùng Angular 22.1.6/TypeScript 6.0.3 làm baseline kiểm tra; đây không phải yêu cầu mọi project phải nâng cấp lên đúng phiên bản đó.
 
-Code được đặt trong các block có nhãn đường dẫn. [Bộ kiểm chứng](../validation/angular-foundation/README.md) trích các block trực tiếp, type-check cùng Angular thật và kiểm tra DI/HTTP. Component đích của route được thay bằng fixture tối giản **chỉ trong kiểm chứng**; chưa có implementation UI nghiệp vụ.
+Code được đặt trong các block có nhãn đường dẫn. [Bộ kiểm chứng nền tảng](../validation/angular-foundation/README.md) trích các block trực tiếp, type-check cùng Angular thật và kiểm tra DI/HTTP; route target trong bộ này vẫn là fixture tối giản. [Angular consumer](../validation/angular-consumer/README.md) bổ sung UI list/detail/create/update dùng Core thật, AOT, router integration và Playwright; README của consumer nêu tập con đã chạy và giới hạn.
 
 Không có mẫu Core UI list/detail/form/drawer được tuyên bố hoàn thành ở phần nền tảng này.

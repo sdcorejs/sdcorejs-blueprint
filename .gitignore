@@ -8,3 +8,7 @@ test-results/
 playwright-report/
 blob-report/
 .auth/
+validation/angular-consumer/generated/
+validation/angular-consumer/dist/
+validation/angular-consumer/.angular/
+validation/angular-consumer/*.log

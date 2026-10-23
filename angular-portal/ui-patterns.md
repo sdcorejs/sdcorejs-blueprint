@@ -1,6 +1,6 @@
 # UI patterns
 
-Trạng thái: Đã chốt convention list, các bố cục detail/create/update và side drawer qua review ngày 19–23/10/2026. Bao gồm section, header/actions, relation qua pipe, select wrapper và giới hạn custom SCSS. Đây là contract và mã giả; chưa triển khai hoặc kiểm chứng AOT/browser các mẫu Angular trong tài liệu. Các bố cục tương tác dùng để review là mockup, không phải Core UI runtime.
+Trạng thái: Đã chốt convention list, các bố cục detail/create/update và side drawer qua review ngày 19–23/10/2026. Bao gồm section, header/actions, relation qua pipe, select wrapper và giới hạn custom SCSS. Tài liệu giữ contract và mã giả; [Angular consumer](../validation/angular-consumer/README.md) đã bổ sung kiểm chứng AOT/Core/browser cho một tập con: list, detail, create/update, section/view, enum select, permission và dirty. Không suy rộng kết quả này sang drawer, relation/select động, tabs/steps hoặc mọi fragment dưới đây. Các bố cục tương tác ban đầu dùng để review vẫn là mockup.
 
 ## Sở hữu nội dung
 
@@ -270,6 +270,8 @@ Fragment thay cho vùng `headerRight`; thêm `SdButtonItem` từ `@sdcorejs/angu
 
 Đã đối chiếu @sdcorejs/angular 22.3.1 đang cài trong portal-template: sd-page có headerLeft/headerRight; sd-card/sd-card-group dùng cho card; sd-tab-group có headerClass/headerStyle/bodyClass/bodyStyle; sd-table có filter.quickSearch, filter.externalFilters và filter.hideInlineFilter. Khi triển khai với version khác, đối chiếu public API thực tế.
 
+Consumer AOT/browser đã xác minh `SdTableFilterRequest.pageNumber` của Core 22.3.1 bắt đầu từ **0**. Khi ghép API nền tảng, map trực tiếp sang `pageIndex`; nếu chỉ hỗ trợ keyword/paging, tắt sort/inline filter chưa có backend tương ứng. Bản Core-paging đầy đủ ở trên vẫn là một biến thể contract khác. Trên mobile, có thể dùng `minWidth` của cột khi nội dung bị ép quá hẹp; giữ cuộn ngang bên trong table, không dùng CSS che overflow.
+
 sd-page hiện có wrapper overflow-y: auto; sd-tab-group bọc các lớp body của Material. Vì vậy chỉ nhìn utility trong HTML chưa chứng minh được chỉ table cuộn. Khi tích hợp cần đo hành vi trên browser và xử lý đúng owner layout nếu có lỗi; không thêm overflow-hidden hoặc sửa overflow toàn cục của mọi page để phục vụ một list.
 
 Source tham khảo trong portal-template: src/modules/page/styles/list-layout.scss, features/list-score-filter và features/list-standard dưới src/modules/page. Mẫu score/filter dùng Core card và external filter; mẫu hiện tại đang đặt hideInlineFilter: true, nên không sao chép giá trị này làm mặc định của Blueprint vừa chốt.
@@ -296,6 +298,7 @@ Entity chính đã tải và kiểm tra quyền theo [Routes](project-structure/
 - Badge trạng thái nằm cạnh title/mã, cùng dòng. Dòng thứ hai chỉ chứa mô tả/ngữ cảnh ngắn nếu cần, ví dụ khách hàng · khu vực. Khối identity tối đa hai dòng; không tách title, badge và mô tả thành ba dòng.
 - Text dài hoặc màn hẹp phải rút gọn phù hợp và vẫn truy cập được nội dung đầy đủ qua tooltip/tên truy cập. Không đẩy badge thành dòng thứ ba hoặc để che nút đóng/back.
 - Page dùng nút trở lại ở `headerLeft` của `sd-page`; action ở `headerRight`. Drawer dùng slot riêng của `sd-side-drawer`, mô tả bên dưới.
+- Core 22.3.1 dùng `headerLeft` làm slot **thay thế** title/description mặc định. Khi project Back, phải ghép cả Back và identity vào slot; truyền `[title]` riêng không giữ title trên màn hình. Consumer có AOT/component/E2E regression cho điểm này.
 - Ngoài `Cập nhật <entity>`, detail có thể có Gửi duyệt, Duyệt, Từ chối, Xóa hoặc tác vụ khác của entity. Không yêu cầu đủ mọi action; hiển thị theo permission và trạng thái nghiệp vụ.
 
 ### Các bố cục đã chốt
@@ -551,11 +554,13 @@ Fragment mã giả dùng cho create/update, `form`/`model` theo contract consume
 
 ### Draft và steps
 
+- Khi dùng Core `[form]` + `name`, component tự đăng ký control; không đồng thời tạo FormControl khác cùng tên trong FormGroup. Consumer để Core đăng ký và khai typed optional controls, còn page vẫn sở hữu validation policy, draft và SaveReq.
 - Update khởi tạo draft từ entity đã preload; sửa draft không làm thay đổi view/detail đang được dùng ở nơi khác trước khi lưu thành công.
 - Chuyển tab/bước hoặc quay lại bước trước vẫn giữ dữ liệu đã nhập. Khi qua bước kế tiếp, kiểm tra điều kiện của bước hiện tại; trước khi lưu kiểm tra toàn bộ dữ liệu cần thiết.
 - Nút bước trước/bước tiếp là điều hướng trong form, khác với back rời page. Bước cuối có phần kiểm tra lại và action lưu; không giả lập tiến trình nhiều bước bằng các form độc lập làm mất draft.
 - Lưu đang pending không tạo request trùng; lỗi lưu giữ draft để sửa/thử lại. Dirty chỉ được xóa sau lưu thành công hoặc người dùng thực sự đồng ý bỏ thay đổi.
 - Khi đã sửa rồi hoàn tác về dữ liệu ban đầu, việc xác định dirty theo giá trị/contract form, không chỉ dựa vào “đã từng gõ”. Chi tiết thời điểm hiển thị validation và điều hướng sau lưu nằm trong các điểm cần chốt tiếp.
+- Core 22.3.1 `registerSdUnsavedChangesForm` theo `form.dirty`, không tự so sánh giá trị với baseline. Để đáp ứng quy tắc hoàn tác trên, consumer dùng `SdUnsavedChangesService.register` với dirty computed theo các field của form; không sửa quy tắc chung thành interaction-only. Khi test click lặp, lưu ý `SdButton` có throttle 300 ms.
 
 ## Side drawer — detail/create/update
 
@@ -674,7 +679,7 @@ Spec của component đặt cạnh source; E2E của pattern nằm trong scope f
 
 Detail/update có ID nhận entity đã tải sau khi qua kiểm tra quyền theo [Routes](project-structure/routes.md). Page khởi tạo view/form từ route data hoặc contract tương đương, nhận entity mới khi đổi ID và không tải lặp entity chính trong lifecycle. Thiếu quyền hoặc lỗi tải entity chuyển tới flow/trang lỗi của consumer trước khi page đích được kích hoạt. Page/drawer vẫn sở hữu lỗi validation/lưu và bảo vệ draft trong quá trình tương tác.
 
-Component route trong validation hiện là fixture không có Core UI. Không copy fixture đó thành page production hoặc coi đó là UI pattern đã có.
+Component route trong `validation/angular-foundation` vẫn là fixture không có Core UI. `validation/angular-consumer` bổ sung implementation thật cho tập con nêu ở đầu tài liệu. Không copy fixture nền tảng thành page production hoặc coi toàn bộ pattern đã được kiểm chứng.
 
 Các case UI cần kiểm chứng khi triển khai: header tối đa hai dòng; section/value đúng loại; relation thiếu dữ liệu hoặc lỗi; edit với select inactive; table nhập liệu không có mô tả thừa dưới select; chuyển tab/bước giữ draft; validation/lưu lỗi; permission độc lập với điều kiện trạng thái; chuẩn bị entity trước khi mở drawer; tất cả đường đóng qua dirty guard; cập nhật kết quả về caller và khôi phục focus. Kiểm tra responsive và scroll trên component Core thật, không suy từ ảnh/mockup.
 
