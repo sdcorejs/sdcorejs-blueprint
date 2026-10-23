@@ -160,9 +160,9 @@ Giữ mặc định inline filter của Core/consumer. Chỉ thêm `hideInlineFi
 - Dùng `*sdPermission` cho UI action; không gọi service permission trong biểu thức render. Route vẫn kiểm tra quyền và resolve entity theo [Routes](project-structure/routes.md).
 - Option tĩnh khai báo trực tiếp; không cần thêm state, lifecycle init, signal/computed hoặc wrapper service khi chưa có nhu cầu.
 
-Các block dưới đây là mã giả để áp dụng quy ước, không có marker `example` và không nằm trong bộ kiểm chứng nền tảng. Giả định biến thể service `ProductService.list(req)` nhận `ProductListReq` tương thích `PagingReq<ProductDto>` và trả `Observable<ProductListRes>` có `items`/`total`. Contract `pageIndex/pageSize/keyword` trong mẫu HTTP nền tảng chưa hỗ trợ toàn bộ filter/sort của Core: consumer phải mở rộng hoặc chuyển đổi request đầy đủ, không chỉ lấy keyword.
+Các block dưới đây là mã giả để áp dụng quy ước, không có marker `example` và không nằm trong bộ kiểm chứng nền tảng. `ProductService.list(req)` nhận `ProductListReq = PagingReq<ProductDto>` và trả `Observable<ProductListRes>` với `PagingRes<ProductDto>` theo [Services](project-structure/services.md). Truyền nguyên tham số thứ hai của callback `items`; base API service map sang request BE, không chỉ lấy keyword hoặc bỏ filter/sort của Core.
 
-Model/constant giữ trong `services/product.model.ts`; với biến thể Core paging:
+Model/constant của Product giữ trong `features/product/services/product.model.ts`; contract paging dùng lại package Utils:
 
 ```ts
 import type { PagingReq, PagingRes } from '@sdcorejs/utils/models';
@@ -310,7 +310,9 @@ Fragment thay cho vùng `headerRight`, minh họa gom sớm Nhập/Xuất khi m�
 
 Đã đối chiếu @sdcorejs/angular 22.3.1 đang cài trong portal-template: sd-page có headerLeft/headerRight; sd-card/sd-card-group dùng cho card; sd-tab-group có headerClass/headerStyle/bodyClass/bodyStyle; sd-table có filter.quickSearch, filter.externalFilters và filter.hideInlineFilter. Khi triển khai với version khác, đối chiếu public API thực tế.
 
-Consumer AOT/browser đã xác minh `SdTableFilterRequest.pageNumber` của Core 22.3.1 bắt đầu từ **0**. Khi ghép API nền tảng, map trực tiếp sang `pageIndex`; nếu chỉ hỗ trợ keyword/paging, tắt sort/inline filter chưa có backend tương ứng. Bản Core-paging đầy đủ ở trên vẫn là một biến thể contract khác. Trên mobile, có thể dùng `minWidth` của cột khi nội dung bị ép quá hẹp; giữ cuộn ngang bên trong table, không dùng CSS che overflow.
+Consumer AOT/browser đã xác minh `PagingReq.pageNumber` của Core 22.3.1 bắt đầu từ **0**. Giữ nguyên `pageNumber`, `pageSize`, `filters`, `orders` và `fields` khi chuyển sang API; transport theo [Services](project-structure/services.md#core-filters--pagingreq--http-request). Chỉ bật filter/sort mà API đích hỗ trợ. Trên mobile, có thể dùng `minWidth` của cột khi nội dung bị ép quá hẹp; giữ cuộn ngang bên trong table, không dùng CSS che overflow.
+
+Để hiện nút sort ở Core 22.3.1, cần cả `sort: { enable: true }` trong table option và `sortable: true` trên từng cột được phép sort. Chỉ bật sort cấp table chưa tạo nút sort; consumer có E2E kiểm tra ASC/DESC và giữ orders khi đổi trang.
 
 sd-page hiện có wrapper overflow-y: auto; sd-tab-group bọc các lớp body của Material. Vì vậy chỉ nhìn utility trong HTML chưa chứng minh được chỉ table cuộn. Khi tích hợp cần đo hành vi trên browser và xử lý đúng owner layout nếu có lỗi; không thêm overflow-hidden hoặc sửa overflow toàn cục của mọi page để phục vụ một list.
 

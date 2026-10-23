@@ -31,14 +31,16 @@ for (const editor of editors) {
     await enterEditor(page, editor.mode);
     await page.getByRole('textbox', { name: 'Tên sản phẩm' }).fill('Unsaved draft');
     const dialogs: string[] = [];
-    page.once('dialog', async dialog => { dialogs.push(dialog.type()); await dialog.dismiss(); });
+    const cancelled = page.waitForEvent('dialog').then(async dialog => { dialogs.push(dialog.type()); await dialog.dismiss(); });
     await page.getByRole('button', { name: 'Quay lại', exact: true }).click();
+    await cancelled;
     await expect(page).toHaveURL(editor.url);
     await expect(page.getByRole('textbox', { name: 'Tên sản phẩm' })).toHaveValue('Unsaved draft');
     await expect(page.getByRole('status').filter({ hasText: 'Đang tải trang' })).toHaveCount(0);
     await page.clock.runFor(301);
-    page.once('dialog', async dialog => { dialogs.push(dialog.type()); await dialog.accept(); });
+    const discarded = page.waitForEvent('dialog').then(async dialog => { dialogs.push(dialog.type()); await dialog.accept(); });
     await page.getByRole('button', { name: 'Quay lại', exact: true }).click();
+    await discarded;
     await expect(page).toHaveURL(editor.backUrl);
     expect(dialogs).toEqual(['confirm', 'confirm']);
     expect(api.requests.filter(request => request.method !== 'GET')).toHaveLength(0);
@@ -68,13 +70,16 @@ for (const editor of editors) {
     await enterEditor(page, editor.mode);
     await page.getByRole('textbox', { name: 'Tên sản phẩm' }).fill('Alpha draft');
     const dialogs: string[] = [];
-    page.once('dialog', async dialog => { dialogs.push(dialog.type()); await dialog.dismiss(); });
+    const cancelled = page.waitForEvent('dialog').then(async dialog => { dialogs.push(dialog.type()); await dialog.dismiss(); });
     await page.getByRole('button', { name: 'Beta', exact: true }).click();
+    await cancelled;
     await expect(page).toHaveURL(editor.url);
     await expect(page.getByRole('textbox', { name: 'Tên sản phẩm' })).toHaveValue('Alpha draft');
+    await expect(page.getByRole('status').filter({ hasText: 'Đang tải trang' })).toHaveCount(0);
     await page.clock.runFor(301);
-    page.once('dialog', async dialog => { dialogs.push(dialog.type()); await dialog.accept(); });
+    const discarded = page.waitForEvent('dialog').then(async dialog => { dialogs.push(dialog.type()); await dialog.accept(); });
     await page.getByRole('button', { name: 'Beta', exact: true }).click();
+    await discarded;
     await expect(page).toHaveURL('/beta/product');
     if (editor.mode === 'create') {
       await page.getByRole('button', { name: 'Tạo mới', exact: true }).click();
@@ -83,8 +88,9 @@ for (const editor of editors) {
       await page.getByRole('button', { name: 'Cập nhật', exact: true }).click();
     }
     await page.getByRole('textbox', { name: 'Tên sản phẩm' }).fill('Beta draft');
-    page.once('dialog', async dialog => { dialogs.push(dialog.type()); await dialog.dismiss(); });
+    const betaCancelled = page.waitForEvent('dialog').then(async dialog => { dialogs.push(dialog.type()); await dialog.dismiss(); });
     await page.getByRole('button', { name: 'Quay lại', exact: true }).click();
+    await betaCancelled;
     await expect(page.getByRole('textbox', { name: 'Tên sản phẩm' })).toHaveValue('Beta draft');
     expect(dialogs).toEqual(['confirm', 'confirm', 'confirm']);
     expect(api.requests.filter(request => request.method !== 'GET')).toHaveLength(0);

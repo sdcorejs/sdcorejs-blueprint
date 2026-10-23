@@ -14,7 +14,7 @@ README này mô tả cây thư mục, ownership, naming và các ranh giới chu
 | --- | --- |
 | [Configuration](configuration.md) | Khai báo token, public provider và scope DI |
 | [Routes](routes.md) | Tích hợp module, quyền vào route và tải entity trước khi mở detail/update |
-| [Services](services.md) | Base API service, service/model của feature, asset URL |
+| [Services](services.md) | Service/model chung của module, base mapping PagingReq, service entity, asset URL |
 | [Assets](assets.md) | Tài nguyên và CSS/SCSS ở module/feature |
 | [Testing](testing.md) | Vị trí spec/integration/E2E, test support và runner discovery |
 
@@ -61,7 +61,7 @@ project/
           provide-mdm-configuration.ts     # Public configuration/provider
           provide-mdm-configuration.spec.ts
           api.configuration.ts             # Chỉ khi integration API cần
-        services/
+        services/                          # Service/model dùng chung trong module
           base-api.service.ts
           asset.service.ts
           asset.service.spec.ts
@@ -198,6 +198,8 @@ Implementation có Core UI của các page/drawer nằm ở [UI patterns](../ui-
 ## Service và model
 
 - Base service đặt tại services cấp module và đặt tên theo trách nhiệm: base-api.service.ts, không tạo một BaseService chứa mọi thứ.
+- `services` cấp module chứa cả model/contract và service dùng chung giữa các feature trong module. Model chung đặt cạnh service liên quan; entity model vẫn do feature sở hữu. Code dùng xuyên module chuyển thành package/library có public contract.
+- Request danh sách dùng `PagingReq<T>` và response dùng `PagingRes<T>` của `@sdcorejs/utils/models`. Core chuyển filter UI sang PagingReq; base API service có hàm mapping sang request BE dùng chung. Không bỏ filter/sort hoặc viết lại utility Core ở từng feature; xem [Services](services.md#core-filters--pagingreq--http-request).
 - Service riêng của feature đặt trong feature/services; file `<entity>.service.ts` export class theo entity, ví dụ `product.service.ts` / `ProductService`, `customer.service.ts` / `CustomerService`.
 - Model/DTO cho service đặt cạnh service và mang tên `<entity>.model.ts`, ví dụ product.model.ts; request/response dùng hậu tố Req/Res, entity giữ tên ProductDto.
 - Const, enum và các type/interface liên quan của feature mặc định đặt chung trong file model. Chỉ tách theo nhóm khi nội dung lớn hoặc trách nhiệm/phạm vi sử dụng khác biệt rõ; tránh chia nhiều file nhỏ cho một feature có ít model.

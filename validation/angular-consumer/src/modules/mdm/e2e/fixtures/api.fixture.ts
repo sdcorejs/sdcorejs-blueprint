@@ -1,4 +1,6 @@
 import { test as base, expect, type Route } from '@playwright/test';
+import { FilterUtilities } from '@sdcorejs/utils/fns';
+import type { PagingReq } from '@sdcorejs/utils/models';
 
 type Product = { id: string; code: string; name: string; status: 'active' | 'inactive' };
 export const permissions = ['LIST', 'DETAIL', 'CREATE', 'UPDATE'].map(action => 'MDM_PRODUCT_C_' + action);
@@ -35,10 +37,24 @@ export const test = base.extend<{ api: Api; browserErrors: void }>({
       }
       if (method === 'GET') {
         if (api.failList) { await route.fulfill({ status: 503, json: { message: 'list unavailable' } }); return; }
-        const keyword = url.searchParams.get('keyword') ?? '';
-        const rows = Array.from({ length: 65 }, (_, index) => product(index === 0 ? 'one' : String(index + 1), mount)).filter(row => (row.code + row.name).includes(keyword));
-        const start = Number(url.searchParams.get('pageIndex')) * Number(url.searchParams.get('pageSize'));
-        await route.fulfill({ json: { items: rows.slice(start, start + Number(url.searchParams.get('pageSize'))), total: rows.length } }); return;
+        // Test-only backend for the documented GET wire format; assertions inspect payloads separately.
+        const req: PagingReq<Product> = {
+          pageNumber: Number(url.searchParams.get('pageNumber') ?? 0),
+          pageSize: Number(url.searchParams.get('pageSize') ?? 20),
+          filters: JSON.parse(url.searchParams.get('filters') ?? '[]'),
+          orders: JSON.parse(url.searchParams.get('orders') ?? '[]'),
+        };
+        const rows = Array.from({ length: 65 }, (_, index) => product(index === 0 ? 'one' : String(index + 1), mount))
+          .filter(row => FilterUtilities.match(req.filters ?? [], row));
+        rows.sort((a, b) => {
+          for (const order of req.orders ?? []) {
+            const compared = a[order.field].localeCompare(b[order.field]);
+            if (compared) return order.direction === 'ASC' ? compared : -compared;
+          }
+          return 0;
+        });
+        const start = req.pageNumber! * req.pageSize!;
+        await route.fulfill({ json: { items: rows.slice(start, start + req.pageSize!), total: rows.length } }); return;
       }
       if (api.failSave) { await route.fulfill({ status: 503, json: { message: 'test failure' } }); return; }
       const saved = { ...(body as Omit<Product, 'id'>), id: id ?? 'created' };
