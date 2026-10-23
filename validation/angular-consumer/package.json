@@ -1,0 +1,44 @@
+{
+  "name": "@sdcorejs-blueprint/angular-consumer-validation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare:source": "node scripts/prepare.mjs",
+    "build": "npm run prepare:source && ng build --configuration production --stats-json && node scripts/check-bundle.mjs",
+    "test": "npm run prepare:source && ng test --watch=false",
+    "test:e2e": "playwright test",
+    "test:e2e:module": "playwright test --config src/modules/mdm/e2e/playwright.config.ts",
+    "check:e2e-types": "tsc -p tsconfig.e2e.json",
+    "check": "npm run check:e2e-types && npm run test && npm run build && npm run test:e2e",
+    "serve": "node scripts/serve.mjs"
+  },
+  "engines": {
+    "node": "^22.22.3 || ^24.15.0"
+  },
+  "dependencies": {
+    "@angular/animations": "22.1.6",
+    "@angular/cdk": "22.1.6",
+    "@angular/common": "22.1.6",
+    "@angular/compiler": "22.1.6",
+    "@angular/core": "22.1.6",
+    "@angular/forms": "22.1.6",
+    "@angular/material": "22.1.6",
+    "@angular/material-date-fns-adapter": "22.1.6",
+    "@angular/platform-browser": "22.1.6",
+    "@angular/router": "22.1.6",
+    "@sdcorejs/angular": "22.3.1",
+    "@sdcorejs/utils": "1.2.5",
+    "rxjs": "7.8.2",
+    "tslib": "2.8.1"
+  },
+  "devDependencies": {
+    "@angular/build": "22.1.7",
+    "@angular/cli": "22.1.7",
+    "@angular/compiler-cli": "22.1.6",
+    "@playwright/test": "1.63.0",
+    "@types/node": "^24.0.0",
+    "@vitest/browser-playwright": "4.1.12",
+    "typescript": "6.0.3",
+    "vitest": "4.1.12"
+  }
+}

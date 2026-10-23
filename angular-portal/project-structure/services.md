@@ -100,6 +100,11 @@ File model cũng chứa const và enum của feature khi có nhu cầu. Mẫu d�
 ```ts
 export type ProductStatus = 'active' | 'inactive';
 
+export const PRODUCT_STATUS_OPTIONS = [
+  { id: 'active', name: 'Đang hoạt động' },
+  { id: 'inactive', name: 'Ngừng hoạt động' },
+] satisfies Array<{ id: ProductStatus; name: string }>;
+
 export interface ProductDto {
   readonly id: string;
   readonly code: string;

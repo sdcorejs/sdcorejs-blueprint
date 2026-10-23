@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "outDir": "./dist/out-tsc", "types": [] },
+  "files": ["generated/src/main.ts"],
+  "exclude": ["**/*.spec.ts", "**/testing/**", "**/e2e/**"]
+}

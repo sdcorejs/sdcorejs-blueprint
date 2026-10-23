@@ -1,0 +1,5 @@
+// why: the host must supply a bounded viewport for sd-page and sd-table scroll ownership.
+html, body, app-root { height: 100%; }
+app-root { display: flex; flex-direction: column; }
+// why: routed pages share the remaining host height; router-outlet itself has no layout box.
+app-root > router-outlet + * { flex: 1; min-height: 0; }

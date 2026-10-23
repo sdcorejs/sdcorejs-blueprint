@@ -6,6 +6,8 @@ Tài liệu này quy định vị trí unit/component/integration spec, E2E và 
 
 validation/angular-foundation trong repo Blueprint là bộ kiểm chứng các block code mẫu. Nó không phải suite unit/E2E của ứng dụng thật và không thay thế kiểm tra Core UI/browser.
 
+[validation/angular-consumer](../../validation/angular-consumer/README.md) là host kiểm chứng bổ sung: Angular specs trong Chromium, AOT production và Playwright theo owner. Source consumer ghép với các block Markdown; xem README để biết coverage cụ thể và phần chưa kiểm chứng.
+
 Các đường dẫn dưới đây là mẫu cấu trúc. Không tạo file spec rỗng hoặc test chỉ để lặp lại implementation.
 
 ## Naming
@@ -154,7 +156,7 @@ E2E của module nhận baseURL/auth/test data setup qua cấu hình test hoặc
 - Dữ liệu hư cấu có scope/cleanup rõ để các test không phụ thuộc thứ tự.
 - Không đặt mock/fixture trong assets hoặc dùng chúng làm dữ liệu fallback của production.
 
-Các case Core UI như dirty guard, save failure, selection, direct URL, keyboard/focus sẽ được viết cùng [UI patterns](../ui-patterns.md). Tài liệu này chưa triển khai những case đó.
+Consumer hiện có dirty guard, save failure, direct URL và keyboard select cùng subset [UI patterns](../ui-patterns.md). Selection, drawer/focus restoration và các flow chưa có trong coverage README vẫn cần suite riêng.
 
 ## Config và runner discovery
 
@@ -198,7 +200,7 @@ Fragment gợi ý cho tsconfig.spec.json:
 
 Ghép vào config hiện hữu và kiểm tra cùng include/files/extends của project. Exclude điều khiển discovery, không phải hàng rào ngăn import; runtime code vẫn không được import test support. Fixture/helper được spec import sẽ đi vào compilation của spec.
 
-Các fragment này mô tả boundary; chưa có cấu hình runner ứng dụng hay Playwright suite được tạo/chạy trong repo Blueprint.
+Các fragment này mô tả boundary. Consumer có cấu hình runner và Playwright thực thi chúng; foundation chỉ kiểm tra các fragment và block nền tảng.
 
 ## Output sinh ra
 

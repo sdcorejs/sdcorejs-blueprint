@@ -1,0 +1,1 @@
+Blueprint MDM asset: served under the mount-specific assetBaseUrl.

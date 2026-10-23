@@ -2,6 +2,12 @@
 
 Cập nhật: 23/10/2026, Asia/Saigon. Tài liệu bàn giao để tiếp tục Blueprint.
 
+## Consumer AOT/browser — 23/10/2026
+
+PR #1 đã merge vào `main` tại `50861ed`; các ghi chú “PR đang mở/giữ nhánh docs” phía dưới là lịch sử. Công việc tiếp theo nằm trên `feat/angular-consumer-validation`.
+
+[Angular consumer](validation/angular-consumer/README.md) giữ kiến trúc đã chốt, trích foundation từ Markdown và thêm Core UI list/detail/create/update, resolver/permission thật, AOT, Angular specs, Playwright cùng CI. README ghi kết quả, command chạy lại, các điểm sửa có regression và giới hạn: chưa có remote micro-frontend runtime/backend thật/drawer/relation dynamic. Không suy rộng subset này thành xác nhận tất cả UI pattern.
+
 ## Cập nhật — detail, create/update và side drawer, 23/10/2026
 
 - Đã ghi các bố cục được review vào [UI patterns](angular-portal/ui-patterns.md), đồng bộ [Angular Portal](angular-portal/README.md) và [Project structure](angular-portal/project-structure/README.md). Đây là convention/mã giả, chưa có implementation Angular Core UI.

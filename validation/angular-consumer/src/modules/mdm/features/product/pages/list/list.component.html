@@ -1,0 +1,16 @@
+<sd-page title="Danh sách sản phẩm">
+  <div headerRight class="d-flex align-items-center gap-8 flex-wrap">
+    <sd-button *sdPermission="'MDM_PRODUCT_C_CREATE'" title="Tạo mới" prefixIcon="add" type="fill" color="primary" [routerLink]="['create']" />
+    <a [href]="assetUrl">Tài liệu module</a>
+  </div>
+  <div class="h-full p-8">
+    <sd-table autoId="product-list" [option]="tableOption">
+      <ng-template sdTableCellDef="code" let-product="item">
+        <div class="d-flex align-items-center gap-8">
+          <span>{{ product.code }}</span>
+          <a *sdPermission="'MDM_PRODUCT_C_DETAIL'" [routerLink]="[product.id, 'detail']">Chi tiết</a>
+        </div>
+      </ng-template>
+    </sd-table>
+  </div>
+</sd-page>

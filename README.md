@@ -15,4 +15,5 @@ Các ví dụ MDM/Product là tên minh họa, không phải module bắt buộc
 
 ## Kiểm tra
 
-[Hướng dẫn kiểm chứng mẫu code](validation/angular-foundation/README.md).
+- [Foundation](validation/angular-foundation/README.md): trích block Markdown, TypeScript/Sass, DI và HTTP.
+- [Angular consumer](validation/angular-consumer/README.md): Core UI thật, production AOT, router integration và Playwright desktop/mobile; có CI chạy lại.
