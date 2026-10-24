@@ -12,12 +12,18 @@ describe('ProductService foundation HTTP contract', () => {
     http = TestBed.inject(HttpTestingController); service = TestBed.inject(ProductService);
   });
   afterEach(() => http.verify());
-  it('transmits zero-based page and trimmed keyword', () => {
-    service.list({ pageIndex: 2, pageSize: 10, keyword: '  abc  ' }).subscribe();
+  it('transmits the full PagingReq using the module base mapping', () => {
+    const filters = [{ field: 'name', operator: 'CONTAIN', data: 'máy lọc & nước + #1' }] as const;
+    service.list({ pageNumber: 2, pageSize: 10, filters: [...filters], orders: [{ field: 'code', direction: 'DESC' }], fields: ['id', 'name'] }).subscribe();
     const request = http.expectOne(req => req.url === '/api/test/products');
-    expect(request.request.params.get('pageIndex')).toBe('2');
+    expect(request.request.method).toBe('GET');
+    expect(request.request.params.get('pageNumber')).toBe('2');
     expect(request.request.params.get('pageSize')).toBe('10');
-    expect(request.request.params.get('keyword')).toBe('abc');
+    expect(JSON.parse(request.request.params.get('filters')!)).toEqual(filters);
+    expect(JSON.parse(request.request.params.get('orders')!)).toEqual([{ field: 'code', direction: 'DESC' }]);
+    expect(JSON.parse(request.request.params.get('fields')!)).toEqual(['id', 'name']);
+    expect(request.request.params.has('keyword')).toBe(false);
+    expect(request.request.params.has('pageIndex')).toBe(false);
     request.flush({ items: [], total: 0 });
   });
   it('propagates API failure without fake empty success', () => {

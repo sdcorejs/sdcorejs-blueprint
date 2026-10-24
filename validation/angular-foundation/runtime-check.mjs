@@ -72,11 +72,18 @@ export async function verifyRuntime(dist) {
     detail.respond(product);
     assert.equal(received, product);
 
-    apiB.list({ pageIndex: 0, pageSize: 20, keyword: '  máy lọc  ' }).subscribe();
+    const paging = { pageNumber: 0, pageSize: 20,
+      filters: [{ field: 'name', operator: 'CONTAIN', data: 'máy lọc & nước' }],
+      orders: [{ field: 'code', direction: 'DESC' }], fields: ['id', 'code', 'name'] };
+    apiB.list(paging).subscribe();
     const list = backend.requests.at(-1);
     assert.equal(list.request.url, '/api/b/products');
-    assert.equal(list.request.params.get('pageIndex'), '0');
-    assert.equal(list.request.params.get('keyword'), 'máy lọc');
+    assert.equal(list.request.params.get('pageNumber'), '0');
+    assert.equal(list.request.params.get('pageSize'), '20');
+    for (const key of ['filters', 'orders', 'fields']) {
+      assert.deepEqual(JSON.parse(list.request.params.get(key)), paging[key]);
+    }
+    assert.equal(list.request.params.has('keyword'), false);
     list.respond({ items: [], total: 0 });
 
     const body = { code: 'SP-002', name: 'Sản phẩm B', status: 'active' };

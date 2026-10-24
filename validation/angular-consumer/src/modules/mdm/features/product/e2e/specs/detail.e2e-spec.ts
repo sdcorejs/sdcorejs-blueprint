@@ -78,7 +78,7 @@ test('list navigation and browser history display the correct ID without duplica
   await page.goto('/alpha/product/one/detail');
   await expect(page.locator('detail')).toContainText('alpha product one');
   await page.getByRole('button', { name: 'Quay lại', exact: true }).click();
-  await page.locator('sd-table').getByRole('link', { name: 'Chi tiết', exact: true }).nth(1).click();
+  await page.locator('sd-table').getByRole('link', { name: 'ALPHA-2', exact: true }).click();
   await expect(page.locator('detail')).toContainText('alpha product 2');
   await page.goBack();
   await page.goBack();

@@ -17,7 +17,7 @@ Dùng Node theo engines trong package.json. Dependency được pin và có pack
 3. Type-check TypeScript với Angular/RxJS thật ở chế độ strict.
 4. Compile SCSS qua Sass.
 5. Kiểm tra hai scope module có cấu hình độc lập, feature service không rò ra root.
-6. Kiểm tra HTTP URL/query/body, giữ lỗi HTTP và asset URL theo configuration.
+6. Kiểm tra HTTP URL/query/body: `PagingReq` của `@sdcorejs/utils` giữ pageNumber, filters, orders, fields qua base mapping; giữ lỗi HTTP và asset URL theo configuration.
 7. Resolve callback lazy route/public entry với provider boundary thực.
 
 generated và dist chỉ là dữ liệu sinh ra, được ignore. Không sửa bản sinh để làm kiểm tra xanh; sửa block code nguồn trong Markdown.

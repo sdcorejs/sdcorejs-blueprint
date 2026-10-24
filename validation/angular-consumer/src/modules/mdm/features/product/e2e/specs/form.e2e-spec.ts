@@ -1,6 +1,8 @@
 import { test, expect } from '../../../../e2e/fixtures/api.fixture';
 
 test('create validates, preserves draft on failed save, then saves only SaveReq fields', async ({ page, api }) => {
+  const dialogs: string[] = [];
+  page.on('dialog', async dialog => { dialogs.push(dialog.type()); await dialog.accept(); });
   await page.clock.install();
   await page.goto('/alpha/product/create');
   await page.getByRole('button', { name: 'Lưu', exact: true }).click();
@@ -20,9 +22,15 @@ test('create validates, preserves draft on failed save, then saves only SaveReq 
   await expect(page).toHaveURL(/\/alpha\/product\/created\/detail$/);
   await expect(page.locator('detail')).toContainText('New product');
   expect(api.requests.filter(request => request.method === 'POST').at(-1)?.body).toEqual({ code: 'NEW-001', name: 'New product', status: 'active' });
+  const closed = page.waitForEvent('close');
+  await page.close({ runBeforeUnload: true });
+  await closed;
+  expect(dialogs).toEqual([]);
 });
 
 test('update receives preload, locks business identifier and saves edited data', async ({ page, api }) => {
+  const dialogs: string[] = [];
+  page.on('dialog', async dialog => { dialogs.push(dialog.type()); await dialog.accept(); });
   await page.goto('/alpha/product/one/update');
   await expect(page.getByRole('textbox', { name: 'Mã sản phẩm' })).toBeDisabled();
   await expect(page.getByRole('textbox', { name: 'Tên sản phẩm' })).toHaveValue('alpha product one');
@@ -32,22 +40,10 @@ test('update receives preload, locks business identifier and saves edited data',
   await expect(page).toHaveURL(/\/one\/detail$/);
   await expect(page.locator('detail')).toContainText('Updated product');
   expect(api.requests.find(request => request.method === 'PUT')?.body).toEqual({ code: 'ALPHA-one', name: 'Updated product', status: 'active' });
-});
-
-test('dirty guard cancels leaving, then discards when confirmed', async ({ page, api }) => {
-  await page.clock.install();
-  await page.goto('/alpha/product/create');
-  await page.getByRole('textbox', { name: 'Tên sản phẩm' }).fill('Unsaved draft');
-  page.once('dialog', dialog => dialog.dismiss());
-  await page.getByRole('button', { name: 'Quay lại', exact: true }).click();
-  await expect(page).toHaveURL(/\/create$/);
-  await expect(page.getByRole('textbox', { name: 'Tên sản phẩm' })).toHaveValue('Unsaved draft');
-  await expect(page.getByRole('status')).toHaveCount(0);
-  await page.clock.runFor(301);
-  page.once('dialog', dialog => dialog.accept());
-  await page.getByRole('button', { name: 'Quay lại', exact: true }).click();
-  await expect(page).toHaveURL(/\/alpha\/product$/);
-  expect(api.requests.filter(request => request.method === 'POST')).toHaveLength(0);
+  const closed = page.waitForEvent('close');
+  await page.close({ runBeforeUnload: true });
+  await closed;
+  expect(dialogs).toEqual([]);
 });
 
 test('status wrapper opens by keyboard and changes the submitted enum', async ({ page, api }) => {
