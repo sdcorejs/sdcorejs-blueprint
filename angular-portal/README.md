@@ -12,6 +12,7 @@ MDM/Product chỉ là ví dụ. Quy ước này không tự động tạo cơ ch
 | --- | --- |
 | [Project structure](project-structure/README.md) | Cấu trúc project/module/feature và các chủ đề configuration, routes, services, assets, testing |
 | [UI patterns](ui-patterns.md) | Page/drawer và component nghiệp vụ có sử dụng Core UI |
+| [Quy ước code](conventions/naming.md) | Đặt tên ([naming](conventions/naming.md)), [signals](conventions/signals.md), [phân quyền](conventions/permission.md), [accessibility](conventions/accessibility.md), [ESLint](conventions/eslint.md). Bản nháp, chờ review |
 
 Trước khi viết code: đọc [Project structure](project-structure/README.md), sau đó chọn tài liệu liên quan từ mục lục của nhóm này. Không suy API Core UI từ tên component hoặc từ ví dụ Angular thuần.
 
