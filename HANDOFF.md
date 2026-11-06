@@ -1,6 +1,30 @@
 # Handoff — Angular Portal Blueprint
 
-Cập nhật: 23/10/2026, Asia/Saigon. Tài liệu bàn giao để tiếp tục Blueprint.
+Cập nhật: 06/11/2026, Asia/Saigon. Tài liệu bàn giao để tiếp tục Blueprint.
+
+## Site trực quan và quy ước code — 06/11/2026
+
+Nhánh `feat/blueprint-site`, PR vào `main`. Làm theo gói thiết kế `blueprint-handoff` (đối chiếu main ngày 05/11/2026).
+
+- [AGENTS.md](AGENTS.md) ở root: nguồn sự thật và 10 quy tắc **Đồng bộ Markdown ↔ UI**, bắt buộc cho mọi PR sau này.
+- `angular-portal/conventions/`: naming, signals, permission, accessibility, eslint — **bản nháp, chờ review**, link từ [Angular Portal](angular-portal/README.md). Marker `example` của `product.model.ts` trong naming.md trùng path với services.md làm foundation FAIL (`Duplicate example`); đã đổi thành `<!-- excerpt: … -->`, không nới validator. `check:sync` kiểm excerpt vẫn là đoạn liên tục của block example gốc.
+- [site/](site/README.md): Node 24, build tĩnh, font tự host, không gọi CDN. Code trích lúc build từ block Markdown, tô màu bằng Shiki dark-plus/light-plus (màu token chưa đạt 4.5:1 trên nền dòng highlight được chỉnh đậm/sáng nhẹ). Layout Explorer (2a) cho BP-02, 04–10, 17; Doc (1a) cho các trang còn lại. `page-map.json` ghi trang → `file#heading`, file code, file minh họa, ảnh và dấu đồng bộ.
+- `npm run check:sync` kiểm 10 quy tắc: anchor tồn tại, code lấy từ block, excerpt khớp, checklist chỉ từ “Nghiệm thu”/“Kiểm tra trước bàn giao”, quote MUST/Tránh có nguyên văn trong Markdown, rule ESLint có trong eslint.md, ảnh có nguồn/ngày, không viết cứng phiên bản, mọi Markdown đều được map. Markdown đổi mà trang chưa rà thì FAIL, chỉ rõ file, dòng và trang; rà xong chạy `npm run sync:accept`.
+- CI: job `site` trong `.github/workflows/angular-consumer.yml` chạy `npm run check` (check:sync, unit test, build, Playwright desktop + 390px). Deploy bằng `.github/workflows/site-pages.yml` khi push `main`.
+
+Kiểm tra đã chạy thật trên Node 24.22.1 (Windows):
+
+- `validation/angular-foundation` `npm run check`: PASS — 16 tài liệu Markdown, 86 liên kết, 14 mẫu TypeScript (thêm `order-line.component.ts` của signals.md), 3 SCSS.
+- `site`: `npm run check:sync` PASS (20 trang, 13 Markdown, 17 block example); `npm test` 14/14 PASS, gồm kịch bản đổi heading, sửa một dòng block example, sửa câu quy tắc, thêm Markdown chưa map, rule ESLint lạ, quote Tránh sai, phiên bản viết cứng → FAIL đúng file và trang; `npm run build` PASS; Playwright 49/49 PASS (20 trang mở bằng deep link `#/<id>/buoc-2`, không cuộn ngang ở 390px, contrast chữ ≥ 4.5:1 cả Light+/Dark+, phím ← →, cây ARIA, tab, checklist/theme lưu localStorage, tìm không dấu).
+- Sửa thử `title: 'Tạo sản phẩm'` trong block `routes.ts` → `check:sync` FAIL tại `routes.md:117` cho BP-04, BP-05, BP-06; khôi phục → PASS.
+
+Còn mở:
+
+- Bật GitHub Pages với nguồn “GitHub Actions” trong Settings của repo trước khi workflow deploy chạy được; URL dự kiến https://sdcorejs.github.io/sdcorejs-blueprint/.
+- Maintainer xác nhận: cấm `item` kể cả biến lặp (`id-denylist`), enum member PascalCase, 4 custom rule ESLint trong `eslint-rules/` của consumer.
+- Checklist bàn giao trống ở BP-01, 11–15, 20 vì nguồn không có mục “Nghiệm thu”/“Kiểm tra trước bàn giao” (ui-patterns.md có đoạn `**Nghiệm thu:**` in đậm, không phải heading).
+- `spacing-demo.png` gắn nhãn “Ảnh cũ” (p-20); `portal-list.png` có thể đang ẩn inline filter. Nên chụp lại từ `validation/angular-consumer`.
+- Các điểm Markdown có vẻ lệch nhau được liệt kê trong mô tả PR; site theo Markdown hiện tại, không tự đổi quy tắc.
 
 ## Consumer AOT/browser — 23/10/2026
 
