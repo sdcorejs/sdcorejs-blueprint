@@ -1,0 +1,105 @@
+{
+  "desc": "Không lặp tên feature trong path nội bộ; page, drawer, -form, -view mỗi loại một vai trò.",
+  "minutes": 4,
+  "movedFrom": null,
+  "tldr": [
+    "Không lặp tên feature trong tên thư mục/file UI nội bộ",
+    "Nhập/sửa: -form · chỉ đọc: -view",
+    "Page/drawer điều phối tải, lưu, điều hướng"
+  ],
+  "hero": {
+    "type": "compare",
+    "label": "Tên đúng / tránh",
+    "items": [
+      { "role": "Page", "ok": "product/pages/list/list.component.ts", "bad": "product/pages/product-list/…" },
+      { "role": "Drawer", "ok": "components/detail-side-drawer/", "bad": "pages/drawer-detail/" },
+      { "role": "Form / View", "ok": "general-information-form · general-information-view", "bad": "general-information-facts" },
+      { "role": "Công bố", "ok": "product-select", "bad": "select" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Page và drawer",
+      "ref": "angular-portal/project-structure/README.md#tên-và-trách-nhiệm-ui",
+      "text": "Page tách `list`, `detail`, `create`, `update`; drawer tách `detail-side-drawer`, `create-side-drawer`, `update-side-drawer`. Không bắt buộc tạo đủ page và drawer cho cùng tác vụ.",
+      "file": "tree",
+      "range": [80, 100],
+      "lines": [81, 85, 87, 89, 98, 99, 100],
+      "focus": [0, 1],
+      "result": "Đường dẫn cho biết phạm vi của file.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Drawer thuộc components; không tự tạo page/route drawer nếu đặc tả chưa yêu cầu URL riêng.",
+          "ref": "angular-portal/project-structure/routes.md#quy-tắc",
+          "quote": "không tự tạo page/route drawer nếu đặc tả chưa yêu cầu URL riêng"
+        }
+      ]
+    },
+    {
+      "title": "-form và -view",
+      "ref": "angular-portal/project-structure/README.md#tên-và-trách-nhiệm-ui",
+      "text": "Component nhập/sửa có hậu tố `-form`; component chỉ đọc có hậu tố `-view`. Create/update có thể dùng chung component `-form`; không copy toàn bộ form.",
+      "file": "tree",
+      "range": [91, 104],
+      "lines": [101, 102, 104],
+      "focus": [2],
+      "result": "Create và update không có hai bản form trùng nhau.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không dùng tên facts trong Blueprint này.",
+          "quote": "Không dùng tên facts trong Blueprint này."
+        }
+      ]
+    },
+    {
+      "title": "Component công bố",
+      "ref": "angular-portal/project-structure/README.md#tên-và-trách-nhiệm-ui",
+      "text": "Component được công bố để consumer khác sử dụng mang tên rõ entity, ví dụ `customer-select`; component chỉ dùng nội bộ không lặp tên feature.",
+      "file": "tree",
+      "range": [91, 97],
+      "lines": [92, 93, 94],
+      "focus": [3],
+      "result": "Tên nội bộ ngắn, tên công bố rõ entity.",
+      "callouts": [
+        {
+          "kind": "tip",
+          "text": "Khi entity được chọn ở các feature khác, feature sở hữu entity cung cấp `<entity>-select`: selector `customer-select`, class `CustomerSelectComponent`.",
+          "ref": "angular-portal/project-structure/README.md#select-của-entity-và-enumconst"
+        }
+      ]
+    },
+    {
+      "title": "Chia trách nhiệm",
+      "ref": "angular-portal/project-structure/README.md#tên-và-trách-nhiệm-ui",
+      "text": "Màn lớn tách component theo nhóm thông tin/tác vụ, kể cả chỉ có một consumer. Component con khai báo input/output mà phần cha thực sự cần; page/drawer điều phối tải/lưu/điều hướng.",
+      "focus": [0, 1],
+      "must": { "quote": "Drawer detail/update mở bằng method phải kiểm tra quyền và chuẩn bị entity tương đương route trước khi mở" },
+      "result": "Mỗi component có một trách nhiệm rõ.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Drawer mở bằng method không tự được bảo vệ bởi guard/resolver của route. Close guard, output kết quả và việc refresh caller theo UI patterns."
+        },
+        {
+          "kind": "tip",
+          "text": "Nhóm thông tin dùng `sd-section`; đây là bố cục UI, không yêu cầu tạo một component/file cho mỗi section."
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "product/pages/list/list.component.ts",
+    "ref": "angular-portal/project-structure/README.md#tên-và-trách-nhiệm-ui"
+  },
+  "dont": {
+    "text": "product/pages/product-list/product-list.component.ts",
+    "ref": "angular-portal/project-structure/README.md#tên-và-trách-nhiệm-ui",
+    "quote": "không lặp lại trong tên thư mục/file UI chỉ dùng nội bộ"
+  },
+  "lint": [
+    { "status": "external", "note": "Tên thư mục/file UI kiểm bằng review" }
+  ],
+  "demo": null
+}

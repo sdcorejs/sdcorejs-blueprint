@@ -1,0 +1,15 @@
+{
+  "eyebrow": "Angular Portal Blueprint",
+  "title": "Bộ quy ước, kiến trúc và mẫu triển khai cho Angular Portal",
+  "lead": "Portal → Module nghiệp vụ → Feature. Markdown trong repo là nguồn quy tắc cho AI và developer; các trang ở đây trình bày lại bằng hình và từng bước. MDM/Product là tên minh họa, không phải module bắt buộc.",
+  "jobs": [
+    { "title": "Tạo feature mới", "text": "Đặt thư mục, đặt tên page, drawer, form.", "pages": ["bp-tree", "bp-ui-naming"] },
+    { "title": "Thêm route detail/update", "text": "Quyền vào route, resolver, trang lỗi.", "pages": ["bp-routes"] },
+    { "title": "Tích hợp module vào Portal", "text": "Public provider, lazy route, configuration.", "pages": ["bp-config", "bp-integration"] },
+    { "title": "Gọi API danh sách", "text": "Service entity, model, PagingReq.", "pages": ["bp-services"] },
+    { "title": "Làm màn list, detail, form", "text": "Bố cục, action, thay đổi chưa lưu, drawer.", "pages": ["bp-list", "bp-detail", "bp-create-update"] },
+    { "title": "Viết test", "text": "Spec cạnh source, integration, E2E theo owner.", "pages": ["bp-testing"] }
+  ],
+  "rules": "angular-portal/README.md#quy-tắc-chung",
+  "verification": "angular-portal/README.md#code-mẫu-và-kiểm-chứng"
+}

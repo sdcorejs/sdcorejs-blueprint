@@ -1,0 +1,148 @@
+{
+  "desc": "Đặt tên theo vai trò và kiểu dữ liệu: hàm, boolean, số, chuỗi, mảng, object và kiểu TypeScript.",
+  "minutes": 8,
+  "movedFrom": "I-12",
+  "tldr": [
+    "Hàm bắt đầu bằng động từ; output là sự kiện đã xảy ra, không tiền tố `on`",
+    "Boolean: `is` · `has` · `should` · `can`",
+    "Type, Interface, Enum: PascalCase, không tiền tố `I`/`T`"
+  ],
+  "hero": {
+    "type": "compare",
+    "label": "Bảng đặt tên theo kiểu",
+    "items": [
+      { "role": "Hàm · Output", "ok": "getUserProfile() · onSave() · output saved", "bad": "output onSave · output click" },
+      { "role": "Boolean · Number", "ok": "isSaving · canEdit · totalPrice · activeTabIndex", "bad": "saving · valid" },
+      { "role": "String · Array · Object", "ok": "createdAt · users · userIds · chartConfig", "bad": "data · info · item · obj" },
+      { "role": "Type · Enum", "ok": "ProductDto · ProductStatus · UserRole", "bad": "IProductDto · TProductStatus" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Hàm và method",
+      "ref": "angular-portal/conventions/naming.md#hàm-và-method",
+      "text": "Hàm đại diện cho một hành động, nên bắt đầu bằng động từ: đọc dữ liệu `get`/`fetch`/`read`, ghi/sửa `create`/`update`/`delete`/`remove`/`set`/`save`, xử lý sự kiện `on` + hành động, biến đổi dữ liệu `to`/`format`/`convert`. Service entity dùng `list`, `detail`, `create`, `update`, `delete`, `approve`, `reject`.",
+      "focus": [0],
+      "should": { "quote": "Hàm đại diện cho một hành động, nên bắt đầu bằng động từ." },
+      "result": "Đọc tên hàm biết nó đọc, ghi, xử lý sự kiện hay biến đổi dữ liệu.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Output của component là sự kiện đã xảy ra: `saved`, `selected`."
+        },
+        {
+          "kind": "warn",
+          "text": "Không đặt tiền tố `on` cho output và không trùng tên sự kiện native như `click`, `change`.",
+          "quote": "Không đặt tiền tố on cho output và không trùng tên sự kiện native như click, change."
+        },
+        {
+          "kind": "info",
+          "text": "Private field/method dùng cú pháp `#`.",
+          "ref": "angular-portal/conventions/naming.md#quy-tắc"
+        },
+        {
+          "kind": "tip",
+          "text": "Danh sách động từ cho tên hàm là danh sách mở: gặp trường hợp hợp lệ thì bổ sung, không tắt rule.",
+          "ref": "angular-portal/conventions/eslint.md#lưu-ý"
+        }
+      ]
+    },
+    {
+      "title": "Boolean",
+      "ref": "angular-portal/conventions/naming.md#boolean",
+      "text": "Boolean dùng tiền tố `is` + tính từ/V-ing cho trạng thái hiện tại, `has` + danh từ/V3 cho điều đã có hoặc đã hoàn thành, `should` + động từ cho điều kiện có nên làm, `can` + động từ cho khả năng hoặc quyền. Từ đơn `loading`, `disabled`, `readonly` chỉ dùng cho trạng thái toàn cục, phổ biến. Áp dụng cả cho `signal(false)`, `computed(() => …)` và `input<boolean>()`.",
+      "focus": [1],
+      "result": "Đọc tên biết đó là trạng thái, điều kiện hay quyền.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "`naming-convention` chỉ thấy kiểu `WritableSignal<boolean>`, không thấy boolean bên trong; custom rule `local/signal-boolean-prefix` bù phần này.",
+          "ref": "angular-portal/conventions/eslint.md#lưu-ý"
+        }
+      ]
+    },
+    {
+      "title": "Number và string",
+      "ref": "angular-portal/conventions/naming.md#number-và-string",
+      "text": "Số lượng tổng dùng tiền tố `total` hoặc hậu tố `Count` (`totalPrice`, `userCount`); chỉ số vị trí dùng hậu tố `Index`; giới hạn dùng tiền tố `min`/`max`. Chuỗi ngày tháng có hậu tố `At`/`Date` (`createdAt`, `birthDate`); định danh, đường dẫn có hậu tố `Id`/`Url`/`Path`.",
+      "focus": [1, 2],
+      "result": "Nhìn tên biết số đếm, vị trí, giới hạn hay loại chuỗi.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Ý nghĩa của tên (`Count`, `Index`, `At`, `Url`…) kiểm bằng review.",
+          "ref": "angular-portal/conventions/naming.md#kiểm-tra-tự-động"
+        }
+      ]
+    },
+    {
+      "title": "Array và object",
+      "ref": "angular-portal/conventions/naming.md#array-và-object",
+      "text": "Array dùng số nhiều: `users`, `products`. Dùng `List` khi số nhiều bất quy tắc hoặc dễ hiểu lầm (`childList`); mảng kiểu nguyên thủy dùng `Ids`, `Names` (`userIds`). Object là danh từ số ít thể hiện bản thể; object cấu hình có hậu tố `Config` hoặc `Options`. Biến lặp đặt theo phần tử: `for (const product of products)`.",
+      "focus": [2],
+      "result": "Nhìn tên biết phần tử của mảng và bản thể của object.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không dùng tên chung chung `data`, `info`, `item`, `obj`, kể cả biến lặp.",
+          "ref": "angular-portal/conventions/naming.md#quy-tắc",
+          "quote": "Không dùng tên chung chung data, info, item, obj, kể cả biến lặp."
+        }
+      ]
+    },
+    {
+      "title": "Type và model",
+      "ref": "angular-portal/conventions/naming.md#type-model-và-enum",
+      "text": "Model đặt trong `<entity>.model.ts`; entity giữ hậu tố `Dto`, request `Req`, response `Res`. Trạng thái ưu tiên union type + const options: `ProductStatus` đi cùng `PRODUCT_STATUS_OPTIONS`.",
+      "file": "product-model",
+      "lines": [1, 3, 8],
+      "focus": [3],
+      "should": { "quote": "Ưu tiên union type + const options cho trạng thái." },
+      "result": "Kiểu đọc như danh từ; trạng thái có type và danh sách lựa chọn đi cùng.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Type, Interface, Enum dùng PascalCase; không thêm tiền tố `I` hoặc `T`.",
+          "ref": "angular-portal/conventions/naming.md#quy-tắc",
+          "quote": "Type, Interface, Enum dùng PascalCase; không thêm tiền tố I hoặc T."
+        },
+        {
+          "kind": "warn",
+          "text": "Kiểu khai báo ở API boundary; không dùng `any`.",
+          "ref": "angular-portal/conventions/naming.md#quy-tắc",
+          "quote": "Kiểu khai báo ở API boundary; không dùng any."
+        }
+      ]
+    },
+    {
+      "title": "Enum khi vẫn cần",
+      "ref": "angular-portal/conventions/naming.md#type-model-và-enum",
+      "text": "Khi vẫn cần enum: tên PascalCase số ít, member PascalCase.",
+      "file": "user-role",
+      "lines": [1, 2, 3],
+      "focus": [3],
+      "result": "Enum đọc như danh từ: `UserRole.Admin`."
+    }
+  ],
+  "do": {
+    "text": "readonly saved = output<ProductDto>()",
+    "ref": "angular-portal/conventions/naming.md#hàm-và-method"
+  },
+  "dont": {
+    "text": "readonly onSave = output<ProductDto>()",
+    "ref": "angular-portal/conventions/naming.md#hàm-và-method",
+    "quote": "Không đặt tiền tố on cho output và không trùng tên sự kiện native như click, change.",
+    "rule": "@angular-eslint/no-output-on-prefix"
+  },
+  "lint": [
+    { "rule": "@angular-eslint/no-output-on-prefix", "status": "on", "note": "output không bắt đầu bằng on" },
+    { "rule": "no-output-native", "status": "on", "note": "output không trùng sự kiện native" },
+    { "rule": "@typescript-eslint/no-explicit-any", "status": "on", "note": "không dùng any" },
+    { "rule": "@typescript-eslint/naming-convention", "status": "config", "note": "hàm · boolean · array · Type/Enum; type-aware" },
+    { "rule": "id-denylist", "status": "config", "note": "không data, info, item, obj" },
+    { "rule": "no-restricted-syntax", "status": "config", "note": "private member dùng #" },
+    { "rule": "local/signal-boolean-prefix", "status": "custom", "note": "boolean trong signal/computed/input" },
+    { "status": "external", "note": "Ý nghĩa của tên (Count, Index, At, Url…) kiểm bằng review" }
+  ],
+  "demo": null
+}

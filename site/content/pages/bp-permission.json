@@ -1,0 +1,124 @@
+{
+  "desc": "Mã MODULE_ENTITY_TYPE_ACTION; Role nhận nhóm G; C ở UI/route, A và phạm vi bản ghi ở backend.",
+  "minutes": 9,
+  "movedFrom": "I-09 · I-10 · I-11",
+  "tldr": [
+    "C = quyền frontend · A = quyền backend · G = nhóm gán vào Role",
+    "UI: `*sdPermission` · route: `data.permission` + `canActivateChild` ở route cha",
+    "Backend kiểm A và phạm vi bản ghi"
+  ],
+  "hero": {
+    "type": "tree",
+    "label": "Cây quyền",
+    "items": [
+      { "t": "Role: Nhân viên kinh doanh" },
+      { "t": "└── Tạo sản phẩm      MDM_PRODUCT_G_CREATE   → gán vào Role" },
+      { "t": "    ├── Quyền FE      MDM_PRODUCT_C_CREATE   → menu, route, action trên UI" },
+      { "t": "    └── Quyền BE      MDM_PRODUCT_A_CREATE   → API" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Đặt mã quyền",
+      "ref": "angular-portal/conventions/permission.md#mã-quyền",
+      "text": "Mẫu `<MODULE>_<ENTITY>_<TYPE>_<ACTION>`, viết `UPPER_SNAKE_CASE`. `C` là quyền frontend, kiểm ở menu, route, action trên UI; `A` là quyền backend, kiểm ở API; `G` là nhóm nghiệp vụ, lựa chọn gán vào Role trên UI của end user.",
+      "file": "permission-tree",
+      "lines": [2, 3, 4],
+      "focus": [1, 2, 3],
+      "result": "Mọi mã quyền đọc theo cùng một thứ tự."
+    },
+    {
+      "title": "Nhóm G cho Role",
+      "ref": "angular-portal/conventions/permission.md#quy-tắc",
+      "text": "Role editor của end user chỉ hiển thị nhóm G bằng nhãn nghiệp vụ, không hiển thị riêng FE/BE. Tập quyền hiệu lực là hợp các quyền của mọi nhóm còn gán; bỏ một nhóm không xóa quyền mà nhóm khác còn cấp.",
+      "focus": [0, 1],
+      "result": "Role editor có “Tạo sản phẩm”, không có lựa chọn FE/BE riêng.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không suy mã C/A bằng cách thay ký tự trong mã G; một nhóm có thể chứa nhiều quyền.",
+          "quote": "Không suy mã C/A bằng cách thay ký tự trong mã G"
+        }
+      ]
+    },
+    {
+      "title": "C ở UI và route",
+      "ref": "angular-portal/conventions/permission.md#quy-tắc",
+      "text": "UI dùng `*sdPermission` với chuỗi quyền C. Route khai báo `data.permission`; kiểm tra bằng `canActivateChild: [SdPermissionGuard]` ở route cha. Detail và update đánh giá riêng.",
+      "file": "detail-route",
+      "lines": [3],
+      "focus": [2],
+      "result": "Thiếu quyền C thì action trên UI không hiện và route bị chặn.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không gọi `permission.hasPermission(...)` trong biểu thức render.",
+          "quote": "không gọi permission.hasPermission(...) trong biểu thức render"
+        },
+        {
+          "kind": "warn",
+          "text": "Không coi `canActivate: [SdPermissionGuard]` trên route đích là đủ để kiểm tra quyền.",
+          "ref": "angular-portal/project-structure/routes.md#permission-theo-consumer",
+          "quote": "không coi canActivate: [SdPermissionGuard] trên route đích là đủ để kiểm tra quyền"
+        }
+      ]
+    },
+    {
+      "title": "A ở backend",
+      "ref": "angular-portal/conventions/permission.md#quy-tắc",
+      "text": "Backend kiểm A với principal đã xác thực, không tin danh sách quyền do browser gửi.",
+      "focus": [3],
+      "result": "Gọi API ngoài UI vẫn bị kiểm quyền A.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Kiểm tra A thuộc backend.",
+          "ref": "angular-portal/conventions/permission.md#kiểm-tra-tự-động"
+        }
+      ]
+    },
+    {
+      "title": "Phạm vi dữ liệu",
+      "ref": "angular-portal/conventions/permission.md#phạm-vi-dữ-liệu",
+      "text": "Có quyền action không đồng nghĩa xem được mọi bản ghi. Server kiểm cả quyền action và quan hệ giữa user với bản ghi cho list lẫn detail. Assignment gắn với user, bản ghi cụ thể và trạng thái còn hiệu lực.",
+      "file": "scope-check",
+      "lines": [1, 2],
+      "focus": [3],
+      "must": { "quote": "assignment hết hạn phải được thu hồi theo dữ liệu server" },
+      "result": "List và detail chỉ trả bản ghi user được phép xem.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không lưu quyền toàn cục từ một task riêng.",
+          "quote": "Không lưu quyền toàn cục từ một task riêng"
+        },
+        {
+          "kind": "info",
+          "text": "Chỉ lọc list ở frontend vẫn lộ dữ liệu qua API/detail."
+        },
+        {
+          "kind": "info",
+          "text": "Quy tắc phạm vi cụ thể do domain quyết định; đoạn mã là mã giả minh họa."
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "Role editor hiển thị nhóm “Tạo sản phẩm”",
+    "ref": "angular-portal/conventions/permission.md#quy-tắc"
+  },
+  "dont": {
+    "text": "Hai checkbox Quyền FE / Quyền BE cho end user",
+    "ref": "angular-portal/conventions/permission.md#quy-tắc",
+    "quote": "Role editor của end user chỉ hiển thị nhóm G bằng nhãn nghiệp vụ, không hiển thị riêng FE/BE."
+  },
+  "lint": [
+    { "rule": "no-restricted-syntax", "status": "config", "note": "chuỗi trong permission: khớp MODULE_ENTITY_[C|A|G]_ACTION" },
+    { "rule": "local/no-permission-call-in-template", "status": "custom", "note": "chặn hasPermission() trong template" },
+    { "status": "external", "note": "Kiểm tra A thuộc backend" }
+  ],
+  "demo": {
+    "url": "https://sdcorejs.github.io/portal-template/instruction/authorization/model",
+    "label": "Role simulator: gán nhóm G, xem quyền C/A hiệu lực."
+  }
+}

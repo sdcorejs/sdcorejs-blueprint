@@ -1,0 +1,168 @@
+{
+  "desc": "sd-page → div.h-full.p-8 → sd-table; search/filter của Core; mã ở cột đầu mở detail.",
+  "minutes": 8,
+  "movedFrom": null,
+  "tldr": [
+    "Không `overflow-hidden`, `host.class` hay SCSS riêng theo mặc định",
+    "Mã/tên ở cột dữ liệu đầu là hyperlink tới detail",
+    "Tabs sát header, padding chỉ ở body"
+  ],
+  "hero": {
+    "type": "shot",
+    "label": "Ảnh list từ portal-template",
+    "img": "assets/img/portal-list.png",
+    "ratio": "1440 / 1000",
+    "alt": "Màn list khách hàng doanh nghiệp",
+    "items": [
+      { "t": "headerRight · Tạo mới", "x": "95%", "y": "3%" },
+      { "t": "External filter", "x": "28%", "y": "10%" },
+      { "t": "Quick search", "x": "48%", "y": "10%" },
+      { "t": "Cột mã · hyperlink", "x": "24%", "y": "15%" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Thứ tự các vùng",
+      "ref": "angular-portal/ui-patterns.md#list--bố-cục-chuẩn",
+      "text": "Page header → tabs nếu có → score card nếu có → external filter khi cần → quick search → table với inline filter theo column. Bố cục logic không đòi hỏi mỗi vùng là một component/file riêng; external filter, quick search, inline filter và pagination ưu tiên dùng ngay trong `sd-table`.",
+      "file": "list-layout",
+      "lines": [2, 3, 4, 6],
+      "focus": [0, 1, 2],
+      "result": "Vùng optional vắng mặt thì không để lại khoảng trống.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Tabs nằm sát dưới header, nền trắng đồng nhất; không thêm padding/margin/gap bao quanh thanh tab, chỉ padding phần body trong tab.",
+          "quote": "không thêm padding/margin/gap bao quanh thanh tab"
+        },
+        {
+          "kind": "warn",
+          "text": "Score card dùng `sd-card` của Core UI; không tạo vùng trống khi không có score card.",
+          "quote": "Không tạo vùng trống khi không có score card"
+        },
+        {
+          "kind": "tip",
+          "text": "Ưu tiên quick search kết hợp inline filter; external filter dành cho điều kiện cần hiển thị riêng theo nghiệp vụ."
+        }
+      ]
+    },
+    {
+      "title": "Chiều cao và scroll",
+      "ref": "angular-portal/ui-patterns.md#chiều-cao-và-quyền-sở-hữu-scroll",
+      "text": "List đơn giản dùng cấu trúc `sd-page` → `div.h-full.p-8` → `sd-table` như CRM. Truyền ràng buộc qua chuỗi route host → sd-page content → tab group/active panel nếu có → list body → sd-table; vùng co giãn cần `min-height: 0`, `min-width: 0`. Chỉ viewport dữ liệu của table cuộn.",
+      "file": "list-html",
+      "lines": [1, 13, 14, 24, 25, 26],
+      "focus": [],
+      "must": { "quote": "Portal phải cấp chiều cao khả dụng xác định cho vùng route." },
+      "result": "Header, filter và pagination đứng yên; dữ liệu dài cuộn trong table.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không bọc `sd-table` trong một div `overflow: auto` tạo thêm scrollbar; không ấn định chiều cao table bằng số pixel.",
+          "quote": "Không bọc sd-table trong một div overflow: auto tạo thêm scrollbar."
+        },
+        {
+          "kind": "warn",
+          "text": "Không dùng `overflow-hidden` ở feature để che lỗi tràn nội dung; xác định wrapper gây scrollbar và xử lý đúng owner layout.",
+          "quote": "Không dùng overflow-hidden ở feature để che lỗi tràn nội dung."
+        },
+        {
+          "kind": "info",
+          "text": "`sd-page` hiện có wrapper `overflow-y: auto`, nên chỉ nhìn utility trong HTML chưa chứng minh được chỉ table cuộn; khi tích hợp cần đo hành vi trên browser.",
+          "ref": "angular-portal/ui-patterns.md#đối-chiếu-core-và-mẫu-tham-khảo"
+        }
+      ]
+    },
+    {
+      "title": "Header và action",
+      "ref": "angular-portal/ui-patterns.md#header-có-nhiều-action-và-menu",
+      "text": "Dùng một wrapper `headerRight` với utility `d-flex align-items-center gap-8 flex-wrap`. Action chính dùng `type=\"fill\"`, đặt ngoài cùng bên phải; action phụ dùng kiểu nhẹ hơn. Fragment minh họa gom sớm Nhập/Xuất vào `SdButtonItem` khi màn hẹp.",
+      "file": "header-menu",
+      "lines": [1, 2, 7, 12, 19, 23],
+      "focus": [0],
+      "must": { "quote": "Khi có hơn ba tác vụ, bắt buộc giữ hai tác vụ ưu tiên và gom từ tác vụ thứ ba bằng SdButtonItem" },
+      "result": "Tối đa ba mục cấp ngoài, action chính ở ngoài cùng bên phải.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không dùng xuống dòng để giữ hơn ba mục cấp ngoài; có thể gom sớm khi thiếu không gian.",
+          "quote": "không dùng xuống dòng để giữ hơn ba mục cấp ngoài"
+        },
+        {
+          "kind": "warn",
+          "text": "Menu có permission riêng do consumer quy định; không suy quyền hiển thị menu bằng OR các quyền con.",
+          "quote": "Không suy quyền hiển thị menu bằng OR các quyền con."
+        }
+      ]
+    },
+    {
+      "title": "Search và filter",
+      "ref": "angular-portal/ui-patterns.md#search-và-filter",
+      "text": "Dùng quick search để tìm theo các trường đã chọn, ví dụ mã/tên; dùng inline filter để lọc chính xác theo từng column. Chỉ thêm `externalFilters` theo nhu cầu nghiệp vụ; giữ mặc định inline filter của Core/consumer.",
+      "file": "list-ts",
+      "lines": [31, 32, 33, 34, 35],
+      "focus": [1, 2],
+      "result": "Filter, sort và trang gửi đúng request.",
+      "callouts": [
+        {
+          "kind": "tip",
+          "text": "Truyền nguyên tham số thứ hai của callback `items` vào `ProductService.list(req)`; base API service map sang request BE, không chỉ lấy keyword hoặc bỏ filter/sort của Core.",
+          "ref": "angular-portal/ui-patterns.md#list-đơn-giản--ts-và-html"
+        },
+        {
+          "kind": "warn",
+          "text": "Khi thêm external filter, tránh tạo hai state độc lập cho cùng một điều kiện; card, filter và request phản ánh cùng giá trị đã áp dụng.",
+          "quote": "tránh tạo hai state độc lập cho cùng một điều kiện"
+        },
+        {
+          "kind": "info",
+          "text": "`PagingReq.pageNumber` của Core {core} bắt đầu từ 0. Nút sort cần cả `sort: { enable: true }` trong table option và `sortable: true` trên từng cột.",
+          "ref": "angular-portal/ui-patterns.md#đối-chiếu-core-và-mẫu-tham-khảo"
+        }
+      ]
+    },
+    {
+      "title": "Cột mã và quyền",
+      "ref": "angular-portal/ui-patterns.md#giới-hạn-commandaction-trên-list-và-detail",
+      "text": "List không có tác vụ Edit/Cập nhật hoặc Detail/Chi tiết. Mở detail bằng hyperlink ngay trên giá trị mã/tên ở cột dữ liệu đầu tiên (không tính checkbox/STT). Khi thiếu quyền detail, mã/tên vẫn hiển thị dạng text.",
+      "file": "list-html",
+      "lines": [15, 16, 17, 18, 19, 20, 21, 22],
+      "focus": [3],
+      "result": "Mở detail từ dữ liệu, không cần nút riêng.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không đặt chữ “Chi tiết” hoặc icon mở detail riêng cạnh mã/tên.",
+          "quote": "Không đặt chữ “Chi tiết” hoặc icon mở detail riêng cạnh mã/tên."
+        },
+        {
+          "kind": "warn",
+          "text": "Không tạo link giả hoặc click handler trên cả dòng để thay đường điều hướng có quyền.",
+          "quote": "không tạo link giả hoặc click handler trên cả dòng để thay đường điều hướng có quyền"
+        },
+        {
+          "kind": "info",
+          "text": "Core {core} chưa có `sdPermissionElse`, nên `canOpenDetail` được chuẩn bị trong TS sau khi guard nạp quyền để chọn text fallback.",
+          "ref": "angular-portal/ui-patterns.md#list-đơn-giản--ts-và-html"
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "<div class=\"h-full p-8\"><sd-table … /></div>",
+    "ref": "angular-portal/ui-patterns.md#chiều-cao-và-quyền-sở-hữu-scroll"
+  },
+  "dont": {
+    "text": "overflow-hidden, host.class + SCSS riêng cho list đơn giản",
+    "ref": "angular-portal/ui-patterns.md#chiều-cao-và-quyền-sở-hữu-scroll",
+    "quote": "không thêm overflow-hidden, host.class, flex-1 hay SCSS riêng theo mặc định"
+  },
+  "lint": [
+    { "rule": "local/no-permission-call-in-template", "status": "custom", "note": "Không gọi service permission trong biểu thức render" },
+    { "status": "external", "note": "Bố cục và scroll kiểm bằng E2E desktop/mobile" }
+  ],
+  "demo": {
+    "url": "https://sdcorejs.github.io/portal-template/page",
+    "label": "Các mẫu list trong Pages của portal-template."
+  }
+}

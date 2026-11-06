@@ -12,3 +12,7 @@ validation/angular-consumer/generated/
 validation/angular-consumer/dist/
 validation/angular-consumer/.angular/
 validation/angular-consumer/*.log
+
+# Blueprint site
+site/dist/
+site/.work/

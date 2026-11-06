@@ -1,0 +1,149 @@
+{
+  "desc": "Ưu tiên Core, *sdPermission, tối đa ba tác vụ cấp ngoài; back ở headerLeft, drawer đóng bằng X.",
+  "minutes": 7,
+  "movedFrom": "I-10 · I-13",
+  "tldr": [
+    "≤ 3 mục cấp ngoài; từ 4 tác vụ: 2 trực tiếp + “Thao tác khác”",
+    "List không có Edit/Detail; mã/tên ở cột đầu là link",
+    "Không lặp nút Hủy/Đóng"
+  ],
+  "hero": {
+    "type": "flow",
+    "label": "Header detail",
+    "items": [
+      { "t": "headerLeft", "s": "Back + identity" },
+      { "t": "Identity", "s": "Chi tiết … · badge" },
+      { "t": "headerRight", "s": "gap-8 · ≤ 3 mục" },
+      { "t": "Thao tác khác", "s": "Action Popover · children" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Ưu tiên Core",
+      "ref": "angular-portal/ui-patterns.md#quy-tắc-ui-dùng-chung",
+      "text": "Ưu tiên component, mặc định và utility Core; chỉ tạo `*.component.scss`/`styleUrl` khi có nhu cầu mà Core chưa đáp ứng. Quy tắc áp dụng cho list, detail, create/update, drawer và wrapper. Các vùng như **Thông tin chung**, **Liên hệ và ghi chú** dùng `sd-section`; bên trong chọn `sd-view`, `sd-section-item`, form hoặc table tùy nội dung.",
+      "focus": [],
+      "result": "Không có SCSS hay khung section tự dựng khi Core đã đáp ứng.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không tạo class riêng chỉ để bọc layout/spacing có utility tương đương; không dùng `overflow-hidden` che lỗi bố cục.",
+          "quote": "không dùng overflow-hidden che lỗi bố cục"
+        },
+        {
+          "kind": "warn",
+          "text": "Không thay section bằng heading và đường kẻ tự dựng.",
+          "quote": "Không thay section bằng heading và đường kẻ tự dựng."
+        },
+        {
+          "kind": "tip",
+          "text": "Dùng wording cập nhật thống nhất trong cùng ứng dụng: `Cập nhật <entity>` hoặc `Chỉnh sửa <entity>`. Mẫu Blueprint dùng `Cập nhật`."
+        }
+      ]
+    },
+    {
+      "title": "Giới hạn tác vụ",
+      "ref": "angular-portal/ui-patterns.md#giới-hạn-commandaction-trên-list-và-detail",
+      "text": "List/detail có tối đa ba mục tác vụ cấp ngoài trong mỗi vùng cùng scope; command một dòng, `selector.actions` và vùng action được đếm riêng. Từ bốn tác vụ: hai tác vụ ưu tiên hiển thị trực tiếp, mục thứ ba là `Thao tác khác` chứa tác vụ thứ ba đến hết. Với table, nhóm bằng `children` của command/action. Back, search/filter và pagination không tính vào số tác vụ.",
+      "file": "action-group",
+      "lines": [5, 12],
+      "focus": [2, 3],
+      "result": "Tác vụ thứ ba trở đi nằm trong một nhóm, không mất hoặc lặp tác vụ.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không để ba tác vụ trực tiếp rồi thêm một menu thứ tư; không chỉ chuyển tác vụ thứ tư vào menu.",
+          "quote": "Không để ba tác vụ trực tiếp rồi thêm một menu thứ tư; không chỉ chuyển tác vụ thứ tư vào menu."
+        },
+        {
+          "kind": "warn",
+          "text": "List không có tác vụ Edit/Cập nhật hoặc Detail/Chi tiết, kể cả command dòng, `selector.actions`, header hay `children`; mở detail bằng hyperlink trên mã/tên ở cột dữ liệu đầu tiên.",
+          "quote": "List không có tác vụ Edit/Cập nhật hoặc Detail/Chi tiết, kể cả command dòng, selector.actions, header hay children."
+        },
+        {
+          "kind": "info",
+          "text": "Core {core} hỗ trợ `children` nhưng không tự áp dụng ngưỡng ba của Blueprint; consumer chuẩn bị cấu hình phù hợp và giữ từng tác vụ đúng một lần."
+        }
+      ]
+    },
+    {
+      "title": "Action Popover trên detail",
+      "ref": "angular-portal/ui-patterns.md#giới-hạn-commandaction-trên-list-và-detail",
+      "text": "Với detail, dùng **Action Popover của `SdButton`**: đặt `sd-button-item` bên trong `sd-button`, Core tự mở popover. Nhóm có permission riêng theo convention consumer; từng tác vụ con vẫn giữ permission, điều kiện và handler riêng.",
+      "file": "detail-header",
+      "lines": [2, 3, 4, 5],
+      "focus": [3],
+      "result": "Tác vụ phụ nằm trong popover, header giữ tối đa ba mục.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không tự dựng dropdown hoặc lồng các `sd-button` tương tác vào trigger.",
+          "quote": "không tự dựng dropdown hoặc lồng các sd-button tương tác vào trigger"
+        },
+        {
+          "kind": "warn",
+          "text": "Không dùng quyền nhóm thay quyền con, không suy quyền nhóm bằng OR các quyền con.",
+          "quote": "Không dùng quyền nhóm thay quyền con, không suy quyền nhóm bằng OR các quyền con."
+        }
+      ]
+    },
+    {
+      "title": "Quyền trên action",
+      "ref": "angular-portal/ui-patterns.md#quy-tắc-ui-dùng-chung",
+      "text": "Permission UI dùng `*sdPermission` với chuỗi quyền của consumer. Điều kiện trạng thái nghiệp vụ được chuẩn bị trong TS bằng state/computed; template không gọi `permission.hasPermission(...)` hoặc hàm lookup/format tùy ý.",
+      "file": "detail-header",
+      "lines": [6, 7],
+      "focus": [2],
+      "result": "Mỗi action ẩn/hiện theo đúng quyền của nó.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Một action chính nổi bật; action phụ dùng kiểu nhẹ hơn. Signal và event handler vẫn dùng theo Angular."
+        }
+      ]
+    },
+    {
+      "title": "Back, X và nút",
+      "ref": "angular-portal/ui-patterns.md#header",
+      "text": "Page dùng nút trở lại ở `headerLeft` của `sd-page`; action ở `headerRight`. Drawer dùng slot riêng của `sd-side-drawer`.",
+      "file": "detail-header",
+      "lines": [1],
+      "focus": [0, 2],
+      "result": "Mỗi màn có một đường thoát.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Drawer: X là đường đóng, không thêm nút Đóng/Hủy thường trực lặp lại.",
+          "ref": "angular-portal/ui-patterns.md#phạm-vi-và-bố-cục",
+          "quote": "X là đường đóng drawer, không thêm nút Đóng/Hủy thường trực lặp lại"
+        },
+        {
+          "kind": "warn",
+          "text": "Create/update: không thêm nút “Hủy thay đổi” cạnh action lưu vì đã có đường quay lại.",
+          "ref": "angular-portal/ui-patterns.md#header-section-và-hướng-dẫn",
+          "quote": "không thêm nút “Hủy thay đổi” cạnh action lưu vì đã có đường quay lại"
+        },
+        {
+          "kind": "tip",
+          "text": "Button thông thường dùng size `sm`. `SdButton` ở Core {core} mặc định đã là `sm`, nên bỏ thuộc tính này khi giữ mặc định; chỉ gán khi cần ghi đè.",
+          "ref": "angular-portal/ui-patterns.md#quy-tắc-ui-dùng-chung"
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "*sdPermission=\"'MDM_PRODUCT_C_CREATE'\"",
+    "ref": "angular-portal/ui-patterns.md#quy-tắc-ui-dùng-chung"
+  },
+  "dont": {
+    "text": "@if (permission.hasPermission('…')) trong template",
+    "ref": "angular-portal/ui-patterns.md#quy-tắc-ui-dùng-chung",
+    "quote": "template không gọi permission.hasPermission(...) hoặc hàm lookup/format tùy ý",
+    "rule": "local/no-permission-call-in-template"
+  },
+  "lint": [
+    { "rule": "local/no-permission-call-in-template", "status": "custom", "note": "Chặn hasPermission() trong template" },
+    { "status": "external", "note": "Ngưỡng ba tác vụ, nhóm “Thao tác khác” và list không có Edit/Detail — kiểm bằng review/E2E" }
+  ],
+  "demo": null
+}

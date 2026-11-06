@@ -1,0 +1,129 @@
+{
+  "desc": "Rule ESLint cho quy ước máy kiểm được; bộ validation kiểm block code mẫu và UI thật.",
+  "minutes": 6,
+  "movedFrom": null,
+  "tldr": [
+    "Rule mới bật `warn`, sửa code hiện có cho sạch rồi mới nâng `error`",
+    "Custom rule đặt `meta.docs.url` trỏ về trang Blueprint",
+    "Foundation kiểm block; consumer chạy Core UI thật"
+  ],
+  "hero": {
+    "type": "flow",
+    "label": "Từ Markdown đến bằng chứng",
+    "items": [
+      { "t": "Block code", "s": "nhãn đường dẫn" },
+      { "t": "angular-foundation", "s": "trích block · type-check · DI/HTTP" },
+      { "t": "angular-consumer", "s": "Core UI · AOT · Playwright" },
+      { "t": "ESLint", "s": "consumer ghép vào eslint.config.js" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Block có nhãn đường dẫn",
+      "ref": "angular-portal/README.md#code-mẫu-và-kiểm-chứng",
+      "text": "Code được đặt trong các block có nhãn đường dẫn. Mẫu nền tảng dùng Angular {angular}/TypeScript {typescript} làm baseline kiểm tra.",
+      "focus": [0],
+      "result": "Bộ kiểm chứng nền tảng trích trực tiếp các block đó.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Baseline không phải yêu cầu mọi project phải nâng cấp lên đúng phiên bản đó."
+        }
+      ]
+    },
+    {
+      "title": "Hai bộ kiểm chứng",
+      "ref": "angular-portal/conventions/eslint.md#kiểm-chứng",
+      "text": "`validation/angular-foundation` trích block Markdown, type-check, kiểm DI/HTTP. `validation/angular-consumer` chạy Core UI thật, production AOT, router integration và Playwright trên CI.",
+      "focus": [1, 2],
+      "result": "Biết phần nào đã chạy trên Core thật, phần nào mới type-check.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Code fixture/typecheck không thay bằng chứng E2E.",
+          "quote": "Code fixture/typecheck không thay bằng chứng E2E."
+        },
+        {
+          "kind": "info",
+          "text": "Route target trong bộ nền tảng vẫn là fixture tối giản; README của consumer nêu tập con đã chạy và giới hạn.",
+          "ref": "angular-portal/README.md#code-mẫu-và-kiểm-chứng"
+        },
+        {
+          "kind": "warn",
+          "text": "Không có mẫu Core UI list/detail/form/drawer được tuyên bố hoàn thành ở phần nền tảng.",
+          "ref": "angular-portal/README.md#code-mẫu-và-kiểm-chứng",
+          "quote": "Không có mẫu Core UI list/detail/form/drawer được tuyên bố hoàn thành ở phần nền tảng này."
+        }
+      ]
+    },
+    {
+      "title": "Rule cho consumer",
+      "ref": "angular-portal/conventions/eslint.md#eslint-cho-quy-ước-blueprint",
+      "text": "Blueprint liệt kê rule; consumer ghép vào `eslint.config.js` của mình. Rule mới bật ở mức `warn`, sửa code hiện có cho sạch rồi mới nâng `error`.",
+      "file": "eslint-config",
+      "lines": [6, 20, 23, 33, 34],
+      "focus": [3],
+      "result": "Rule mới chỉ cảnh báo cho tới khi code hiện có sạch."
+    },
+    {
+      "title": "Type-aware và custom rule",
+      "ref": "angular-portal/conventions/eslint.md#lưu-ý",
+      "text": "Rule naming-convention cho boolean/array và `no-floating-promises` cần lint type-aware; đo thời gian `npm run lint` trước và sau khi bật. `naming-convention` chỉ thấy kiểu `WritableSignal<boolean>`, không thấy boolean bên trong; custom rule `local/signal-boolean-prefix` bù phần này.",
+      "file": "eslint-config",
+      "range": [1, 5],
+      "lines": [3, 4],
+      "focus": [3],
+      "result": "Thời gian lint được đo; phần boolean trong signal vẫn được kiểm.",
+      "callouts": [
+        {
+          "kind": "tip",
+          "text": "Custom rule có test bằng RuleTester, đặt cùng `eslint-rules/`."
+        },
+        {
+          "kind": "warn",
+          "text": "Danh sách động từ cho tên hàm là danh sách mở; bổ sung khi gặp trường hợp hợp lệ, không tắt rule.",
+          "quote": "Danh sách động từ cho tên hàm là danh sách mở; bổ sung khi gặp trường hợp hợp lệ, không tắt rule."
+        }
+      ]
+    },
+    {
+      "title": "Message trỏ về Blueprint",
+      "ref": "angular-portal/conventions/eslint.md#lưu-ý",
+      "text": "Chỉ `no-restricted-*` cho đổi message. Custom rule đặt `meta.docs.url` trỏ về trang Blueprint tương ứng.",
+      "file": "eslint-config",
+      "range": [25, 32],
+      "lines": [27, 29, 31],
+      "focus": [3],
+      "result": "Cảnh báo lint chỉ tới đúng tài liệu quy ước."
+    }
+  ],
+  "do": {
+    "text": "Bằng chứng E2E: angular-consumer chạy Core UI thật, AOT và Playwright trên CI",
+    "ref": "angular-portal/conventions/eslint.md#kiểm-chứng"
+  },
+  "dont": {
+    "text": "Coi fixture/typecheck là bằng chứng E2E",
+    "ref": "angular-portal/conventions/eslint.md#kiểm-chứng",
+    "quote": "Code fixture/typecheck không thay bằng chứng E2E."
+  },
+  "lint": [
+    { "rule": "@angular-eslint/no-output-on-prefix · no-output-native", "status": "on", "note": "Output không tiền tố on, không trùng sự kiện native · có trong tsRecommended" },
+    { "rule": "@typescript-eslint/no-explicit-any", "status": "on", "note": "Không dùng any · có trong recommended" },
+    { "rule": "template/alt-text · click-events-have-key-events · table-scope", "status": "on", "note": "Ảnh có alt, không div (click), th scope · có trong templateAccessibility" },
+    { "rule": "@typescript-eslint/naming-convention", "status": "config", "note": "Hàm bắt đầu bằng động từ; boolean, array, Type/Enum · type-aware" },
+    { "rule": "id-denylist", "status": "config", "note": "Không data, info, item, obj" },
+    { "rule": "no-restricted-syntax", "status": "config", "note": "Private member dùng #" },
+    { "rule": "@typescript-eslint/no-floating-promises", "status": "config", "note": "Promise phải được xử lý · type-aware" },
+    { "rule": "no-restricted-imports", "status": "config", "note": "Host không import features/; module không import environments" },
+    { "rule": "@angular-eslint/prefer-inject · no-restricted-syntax", "status": "config", "note": "inject() thay constructor; không new …Service()" },
+    { "rule": "@angular-eslint/prefer-signals · prefer-output-readonly", "status": "config", "note": "Signal input/query; output readonly" },
+    { "rule": "no-restricted-syntax", "status": "config", "note": "Mã quyền MODULE_ENTITY_[C/A/G]_ACTION" },
+    { "rule": "template/button-has-type", "status": "config", "note": "button có type" },
+    { "rule": "local/signal-boolean-prefix", "status": "custom", "note": "Boolean trong signal/computed/input có tiền tố" },
+    { "rule": "local/no-set-in-effect", "status": "custom", "note": "Không .set() trong effect()" },
+    { "rule": "local/iframe-has-title", "status": "custom", "note": "iframe có title" },
+    { "rule": "local/no-permission-call-in-template", "status": "custom", "note": "Template không gọi hasPermission()" },
+    { "status": "external", "note": "Không ::ng-deep, không mã màu hex trong scss feature — Stylelint, ngoài ESLint, đề xuất riêng" }
+  ],
+  "demo": null
+}

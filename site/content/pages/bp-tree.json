@@ -1,0 +1,138 @@
+{
+  "desc": "Vị trí được phép cho app, module, feature, test và assets; phần nào thuộc owner nào.",
+  "minutes": 6,
+  "movedFrom": "I-03",
+  "tldr": [
+    "Cây là vị trí được phép, không phải scaffold bắt buộc",
+    "Tạo thư mục/file khi có nội dung và consumer thực tế",
+    "Dùng chung nhiều module → package/library có public contract"
+  ],
+  "hero": {
+    "type": "tree",
+    "label": "Cây thư mục",
+    "items": [
+      { "t": "src/app/                     ← bố cục · navigation · auth" },
+      { "t": "src/modules/mdm/" },
+      { "t": "├─ index.ts · routes.ts" },
+      { "t": "├─ configurations/           ← token + provideMdmConfiguration" },
+      { "t": "├─ services/                 ← base-api · asset (dùng chung)" },
+      { "t": "├─ testing/ · e2e/           ← test của module" },
+      { "t": "└─ features/product/" },
+      { "t": "   ├─ routes.ts · pages/list|detail|create|update/" },
+      { "t": "   ├─ components/ · pipes/ · services/" },
+      { "t": "   └─ testing/ · e2e/ · assets/" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Vị trí được phép",
+      "ref": "angular-portal/project-structure/README.md#cấu-trúc-tổng-thể",
+      "text": "Cây minh họa các vị trí được phép, không phải scaffold bắt buộc. Các component khác cũng có TS/HTML/SCSS và spec cùng thư mục khi cần.",
+      "file": "tree",
+      "lines": [20, 32, 77],
+      "focus": [0, 1, 6],
+      "result": "Chỉ thư mục có nội dung thật mới xuất hiện trong project.",
+      "callouts": [
+        {
+          "kind": "tip",
+          "text": "Tạo thư mục/file khi có nội dung và consumer thực tế.",
+          "ref": "angular-portal/README.md#quy-tắc-chung"
+        },
+        {
+          "kind": "warn",
+          "text": "Chỉ thêm test có giá trị xác nhận hành vi; không tạo spec rỗng cho mọi file.",
+          "quote": "Chỉ thêm test có giá trị xác nhận hành vi; không tạo spec rỗng cho mọi file."
+        },
+        {
+          "kind": "info",
+          "text": "Project đang dùng `src/libs` giữ cấu trúc hiện hữu nếu chưa có yêu cầu migration. Baseline cho project mới là `src/modules`."
+        }
+      ]
+    },
+    {
+      "title": "Portal và module",
+      "ref": "angular-portal/project-structure/README.md#quyền-sở-hữu",
+      "text": "`app` giữ bố cục chính, navigation, auth integration và cấu hình triển khai; `modules/<module>` giữ nghiệp vụ, tài nguyên, public entry, configuration và routes.",
+      "file": "app-dir",
+      "focus": [0, 1, 2, 3],
+      "must": { "quote": "Phần dùng chung cho nhiều module phải là package/library có public contract." },
+      "result": "Biết đặt code mới ở Portal hay module.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "`src/shared` của Portal, nếu có, chỉ phục vụ Portal; module nghiệp vụ không phụ thuộc vào đó.",
+          "quote": "module nghiệp vụ không phụ thuộc vào đó"
+        }
+      ]
+    },
+    {
+      "title": "Module và feature",
+      "ref": "angular-portal/project-structure/README.md#quyền-sở-hữu",
+      "text": "`services`/`assets` cấp module dùng chung cho các feature của module; cấp feature dùng riêng trong feature. Feature là một entity hoặc nhóm tác vụ nghiệp vụ, không bắt buộc tương ứng một bảng database.",
+      "file": "p-service",
+      "lines": [3, 12],
+      "focus": [4, 6, 8],
+      "result": "Code dùng chung nằm ở module, code của entity nằm trong feature.",
+      "callouts": [
+        {
+          "kind": "tip",
+          "text": "Model chung đặt cạnh service liên quan; entity model vẫn do feature sở hữu.",
+          "ref": "angular-portal/project-structure/README.md#service-và-model"
+        }
+      ]
+    },
+    {
+      "title": "Page và component",
+      "ref": "angular-portal/project-structure/README.md#quyền-sở-hữu",
+      "text": "`pages` là container có route, điều phối ID, tải/lưu và navigation; `components` trong feature chứa drawer và các phần form/view.",
+      "file": "p-routes",
+      "lines": [13, 18, 23, 28],
+      "focus": [7, 8],
+      "result": "Mỗi page là một route lazy load của feature.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Drawer thuộc components; không tự tạo page/route drawer nếu đặc tả chưa yêu cầu URL riêng.",
+          "ref": "angular-portal/project-structure/routes.md#quy-tắc",
+          "quote": "không tự tạo page/route drawer nếu đặc tả chưa yêu cầu URL riêng"
+        }
+      ]
+    },
+    {
+      "title": "Test theo owner",
+      "ref": "angular-portal/project-structure/README.md#test-và-test-support",
+      "text": "Unit/component/service spec nằm cạnh source. Kịch bản phối hợp nhiều phần đặt trong `testing/integration` của owner gần nhất; E2E dùng hậu tố `.e2e-spec.ts`, nằm trong `e2e/specs` của feature/module/Portal sở hữu flow.",
+      "file": "e2e-owner",
+      "lines": [3, 11, 19],
+      "focus": [5, 9],
+      "must": { "quote": "Runner discovery và tsconfig phải tách Angular spec với Playwright E2E." },
+      "result": "Module tự chứa test nghiệp vụ và test support.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không đưa test fixture/mock vào assets hay public entry runtime.",
+          "quote": "Không đưa test fixture/mock vào assets hay public entry runtime."
+        },
+        {
+          "kind": "warn",
+          "text": "Module không import fixture/page object riêng của Portal hoặc module khác.",
+          "quote": "không import fixture/page object riêng của Portal hoặc module khác"
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "Tạo thư mục/file khi có nội dung và consumer thực tế",
+    "ref": "angular-portal/README.md#quy-tắc-chung"
+  },
+  "dont": {
+    "text": "Sinh sẵn đủ cây thư mục rỗng cho mọi feature",
+    "ref": "angular-portal/project-structure/README.md#cấu-trúc-tổng-thể",
+    "quote": "Cây minh họa các vị trí được phép, không phải scaffold bắt buộc."
+  },
+  "lint": [
+    { "rule": "no-restricted-imports", "status": "config", "note": "host không import features/; module không import environments" },
+    { "status": "external", "note": "Vị trí thư mục và owner kiểm bằng review" }
+  ],
+  "demo": null
+}

@@ -1,0 +1,142 @@
+{
+  "desc": "Module công bố provide<Module>Configuration(); provider đặt ở biên route module hoặc feature.",
+  "minutes": 6,
+  "movedFrom": "I-05 · I-07",
+  "tldr": [
+    "Host gọi provideMdmConfiguration(), không provide token",
+    "Không đặt access token/secret vào configuration frontend",
+    "Không tự đặt mọi service providedIn root"
+  ],
+  "hero": {
+    "type": "flow",
+    "label": "Host → provider → service",
+    "items": [
+      { "t": "Host", "s": "environment.mdm" },
+      { "t": "provideMdmConfiguration()", "s": "makeEnvironmentProviders" },
+      { "t": "MDM_CONFIGURATION", "s": "token nội bộ" },
+      { "t": "Service", "s": "inject(MDM_CONFIGURATION)" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Token và interface",
+      "ref": "angular-portal/project-structure/configuration.md#srcmodulesmdmconfigurationsmdmconfigurationts",
+      "text": "`MdmConfiguration` chứa các giá trị triển khai Portal cấp cho MDM; token `MDM_CONFIGURATION` là nội bộ module. `apiHost` và `assetBaseUrl` là base URL, không có query/hash; chỉ nhận root-relative hoặc HTTP(S) tuyệt đối.",
+      "file": "mdm-config",
+      "lines": [4, 6, 8, 12, 13],
+      "focus": [2],
+      "result": "Module không đọc environment của Portal; Portal cấp giá trị qua configuration.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không đặt access token/secret vào configuration frontend.",
+          "quote": "Không đặt access token/secret vào configuration frontend."
+        }
+      ]
+    },
+    {
+      "title": "Public provider",
+      "ref": "angular-portal/project-structure/configuration.md#srcmodulesmdmconfigurationsprovide-mdm-configurationts",
+      "text": "`provideMdmConfiguration` nhận cấu hình tường minh, chuẩn hóa base URL, copy và freeze object rồi đăng ký token cùng `AssetService` bằng `makeEnvironmentProviders`.",
+      "file": "provide-config",
+      "lines": [9, 14, 15, 16],
+      "focus": [1],
+      "result": "Host sửa object gốc không làm thay đổi cấu hình đã đăng ký.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Hàm không tự đọc localStorage/environment/global object.",
+          "quote": "không tự đọc localStorage/environment/global object"
+        },
+        {
+          "kind": "warn",
+          "text": "`makeEnvironmentProviders` dùng cho application/environment route injector; không đưa kết quả vào providers của một component.",
+          "quote": "không đưa kết quả vào providers của một component"
+        }
+      ]
+    },
+    {
+      "title": "Public entry",
+      "ref": "angular-portal/project-structure/configuration.md#srcmodulesmdmindexts",
+      "text": "`index.ts` công bố `mdmRoutes`, kiểu `MdmConfiguration` và `provideMdmConfiguration`.",
+      "file": "mdm-index",
+      "lines": [1, 2, 3],
+      "focus": [0, 1],
+      "result": "Host chỉ thấy public contract của module.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Mỗi module công bố provide<Module>Configuration và kiểu configuration; không yêu cầu host biết token/service nội bộ.",
+          "ref": "angular-portal/project-structure/configuration.md#contract"
+        },
+        {
+          "kind": "warn",
+          "text": "Không export token, feature service, page hoặc component nội bộ nếu chưa có external consumer.",
+          "quote": "Không export token, feature service, page hoặc component nội bộ nếu chưa có external consumer."
+        }
+      ]
+    },
+    {
+      "title": "Service nhận qua token",
+      "ref": "angular-portal/project-structure/configuration.md#tích-hợp",
+      "text": "Portal cấp `apiHost`/`assetBaseUrl`; module nhận qua token và không import ngược environment.",
+      "file": "asset-service",
+      "lines": [7, 10],
+      "focus": [3],
+      "result": "Service đọc base URL từ token, không từ environment.",
+      "callouts": [
+        {
+          "kind": "tip",
+          "text": "Token và kiểu cấu hình nằm trong `mdm.configuration.ts`; `provideMdmConfiguration` nằm cạnh đó trong file riêng để đăng ký service chung mà không tạo vòng import token → service → token.",
+          "ref": "angular-portal/project-structure/README.md#public-api-và-configuration"
+        }
+      ]
+    },
+    {
+      "title": "Provider scope",
+      "ref": "angular-portal/project-structure/configuration.md#provider-scope",
+      "text": "HttpClient/auth interceptor của Portal ở host bootstrap; `MDM_CONFIGURATION` và `AssetService` ở biên route module qua `provideMdmConfiguration`; API service của Product ở biên route feature; draft/interaction state của một page hoặc drawer ở scope phù hợp với owner UI.",
+      "file": "p-routes",
+      "lines": [7],
+      "focus": [1, 3],
+      "result": "ProductService nằm ở injector của route feature, không ở root.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không đăng ký cùng bộ provider một lần ở root rồi lại một lần ở route con.",
+          "ref": "angular-portal/project-structure/configuration.md#contract",
+          "quote": "Không đăng ký cùng bộ provider một lần ở root rồi lại một lần ở route con."
+        },
+        {
+          "kind": "warn",
+          "text": "Không tự đặt mọi service `providedIn: 'root'`.",
+          "ref": "angular-portal/project-structure/README.md#public-api-và-configuration",
+          "quote": "Không tự đặt mọi service providedIn root."
+        },
+        {
+          "kind": "info",
+          "text": "Root service không phụ thuộc token chỉ tồn tại trong child route. Cấu trúc này không mặc định cần `mdm.module.ts` chỉ để cung cấp config."
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "providers: [module.provideMdmConfiguration(environment.mdm)]",
+    "ref": "angular-portal/project-structure/routes.md#host-cấp-configuration-trong-lazy-module-boundary"
+  },
+  "dont": {
+    "text": "providers: [{ provide: MDM_CONFIGURATION, … }] ở host",
+    "ref": "angular-portal/project-structure/configuration.md#contract",
+    "quote": "Không yêu cầu host biết token/service nội bộ."
+  },
+  "lint": [
+    { "rule": "no-restricted-imports", "status": "config", "note": "module không import environments" },
+    { "rule": "@angular-eslint/prefer-inject", "status": "config", "note": "inject() thay constructor" },
+    { "rule": "no-restricted-syntax", "status": "config", "note": "không new …Service(); dùng inject()" },
+    { "status": "external", "note": "Provider scope và chuỗi injector kiểm bằng review và validation/angular-foundation" }
+  ],
+  "demo": {
+    "url": "https://sdcorejs.github.io/portal-template/instruction/modern-angular/dependency-injection",
+    "label": "Provider scope và instance ID chạy bằng Angular DI thật."
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "desc": "Host chỉ import public entry và gọi provider trong callback lazy loading.",
+  "minutes": 4,
+  "movedFrom": "I-06",
+  "tldr": [
+    "Host chỉ import public entry",
+    "provideMdmConfiguration() gọi trong callback loadChildren",
+    "Ghép vào routes hiện có, không thay toàn bộ"
+  ],
+  "hero": {
+    "type": "flow",
+    "label": "Host → biên module",
+    "items": [
+      { "t": "Public entry", "s": "import('../modules/mdm')" },
+      { "t": "Provider", "s": "provideMdmConfiguration()" },
+      { "t": "Route", "s": "loadChildren async" },
+      { "t": "URL", "s": "/mdm/product" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Import public entry",
+      "ref": "angular-portal/project-structure/routes.md#host-cấp-configuration-trong-lazy-module-boundary",
+      "text": "Host chỉ import public entry của module: `await import('../modules/mdm')` trả về `mdmRoutes` và `provideMdmConfiguration`.",
+      "file": "app-routes",
+      "lines": [9],
+      "focus": [0],
+      "result": "Host không phụ thuộc file private của module.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Đây là mẫu local/lazy integration. Khi có remote loader, thay cơ chế lấy public entry bằng loader đã chốt, giữ public configuration contract."
+        },
+        {
+          "kind": "warn",
+          "text": "Không suy ra rằng một Angular injector tự truyền xuyên các application runtime độc lập.",
+          "quote": "Không suy ra rằng một Angular injector tự truyền xuyên các application runtime độc lập."
+        }
+      ]
+    },
+    {
+      "title": "Provider trong loadChildren",
+      "ref": "angular-portal/project-structure/routes.md#host-cấp-configuration-trong-lazy-module-boundary",
+      "text": "Factory `provideMdmConfiguration(environment.mdm)` được gọi trong callback lazy loading, đặt ở `providers` của route biên module; `mdmRoutes` là `children` của route đó.",
+      "file": "app-routes",
+      "lines": [8, 13, 14],
+      "focus": [1, 2],
+      "result": "Configuration của MDM được cấp tại biên route module.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Gọi factory trong callback lazy loading, tránh static import module implementation vào host chỉ để đăng ký config.",
+          "quote": "tránh static import module implementation vào host chỉ để đăng ký config"
+        },
+        {
+          "kind": "info",
+          "text": "Portal cấp `apiHost`/`assetBaseUrl`; module nhận qua token và không import ngược environment.",
+          "ref": "angular-portal/project-structure/configuration.md#tích-hợp"
+        }
+      ]
+    },
+    {
+      "title": "Ghép vào host hiện có",
+      "ref": "angular-portal/project-structure/routes.md#host-cấp-configuration-trong-lazy-module-boundary",
+      "text": "Mẫu bỏ qua shell/auth/not-found của host để tập trung vào boundary. AppComponent/router outlet và HTTP interceptors dùng implementation host.",
+      "file": "main",
+      "lines": [9, 10],
+      "focus": [2],
+      "must": { "quote": "Khi tích hợp thực phải ghép vào routes hiện hữu, không thay toàn bộ host routes bằng đoạn này." },
+      "result": "Route mdm nằm cạnh shell, auth và not-found sẵn có của host.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không gọi `provideHttpClient` lại trong mọi feature nếu không có lý do về scope.",
+          "quote": "Không gọi provideHttpClient lại trong mọi feature nếu không có lý do về scope."
+        }
+      ]
+    },
+    {
+      "title": "URL sau tích hợp",
+      "ref": "angular-portal/project-structure/routes.md#url-và-hành-vi",
+      "text": "`/mdm/product` mở List, `/mdm/product/create` mở Create, `/mdm/product/:id/detail` mở Detail, `/mdm/product/:id/update` mở Update.",
+      "file": "mdm-routes",
+      "lines": [7, 10, 11],
+      "focus": [3],
+      "result": "Host giữ prefix `/mdm`; module và feature chỉ khai báo phần path của mình.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không đặt prefix mdm lặp lại trong module routes.",
+          "ref": "angular-portal/project-structure/routes.md#module-routes",
+          "quote": "Không đặt prefix mdm lặp lại trong module routes."
+        },
+        {
+          "kind": "info",
+          "text": "Routes sở hữu kiểm tra quyền vào route, tải entity bắt buộc và chuyển lỗi trước activation."
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "Ghép route mdm vào app.routes hiện có",
+    "ref": "angular-portal/project-structure/routes.md#host-cấp-configuration-trong-lazy-module-boundary"
+  },
+  "dont": {
+    "text": "Thay toàn bộ host routes bằng đoạn mẫu",
+    "ref": "angular-portal/project-structure/routes.md#host-cấp-configuration-trong-lazy-module-boundary",
+    "quote": "không thay toàn bộ host routes bằng đoạn này"
+  },
+  "lint": [
+    { "rule": "no-restricted-imports", "status": "config", "note": "host không import features/" },
+    { "status": "external", "note": "Ghép route vào host hiện hữu kiểm bằng review" }
+  ],
+  "demo": null
+}

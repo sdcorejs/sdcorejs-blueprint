@@ -1,0 +1,130 @@
+{
+  "desc": "Drawer có header/body/footer, X của Core, action ở sdFooterRight, close guard bảo vệ draft.",
+  "minutes": 6,
+  "movedFrom": null,
+  "tldr": [
+    "Đóng bằng X của Core, không thêm nút Đóng/Hủy",
+    "Action chính và nghiệp vụ ở `sdFooterRight`",
+    "Mở bằng method phải tự kiểm quyền và tải entity"
+  ],
+  "hero": {
+    "type": "flow",
+    "label": "Cấu trúc drawer",
+    "items": [
+      { "t": "Header", "s": "sdHeaderLeft · X của Core" },
+      { "t": "Body", "s": "Core quản lý cuộn" },
+      { "t": "sdFooterRight", "s": "gap-8 · Từ chối · Duyệt" },
+      { "t": "beforeClose", "s": "dirty → confirm" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Bố cục drawer",
+      "ref": "angular-portal/ui-patterns.md#phạm-vi-và-bố-cục",
+      "text": "Drawer phục vụ xem/sửa/tạo trong ngữ cảnh của list hoặc page cha; feature tách `detail-side-drawer`, `create-side-drawer`, `update-side-drawer`. Header trái dùng `sdHeaderLeft`; `sdHeaderRight` dành cho tác vụ phụ/menu và giữ nút X mặc định của Core. Body là các `sd-section`; Core quản lý cuộn body, backdrop và focus.",
+      "focus": [0, 1],
+      "result": "Header/footer giữ khả dụng khi body dài.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không bọc toàn bộ drawer bằng container cuộn riêng hoặc thêm `overflow-hidden` ở feature.",
+          "quote": "Không bọc toàn bộ drawer bằng container cuộn riêng hoặc thêm overflow-hidden ở feature."
+        },
+        {
+          "kind": "info",
+          "text": "Giữ width mặc định khi đủ dùng: Core {core} mặc định `480px`, mẫu đã review dùng `600px`. Đây là lựa chọn theo nội dung, không phải cấu hình bắt buộc mọi drawer."
+        },
+        {
+          "kind": "tip",
+          "text": "Detail 360° nhiều tab/table lớn hoặc form nhiều bước phức tạp thường phù hợp page hơn."
+        }
+      ]
+    },
+    {
+      "title": "Chuẩn bị trước khi mở",
+      "ref": "angular-portal/ui-patterns.md#chuẩn-bị-dữ-liệu-trước-khi-mở",
+      "text": "Drawer mở bằng method không tự chạy guard/resolver của route. Trước khi mở: kiểm tra permission tác vụ; với detail/update gọi `detail(id)` qua service của đúng entity; kiểm tra điều kiện/quyền theo bản ghi, khởi tạo entity hoặc draft rồi mới mở nội dung đích.",
+      "focus": [],
+      "must": { "quote": "caller/drawer phải thực hiện luồng chuẩn bị tương đương và có loading trong lúc chờ" },
+      "result": "Drawer không mở với dữ liệu thiếu.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không mặc định dùng object row từ list làm detail.",
+          "quote": "không mặc định dùng object row từ list"
+        },
+        {
+          "kind": "warn",
+          "text": "Lỗi tải/thiếu quyền đi theo error mapping của consumer; không mở form rỗng như tải thành công.",
+          "quote": "không mở form rỗng như tải thành công"
+        },
+        {
+          "kind": "tip",
+          "text": "Khi mở liên tiếp các ID, response cũ không được ghi đè entity mới."
+        }
+      ]
+    },
+    {
+      "title": "Footer và quyền",
+      "ref": "angular-portal/ui-patterns.md#detail-có-duyệttừ-chốicập-nhật",
+      "text": "Mỗi action có `*sdPermission` riêng; trạng thái nghiệp vụ (`canApprove`, `canReject`, `canUpdate`) là điều kiện bổ sung, không thay thế permission. Bộ Từ chối/Duyệt/Cập nhật có thể đặt cùng footer; màn hẹp cho xuống dòng.",
+      "file": "drawer-footer",
+      "lines": [11, 12, 14, 19, 21, 26, 28],
+      "focus": [2],
+      "result": "Đúng action theo quyền và trạng thái.",
+      "callouts": [
+        {
+          "kind": "tip",
+          "text": "Action chính và nghiệp vụ tại `sdFooterRight`, utility `d-flex align-items-center gap-8 flex-wrap`; `sdFooterLeft` chỉ khi có thông tin/tác vụ cần thiết.",
+          "ref": "angular-portal/ui-patterns.md#phạm-vi-và-bố-cục"
+        },
+        {
+          "kind": "warn",
+          "text": "Action gọi service entity (`approve`/`reject`/`update`), không sửa status ở client thay cho API.",
+          "quote": "không sửa status ở client thay cho API"
+        },
+        {
+          "kind": "warn",
+          "text": "Đang thực hiện action: biểu thị pending, tránh request lặp hoặc tác vụ xung đột.",
+          "quote": "tránh request lặp hoặc tác vụ xung đột"
+        }
+      ]
+    },
+    {
+      "title": "Đóng, dirty và kết quả",
+      "ref": "angular-portal/ui-patterns.md#đóng-drawer-dirty-và-kết-quả",
+      "text": "Dùng `beforeClose` để thống nhất bảo vệ dirty cho X, backdrop, Escape và lệnh đóng: từ chối đóng giữ nguyên draft, đồng ý bỏ thay đổi mới đóng. Caller phân biệt lưu/thay đổi thành công với đóng không thay đổi qua output/result có kiểu phù hợp; chỉ refresh dữ liệu cha khi có thay đổi thành công.",
+      "focus": [3],
+      "result": "Caller biết khi nào cần tải lại; focus trở về control đã mở drawer.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Tránh bypass guard bằng `forceClose()` trong đường đóng thông thường; `sdClosed` chỉ báo drawer đã đóng, không đồng nghĩa đã lưu.",
+          "quote": "Tránh bypass guard bằng forceClose() trong đường đóng thông thường."
+        },
+        {
+          "kind": "warn",
+          "text": "Không dựa riêng vào sự kiện đóng để reload mọi lần.",
+          "quote": "Không dựa riêng vào sự kiện đóng để reload mọi lần."
+        },
+        {
+          "kind": "info",
+          "text": "Core {core}: `beforeClose` nhận hàm trả boolean hoặc `Promise<boolean>`; `disableBackdropClose` đang chặn cả backdrop và Escape."
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "<div sdFooterRight class=\"d-flex align-items-center gap-8 flex-wrap\">",
+    "ref": "angular-portal/ui-patterns.md#phạm-vi-và-bố-cục"
+  },
+  "dont": {
+    "text": "Bọc drawer bằng container cuộn riêng + overflow-hidden",
+    "ref": "angular-portal/ui-patterns.md#phạm-vi-và-bố-cục",
+    "quote": "Không bọc toàn bộ drawer bằng container cuộn riêng hoặc thêm overflow-hidden ở feature."
+  },
+  "lint": [
+    { "status": "external", "note": "Chuẩn bị entity, mọi đường đóng qua dirty guard, kết quả về caller và focus — kiểm chứng khi triển khai; consumer chưa kiểm chứng drawer" }
+  ],
+  "demo": null
+}

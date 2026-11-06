@@ -1,0 +1,111 @@
+{
+  "desc": "Ngữ nghĩa HTML, bàn phím và thông báo trạng thái là một phần của template.",
+  "minutes": 5,
+  "movedFrom": "I-14",
+  "tldr": [
+    "`button` cho hành động, `a` cho điều hướng",
+    "Ảnh trang trí dùng `alt=\"\"`",
+    "Kết quả async qua vùng `role=\"status\"`"
+  ],
+  "hero": {
+    "type": "shot",
+    "label": "Ảnh UI thật có chú thích",
+    "img": "assets/img/a11y-demo.png",
+    "ratio": "822 / 547",
+    "alt": "Demo markup sau khi cải thiện: bảng khách hàng có tiêu đề cột, nút Xác nhận chọn và dòng trạng thái bên dưới",
+    "items": [
+      { "t": "Nút dùng được bằng bàn phím", "x": "21%", "y": "81%" },
+      { "t": "Bảng có caption và th scope", "x": "12%", "y": "55%" },
+      { "t": "Vùng role=\"status\"", "x": "17%", "y": "89%" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Nút và liên kết",
+      "ref": "angular-portal/conventions/accessibility.md#quy-tắc",
+      "text": "`button` cho hành động, `a` cho điều hướng. `button` luôn có `type`.",
+      "file": "a11y-markup",
+      "range": [1, 2],
+      "lines": [1, 2],
+      "focus": [0],
+      "result": "Thao tác được bằng bàn phím; focus thấy rõ.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không dùng `div (click)` làm nút.",
+          "quote": "không dùng div (click) làm nút"
+        }
+      ]
+    },
+    {
+      "title": "Ảnh và iframe",
+      "ref": "angular-portal/conventions/accessibility.md#quy-tắc",
+      "text": "Ảnh thông tin có `alt` mô tả nội dung; ảnh trang trí dùng `alt=\"\"`. Quyết định theo ý nghĩa của ảnh, không theo nơi dữ liệu ảnh được trả về. `iframe` có `title`.",
+      "file": "a11y-markup",
+      "range": [3, 3],
+      "lines": [3],
+      "result": "Ảnh và iframe có tên phù hợp."
+    },
+    {
+      "title": "Bảng có tên",
+      "ref": "angular-portal/conventions/accessibility.md#quy-tắc",
+      "text": "Table có `caption` và `th scope`.",
+      "file": "a11y-markup",
+      "range": [5, 8],
+      "lines": [6, 7],
+      "focus": [1],
+      "result": "Table có caption và headers.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Caption, aria-live và thứ tự Tab kiểm bằng review.",
+          "ref": "angular-portal/conventions/accessibility.md#kiểm-tra-tự-động"
+        }
+      ]
+    },
+    {
+      "title": "Thông báo và hiển thị",
+      "ref": "angular-portal/conventions/accessibility.md#quy-tắc",
+      "text": "Kết quả thao tác async được thông báo qua vùng `role=\"status\"`.",
+      "file": "a11y-markup",
+      "range": [10, 10],
+      "lines": [10],
+      "focus": [2],
+      "result": "Loading/error được thông báo.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không dùng màu làm dấu hiệu trạng thái duy nhất.",
+          "quote": "Không dùng màu làm dấu hiệu trạng thái duy nhất."
+        },
+        {
+          "kind": "warn",
+          "text": "Code block dài cuộn trong khối của nó, không đẩy layout ngang.",
+          "quote": "Code block dài cuộn trong khối của nó, không đẩy layout ngang."
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "<button type=\"button\" (click)=\"onSave()\">Lưu</button>",
+    "ref": "angular-portal/conventions/accessibility.md#mẫu"
+  },
+  "dont": {
+    "text": "<div (click)=\"onSave()\">Lưu</div>",
+    "ref": "angular-portal/conventions/accessibility.md#quy-tắc",
+    "quote": "không dùng div (click) làm nút",
+    "rule": "click-events-have-key-events"
+  },
+  "lint": [
+    { "rule": "template/alt-text", "status": "on", "note": "ảnh có alt" },
+    { "rule": "click-events-have-key-events", "status": "on", "note": "không div (click)" },
+    { "rule": "table-scope", "status": "on", "note": "th scope" },
+    { "rule": "template/button-has-type", "status": "config", "note": "button có type" },
+    { "rule": "local/iframe-has-title", "status": "custom", "note": "iframe có title" },
+    { "status": "external", "note": "Caption, aria-live và thứ tự Tab kiểm bằng review" }
+  ],
+  "demo": {
+    "url": "https://sdcorejs.github.io/portal-template/instruction/coding-convention/quality",
+    "label": "Demo markup trước/sau trong portal-template."
+  }
+}
