@@ -21,7 +21,7 @@ Kiểm tra đã chạy thật trên Node 24.22.1 (Windows):
 
 Còn mở:
 
-- GitHub Pages của repo đã đặt nguồn “GitHub Actions” (kiểm qua API ngày 06/11/2026); workflow `site-pages.yml` deploy lên https://sdcorejs.github.io/sdcorejs-blueprint/ sau khi merge vào `main`. Nhánh `main` chưa có branch protection: nên đặt job `site` (cùng `foundation`, `consumer`) làm required check để PR lệch Markdown không merge được.
+- GitHub Pages của repo đã đặt nguồn “GitHub Actions” (kiểm qua API ngày 06/11/2026); workflow `site-pages.yml` deploy lên https://sdcorejs.github.io/sdcorejs-blueprint/ sau khi merge vào `main`. Branch protection của `main` (06/11/2026) bắt buộc check `foundation`, `consumer`, `site` của GitHub Actions trước khi merge; chặn force push và xóa nhánh; admin vẫn có thể bypass.
 - Maintainer xác nhận: cấm `item` kể cả biến lặp (`id-denylist`), enum member PascalCase, 4 custom rule ESLint trong `eslint-rules/` của consumer.
 - Checklist bàn giao trống ở BP-01, 11–15, 20 vì nguồn không có mục “Nghiệm thu”/“Kiểm tra trước bàn giao” (ui-patterns.md có đoạn `**Nghiệm thu:**` in đậm, không phải heading).
 - `spacing-demo.png` gắn nhãn “Ảnh cũ” (p-20); `portal-list.png` có thể đang ẩn inline filter. Nên chụp lại từ `validation/angular-consumer`.
