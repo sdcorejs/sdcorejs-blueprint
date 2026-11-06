@@ -1,0 +1,93 @@
+{
+  "desc": "Portal → Module nghiệp vụ → Feature; module tích hợp với Portal qua public entry, routes và configuration.",
+  "minutes": 4,
+  "movedFrom": null,
+  "tldr": [
+    "Module sở hữu code nghiệp vụ, tài nguyên và test của mình",
+    "Không import environment, app/shared của Portal",
+    "MUST là yêu cầu; SHOULD là mặc định, đổi được khi có lý do rõ"
+  ],
+  "hero": {
+    "type": "flow",
+    "label": "Portal → Module → Feature",
+    "items": [
+      { "t": "Portal", "s": "bố cục · navigation · auth" },
+      { "t": "Public entry", "s": "index.ts · routes · configuration" },
+      { "t": "Module", "s": "mdm" },
+      { "t": "Feature", "s": "product · pages · services" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Đọc theo công việc",
+      "ref": "angular-portal/README.md#đọc-theo-công-việc",
+      "text": "Trước khi viết code, đọc **Project structure**; sau đó chọn tài liệu liên quan: configuration, routes, services, assets, testing, UI patterns hoặc quy ước code.",
+      "focus": [0, 1, 2, 3],
+      "result": "Biết mở tài liệu nào trước khi viết code.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không suy API Core UI từ tên component hoặc từ ví dụ Angular thuần.",
+          "quote": "Không suy API Core UI từ tên component hoặc từ ví dụ Angular thuần."
+        }
+      ]
+    },
+    {
+      "title": "Ranh giới module",
+      "ref": "angular-portal/README.md#quy-tắc-chung",
+      "text": "Module sở hữu toàn bộ code nghiệp vụ, tài nguyên và test nghiệp vụ của mình. Phần dùng xuyên module nằm trong package/library có public contract.",
+      "file": "mdm-index",
+      "lines": [1, 2, 3],
+      "focus": [1, 2],
+      "result": "Host chỉ biết public entry của module.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không import environment, app/shared của Portal hoặc private file của module khác.",
+          "quote": "Không import environment, app/shared của Portal hoặc private file của module khác."
+        },
+        {
+          "kind": "info",
+          "text": "Module tích hợp với Portal qua public entry, routes và configuration, không phụ thuộc source riêng của host. MDM/Product chỉ là ví dụ.",
+          "ref": "angular-portal/README.md#phạm-vi"
+        },
+        {
+          "kind": "tip",
+          "text": "Tạo thư mục/file khi có nội dung và consumer thực tế."
+        }
+      ]
+    },
+    {
+      "title": "MUST và SHOULD",
+      "ref": "angular-portal/README.md#quy-tắc-chung",
+      "text": "**MUST** là yêu cầu của Blueprint trong phạm vi đã áp dụng; **SHOULD** là mặc định có thể thay đổi với lý do rõ.",
+      "result": "Phân biệt quy tắc bắt buộc với mặc định.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Code mẫu dùng Angular {angular}/TypeScript {typescript} làm baseline kiểm tra; đây không phải yêu cầu mọi project phải nâng cấp lên đúng phiên bản đó.",
+          "ref": "angular-portal/README.md#code-mẫu-và-kiểm-chứng"
+        },
+        {
+          "kind": "info",
+          "text": "Không có mẫu Core UI list/detail/form/drawer được tuyên bố hoàn thành ở phần nền tảng.",
+          "ref": "angular-portal/README.md#code-mẫu-và-kiểm-chứng"
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "Tích hợp với Portal qua public entry, routes và configuration",
+    "ref": "angular-portal/README.md#phạm-vi"
+  },
+  "dont": {
+    "text": "import { environment } … bên trong module",
+    "ref": "angular-portal/README.md#quy-tắc-chung",
+    "quote": "Không import environment, app/shared của Portal hoặc private file của module khác.",
+    "rule": "no-restricted-imports"
+  },
+  "lint": [
+    { "rule": "no-restricted-imports", "status": "config", "note": "module không import environments" }
+  ],
+  "demo": null
+}

@@ -27,7 +27,9 @@ for (const doc of walk(path.resolve(root, '../../angular-portal')).filter(file =
     fs.writeFileSync(destination, source);
   }
 }
-assert.equal(examples.size, 16, 'Review the extraction boundary when Blueprint examples change');
+// 17 = 16 nền tảng + order-line.component.ts của conventions/signals.md. Mẫu signals chỉ được trích ra,
+// không nằm trong đồ thị import của main.ts nên không vào AOT/bundle; foundation vẫn type-check nó.
+assert.equal(examples.size, 17, 'Review the extraction boundary when Blueprint examples change');
 for (const file of walk(path.join(root, 'src'))) {
   const name = path.relative(root, file).replaceAll('\\', '/');
   if (name.includes('/e2e/')) continue;
@@ -36,4 +38,4 @@ for (const file of walk(path.join(root, 'src'))) {
   fs.mkdirSync(path.dirname(destination), { recursive: true });
   fs.copyFileSync(file, destination);
 }
-console.log('Node ' + process.version + ': prepared 16 Markdown examples plus consumer UI/guard/resolver composition (3 explicit entry overrides).');
+console.log('Node ' + process.version + ': prepared ' + examples.size + ' Markdown examples plus consumer UI/guard/resolver composition (3 explicit entry overrides).');

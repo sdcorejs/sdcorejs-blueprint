@@ -1,0 +1,141 @@
+{
+  "desc": "Tài nguyên theo module/feature có namespace; ưu tiên utility Core, SCSS chỉ khi cần.",
+  "minutes": 5,
+  "movedFrom": "I-13",
+  "tldr": [
+    "Chỉ tạo nhóm assets có tài nguyên thực",
+    "List, detail, create/update, drawer, wrapper mặc định không có SCSS",
+    "Biến/mixin không tự phát sinh CSS"
+  ],
+  "hero": {
+    "type": "tree",
+    "label": "Assets",
+    "items": [
+      { "t": "src/modules/mdm/assets/" },
+      { "t": "├─ images/ · icons/ · fonts/" },
+      { "t": "├─ styles/_index.scss · _variables.scss · _mixins.scss" },
+      { "t": "└─ templates/ · documents/" },
+      { "t": "src/modules/mdm/features/product/assets/" },
+      { "t": "└─ templates/import.xlsx" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Nhóm tài nguyên",
+      "ref": "angular-portal/project-structure/assets.md#cấu-trúc",
+      "text": "Module và feature dùng cùng một quy ước nhóm: `images`, `icons`, `fonts`, `styles`, `templates`, `documents`. Icon ưu tiên icon sẵn có của Core; fonts chỉ chứa font đặc thù thực sự cần đóng gói.",
+      "file": "product-assets",
+      "focus": [1, 3, 4],
+      "result": "Chỉ có nhóm assets chứa tài nguyên thực.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không đưa tài liệu kiến trúc/developer vào `assets/documents`. Không tạo thư mục rỗng.",
+          "quote": "Không đưa tài liệu kiến trúc/developer vào assets/documents. Không tạo thư mục rỗng."
+        }
+      ]
+    },
+    {
+      "title": "Namespace URL",
+      "ref": "angular-portal/project-structure/assets.md#namespace-url",
+      "text": "Tài nguyên xuất bản theo namespace: module MDM ở `/assets/mdm/...`, feature Product ở `/assets/mdm/features/product/...`. Host cấp `assetBaseUrl` qua configuration; khi remote origin thay đổi, module không phải hardcode lại đường dẫn Portal.",
+      "file": "asset-service",
+      "lines": [9, 10],
+      "focus": [0, 4, 5],
+      "result": "Đổi remote origin không phải sửa đường dẫn trong module.",
+      "callouts": [
+        {
+          "kind": "tip",
+          "text": "Gọi trong module: `assets.url('templates', 'import.xlsx')` hoặc `assets.url('features', 'product', 'templates', 'import.xlsx')`. AssetService được đăng ký bởi `provideMdmConfiguration`, không phải root singleton.",
+          "ref": "angular-portal/project-structure/services.md#asset-service-của-module"
+        },
+        {
+          "kind": "warn",
+          "text": "Source `feature/assets` vẫn nằm trong feature; không copy source sang `module/assets` chỉ để có URL mong muốn.",
+          "quote": "Không copy source sang module/assets chỉ để có URL mong muốn."
+        },
+        {
+          "kind": "info",
+          "text": "Đây là static resource URL, không thay API ký URL tải file private.",
+          "ref": "angular-portal/project-structure/services.md#asset-service-của-module"
+        }
+      ]
+    },
+    {
+      "title": "Build copy",
+      "ref": "angular-portal/project-structure/assets.md#build-copy--đoạn-ghép-vào-angularjson",
+      "text": "Ghép fragment vào `build.options` của project Angular, không thay toàn bộ `angular.json`; chỉ thêm entry cho thư mục có thật. Mỗi entry copy assets của module/feature ra đúng namespace và bỏ qua `styles/**`, file SCSS.",
+      "file": "angular-json",
+      "lines": [10, 11, 12, 16, 17, 18],
+      "focus": [0, 4],
+      "result": "Bundle chỉ có file tĩnh thật, đúng namespace.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "File tĩnh được copy theo build config; SCSS được compile/import, không copy mù `assets/**`.",
+          "ref": "angular-portal/project-structure/README.md#assets-và-style",
+          "quote": "SCSS được compile/import, không copy mù assets/**"
+        },
+        {
+          "kind": "info",
+          "text": "Module build/deploy riêng thì copy assets trong pipeline của module đó và cấp URL kết quả cho Portal; configuration provider chỉ cấp URL."
+        }
+      ]
+    },
+    {
+      "title": "SCSS dùng chung",
+      "ref": "angular-portal/project-structure/assets.md#scss-dùng-chung",
+      "text": "`_variables.scss` giữ biến dùng chung, `_mixins.scss` giữ mixin layout/behavior, `_index.scss` là public Sass entry. Component dùng mixin qua `@use` và `@include` tại selector của mình.",
+      "file": "scss-mixins",
+      "lines": [1, 3, 8],
+      "focus": [2],
+      "result": "Import `_index.scss` không phát sinh CSS ngoài ý muốn.",
+      "callouts": [
+        {
+          "kind": "tip",
+          "text": "Màu/theme trong `_variables.scss` ưu tiên Core tokens."
+        },
+        {
+          "kind": "warn",
+          "text": "`_utilities.scss` không được tạo sẵn nếu chưa có utility cần dùng.",
+          "quote": "_utilities.scss không được tạo sẵn nếu chưa có utility cần dùng"
+        }
+      ]
+    },
+    {
+      "title": "Style có scope",
+      "ref": "angular-portal/project-structure/README.md#assets-và-style",
+      "text": "Ưu tiên utility Core. Chỉ tạo `*.component.scss` khi cần style riêng mà utility chưa đáp ứng; detail, create/update, drawer và wrapper cũng không mặc định có SCSS hoặc `styleUrl`. Biến/mixin không tự phát sinh CSS; utility có namespace/scope rõ.",
+      "file": "scss-index",
+      "lines": [1, 2],
+      "focus": [2],
+      "result": "Style không rò ra ngoài scope của module/feature.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không tự phát sinh reset/theme/global styles từ mỗi lần import `_index.scss`; không dùng selector rộng để override toàn Portal.",
+          "ref": "angular-portal/project-structure/assets.md#scss-dùng-chung",
+          "quote": "Không dùng selector rộng để override toàn Portal."
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "class=\"p-16 d-grid gap-16\" — utility Core, không thêm SCSS",
+    "ref": "angular-portal/project-structure/README.md#assets-và-style"
+  },
+  "dont": {
+    "text": "::ng-deep .sd-input { … } trong SCSS của feature",
+    "ref": "angular-portal/conventions/eslint.md#trạng-thái-rule",
+    "quote": "Không ::ng-deep, không mã màu hex trong scss feature"
+  },
+  "lint": [
+    { "status": "external", "note": "Stylelint (ngoài ESLint, đề xuất riêng): không ::ng-deep, không mã màu hex trong SCSS feature" },
+    { "status": "external", "note": "Namespace assets và build copy — kiểm bằng review cấu hình build" }
+  ],
+  "demo": {
+    "url": "https://sdcorejs.github.io/portal-template/instruction/coding-convention/scss",
+    "label": "Trang quy ước SCSS trong portal-template; form mẫu trong ảnh còn dùng p-20.",
+    "img": "assets/img/spacing-demo.png"
+  }
+}

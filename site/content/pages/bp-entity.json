@@ -1,0 +1,163 @@
+{
+  "desc": "Feature sở hữu entity cung cấp pipe <entity>Detail và component <entity>-select cho consumer khác.",
+  "minutes": 6,
+  "movedFrom": null,
+  "tldr": [
+    "Pipe nhận ID, trả object detail có kiểu",
+    "ID rỗng: không gọi API, trả `null`",
+    "Select giữ entity inactive đã chọn khi edit"
+  ],
+  "hero": {
+    "type": "flow",
+    "label": "Consumer dùng entity của feature khác",
+    "items": [
+      { "t": "Consumer", "s": "Order page" },
+      { "t": "customerDetail · customer-select", "s": "public entry của Customer" },
+      { "t": "CustomerService", "s": "API · cache" },
+      { "t": "View", "s": "chọn field cần hiển thị" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Pipe detail",
+      "ref": "angular-portal/project-structure/README.md#pipe-detail-của-entity",
+      "text": "Mỗi entity có pipe detail: `customerDetail` trong template, `CustomerDetailPipe` cho class, `pipes/customer-detail.pipe.ts` cho file. Pipe nhận ID, trả object detail có kiểu của entity qua `Promise` hoặc `Observable`, dùng cùng `async`.",
+      "file": "customer-pipe",
+      "lines": [6, 7, 9, 12, 13, 14],
+      "focus": [1],
+      "result": "Mọi view hiển thị relation của Customer qua cùng một pipe.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Mẫu minh họa service trả `Promise`. Với service trả Observable, bỏ `async` ở `transform`, trả Observable tương ứng và dùng `of(null)` cho ID rỗng.",
+          "ref": "angular-portal/ui-patterns.md#giá-trị-rỗng-dùng-placeholder-của-core"
+        },
+        {
+          "kind": "tip",
+          "text": "Pipe thuộc feature sở hữu entity, tái sử dụng qua public entry khi có consumer bên ngoài; không nhân bản ở các feature tham chiếu."
+        }
+      ]
+    },
+    {
+      "title": "ID rỗng và injector",
+      "ref": "angular-portal/project-structure/README.md#pipe-detail-của-entity",
+      "text": "ID rỗng không gọi API và cho kết quả `null`. Pipe gọi service của đúng entity; service sở hữu API/cache và chia sẻ request.",
+      "file": "customer-pipe",
+      "lines": [10, 15, 16, 19],
+      "focus": [1, 2],
+      "must": { "quote": "Consumer phải cấp service/configuration trong chuỗi injector nơi pipe chạy." },
+      "result": "ID rỗng không phát sinh request; pipe chạy được ngoài route của Customer.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Dùng qua nhiều route thì chọn scope chung/public provider; không dựa vào provider của route sibling hoặc tự dùng `providedIn: 'root'`.",
+          "quote": "không dựa vào provider của route sibling hoặc tự dùng providedIn: 'root'"
+        },
+        {
+          "kind": "warn",
+          "text": "Loading, lỗi tải và thiếu quyền là trạng thái của lookup; không bắt mọi lỗi rồi chuyển thành `null` như tải thành công.",
+          "ref": "angular-portal/ui-patterns.md#relation-dùng-pipe-entitydetail",
+          "quote": "không được bắt mọi lỗi rồi chuyển thành null như tải thành công"
+        }
+      ]
+    },
+    {
+      "title": "Render relation trong view",
+      "ref": "angular-portal/ui-patterns.md#relation-dùng-pipe-entitydetail",
+      "text": "Với trường tham chiếu như `customerId`, dùng `@let customer = entity().customerId | customerDetail | async;` rồi view chọn `customer?.name`, `customer?.code` hoặc field cần hiển thị.",
+      "file": "relation-html",
+      "lines": [1, 4, 8],
+      "focus": [0, 3],
+      "result": "View tự chọn field, pipe không trả chuỗi HTML.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không gọi hàm tải/tra tên từ HTML hoặc lặp logic lookup trong từng page.",
+          "quote": "Không gọi hàm tải/tra tên từ HTML hoặc lặp logic lookup trong từng page."
+        },
+        {
+          "kind": "tip",
+          "text": "`sd-view` và `sd-section-item` là hai cách trình bày thay thế nhau; giá trị rỗng hiển thị `--` qua `sdView`/`sdEmpty` của Core.",
+          "ref": "angular-portal/ui-patterns.md#giá-trị-rỗng-dùng-placeholder-của-core"
+        }
+      ]
+    },
+    {
+      "title": "Select wrapper",
+      "ref": "angular-portal/ui-patterns.md#contract-của-component",
+      "text": "`customer-select` bọc select Core hiện hữu và gọi `CustomerService`. Consumer như Order chỉ truyền model/form và `[filters]` khi cần; không tự gọi API, cung cấp `items`, khai báo lại `valueField`/`displayField` hay viết lại template option.",
+      "file": "select-usage",
+      "lines": [1, 3, 4, 5],
+      "focus": [0, 1],
+      "result": "Consumer không tự tải danh sách customer.",
+      "callouts": [
+        {
+          "kind": "tip",
+          "text": "Mỗi option tối đa hai dòng text: tên/nhãn chính ở dòng đầu, thông tin phụ như role, mã, đơn vị ở dòng thứ hai.",
+          "ref": "angular-portal/ui-patterns.md#option-có-thông-tin-nhận-diện--tối-đa-hai-dòng"
+        },
+        {
+          "kind": "info",
+          "text": "Model mặc định mang ID (hoặc mảng ID khi hỗ trợ multiple), không bắt consumer quản lý object option.",
+          "ref": "angular-portal/project-structure/README.md#select-của-entity-và-enumconst"
+        }
+      ]
+    },
+    {
+      "title": "Dropdown enum/const",
+      "ref": "angular-portal/ui-patterns.md#dropdown-enumconst-và-cách-dùng-trong-createupdate",
+      "text": "Feature cung cấp wrapper cho dropdown enum/const nó sử dụng, ví dụ `order-status-select`. Enum/const và option metadata vẫn ở `<entity>.model.ts`; wrapper import dữ liệu này. Option tĩnh không cần API.",
+      "file": "order-form",
+      "lines": [7, 8, 9, 10, 11],
+      "focus": [0, 1],
+      "result": "Create/update chỉ bind model/form, không dựng lại options.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Create/update không tự dựng lại options, mapping label hoặc template cho cùng một trường.",
+          "quote": "Create/update không tự dựng lại options, mapping label hoặc template cho cùng một trường."
+        }
+      ]
+    },
+    {
+      "title": "Giữ giá trị khi edit",
+      "ref": "angular-portal/project-structure/README.md#select-của-entity-và-enumconst",
+      "text": "Filter chọn mới và việc tải giá trị đã chọn có mục đích khác nhau: lựa chọn mới theo filter, giá trị đã chọn tải theo đúng ID trong model.",
+      "file": "customer-select",
+      "focus": [1, 2],
+      "must": { "quote": "Khi edit, phải hiển thị được entity inactive đã chọn" },
+      "result": "Mở form update không mất giá trị cũ.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không tự xóa model chỉ vì entity không còn trong kết quả tìm kiếm hoặc không khớp filter lựa chọn mới.",
+          "quote": "không tự xóa model chỉ vì entity không còn trong kết quả tìm kiếm hoặc không khớp filter lựa chọn mới"
+        },
+        {
+          "kind": "info",
+          "text": "Với API search/phân trang, tải ID đã chọn riêng bằng service detail/batch hoặc query OR; Core {core} có `SdSearchReq.type` gồm `SEARCH`/`VALUE`.",
+          "ref": "angular-portal/ui-patterns.md#giữ-giá-trị-đã-chọn-khi-edit"
+        },
+        {
+          "kind": "warn",
+          "text": "Bản ghi bị xóa, không được phép đọc hoặc tải lỗi thì hiển thị trạng thái tương ứng; không ngụy tạo object hay tự phát `modelChange(null)`.",
+          "ref": "angular-portal/ui-patterns.md#giữ-giá-trị-đã-chọn-khi-edit",
+          "quote": "không ngụy tạo object, không tự phát modelChange(null) hay biến lỗi thành thành công rỗng"
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "<customer-select name=\"customerId\" [(model)]=\"model.customerId\" [form]=\"form\" />",
+    "ref": "angular-portal/project-structure/README.md#select-của-entity-và-enumconst"
+  },
+  "dont": {
+    "text": "<sd-select> trực tiếp + tự tải danh sách customer trong page Order",
+    "ref": "angular-portal/project-structure/README.md#select-của-entity-và-enumconst",
+    "quote": "không tự tải danh sách customer hoặc copy option template"
+  },
+  "lint": [
+    { "status": "external", "note": "Pipe detail và select của entity — kiểm bằng review và E2E select" }
+  ],
+  "demo": null
+}

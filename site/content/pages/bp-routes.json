@@ -1,0 +1,115 @@
+{
+  "desc": "Portal → public entry → feature routes → page; detail/update resolve entity trước khi mở page.",
+  "minutes": 8,
+  "movedFrom": "I-03 · I-04",
+  "tldr": [
+    "`''` · `create` · `:id/detail` · `:id/update`",
+    "Guard quyền → resolver → page nhận entity",
+    "Lỗi 404/401/403/mạng đi đúng trang của consumer"
+  ],
+  "hero": {
+    "type": "flow",
+    "label": "Contract vào route có ID",
+    "items": [
+      { "t": "URL + ID", "s": "/mdm/product/:id/detail" },
+      { "t": "Guard", "s": "canActivateChild · data.permission" },
+      { "t": "Resolver", "s": "ProductService.detail(id)" },
+      { "t": "Page", "s": "route data.entity" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Feature routes",
+      "ref": "angular-portal/project-structure/routes.md#quy-tắc",
+      "text": "List ở path rỗng, create không có ID, detail/update có `:id`. `ProductService` đăng ký ở route cha; page lazy load.",
+      "file": "p-routes",
+      "lines": [7, 10, 16, 21, 26],
+      "focus": [0],
+      "result": "Mỗi tác vụ có một URL mở trực tiếp được.",
+      "callouts": [
+        {
+          "kind": "tip",
+          "text": "Đăng ký service ở parent của các route để page và descendants dùng chung provider của feature.",
+          "ref": "angular-portal/project-structure/routes.md#feature-routes"
+        }
+      ]
+    },
+    {
+      "title": "Quyền vào route",
+      "ref": "angular-portal/project-structure/routes.md#permission-theo-consumer",
+      "text": "Gán chuỗi quyền vào `data.permission`; detail và update kiểm riêng, có quyền xem không suy ra có quyền cập nhật.",
+      "file": "detail-route",
+      "lines": [3],
+      "focus": [1],
+      "result": "URL update bị chặn khi chỉ có quyền detail.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Với Core {core}, `SdPermissionGuard.canActivate` tải quyền; `canActivateChild` ở route cha mới kiểm tra `data.permission`."
+        }
+      ]
+    },
+    {
+      "title": "Resolve entity",
+      "ref": "angular-portal/project-structure/routes.md#contract-vào-route-có-id",
+      "text": "Resolver inject service của đúng entity và gọi `detail(id)` trước khi kích hoạt page.",
+      "file": "resolver-call",
+      "lines": [1, 3],
+      "focus": [2],
+      "must": { "quote": "Resolver phải inject đúng service sở hữu entity" },
+      "result": "Page không mở với entity rỗng; đổi ID thì tải lại.",
+      "callouts": [
+        {
+          "kind": "tip",
+          "text": "`runGuardsAndResolvers: 'paramsChange'` cho resolver chạy lại khi ID trong path đổi.",
+          "ref": "angular-portal/project-structure/routes.md#bàn-giao-entity-cho-page"
+        },
+        {
+          "kind": "warn",
+          "text": "Không inject `HttpClient` hay ApiService chung để tự dựng endpoint trong resolver.",
+          "quote": "không inject generic ApiService/SdApiService/HttpClient để tự dựng endpoint trong resolver"
+        }
+      ]
+    },
+    {
+      "title": "Page nhận entity",
+      "ref": "angular-portal/project-structure/routes.md#bàn-giao-entity-cho-page",
+      "text": "Page lấy entity từ `ActivatedRoute.data` rồi khởi tạo view; không gọi lại `detail(id)`.",
+      "file": "p-detail-ts",
+      "lines": [11, 12, 13],
+      "focus": [3],
+      "result": "Không có request trùng khi mở page.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không resolve thành `null`/`undefined` hoặc nuốt lỗi thành success giả.",
+          "ref": "angular-portal/project-structure/routes.md#contract-vào-route-có-id",
+          "quote": "Không resolve thành null/undefined hoặc nuốt lỗi thành success giả."
+        },
+        {
+          "kind": "warn",
+          "text": "Không hardcode URL lỗi của một Portal vào module tái sử dụng.",
+          "ref": "angular-portal/project-structure/routes.md#lỗi-trước-activation",
+          "quote": "Không hardcode các URL lỗi của một Portal vào module tái sử dụng."
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "data: { permission: 'MDM_PRODUCT_C_DETAIL' } + canActivateChild ở route cha",
+    "ref": "angular-portal/project-structure/routes.md#permission-theo-consumer"
+  },
+  "dont": {
+    "text": "canActivate: [SdPermissionGuard] trên route đích là đủ",
+    "ref": "angular-portal/project-structure/routes.md#permission-theo-consumer",
+    "quote": "không coi canActivate: [SdPermissionGuard] trên route đích là đủ để kiểm tra quyền"
+  },
+  "lint": [
+    { "rule": "no-restricted-imports", "status": "config", "note": "host không import page của module" },
+    { "status": "external", "note": "Resolver dùng service của đúng entity — kiểm bằng review" }
+  ],
+  "demo": {
+    "url": "https://sdcorejs.github.io/portal-template/page",
+    "label": "Luồng list → detail → update với URL có ID trong Pages của portal-template."
+  }
+}

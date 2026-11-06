@@ -1,0 +1,155 @@
+{
+  "desc": "Header có “Chi tiết” và badge trạng thái; value trong sd-view hoặc sd-section-item; relation qua pipe; rỗng dùng placeholder Core.",
+  "minutes": 7,
+  "movedFrom": null,
+  "tldr": [
+    "Title có chữ “Chi tiết”, badge cạnh title, identity ≤ 2 dòng",
+    "Nhóm bằng `sd-section`; value dùng `sd-view` hoặc `sd-section-item`",
+    "Giá trị rỗng: placeholder `--` của Core"
+  ],
+  "hero": {
+    "type": "flow",
+    "label": "Bố cục detail",
+    "items": [
+      { "t": "Header", "s": "Chi tiết · badge · ≤ 3 tác vụ" },
+      { "t": "sd-section", "s": "nhóm thông tin" },
+      { "t": "Value", "s": "sd-view · sd-section-item" },
+      { "t": "Relation", "s": "customerDetail | async" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Header",
+      "ref": "angular-portal/ui-patterns.md#header",
+      "text": "Tiêu đề có chữ **Chi tiết**, tên entity và mã khi có, ví dụ `Chi tiết đơn hàng #DH-1024`. Badge trạng thái nằm cạnh title/mã, cùng dòng; dòng thứ hai chỉ chứa mô tả/ngữ cảnh ngắn nếu cần. Page dùng nút trở lại ở `headerLeft`; khi project Back phải ghép cả Back và identity vào slot.",
+      "focus": [0],
+      "must": { "quote": "Khi project Back, phải ghép cả Back và identity vào slot" },
+      "result": "Nhìn header biết bản ghi và trạng thái.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Core {core} dùng `headerLeft` làm slot thay thế title/description mặc định; truyền `[title]` riêng không giữ title trên màn hình."
+        },
+        {
+          "kind": "warn",
+          "text": "Khối identity tối đa hai dòng; không tách title, badge và mô tả thành ba dòng.",
+          "quote": "không tách title, badge và mô tả thành ba dòng"
+        },
+        {
+          "kind": "warn",
+          "text": "Text dài hoặc màn hẹp rút gọn và vẫn truy cập được qua tooltip/tên truy cập; không đẩy badge thành dòng thứ ba hoặc để che nút đóng/back.",
+          "quote": "Không đẩy badge thành dòng thứ ba hoặc để che nút đóng/back."
+        }
+      ]
+    },
+    {
+      "title": "Action trên header",
+      "ref": "angular-portal/ui-patterns.md#header",
+      "text": "Ngoài `Cập nhật <entity>`, detail có thể có Gửi duyệt, Duyệt, Từ chối, Xóa hoặc tác vụ khác, hiển thị theo permission và trạng thái nghiệp vụ. Tối đa ba mục cấp ngoài; khi có hơn ba, giữ hai tác vụ ưu tiên, từ tác vụ thứ ba nằm trong Action Popover của `SdButton`.",
+      "file": "detail-header",
+      "lines": [2, 3, 4, 7],
+      "focus": [0],
+      "result": "In/Lưu trữ nằm trong popover; Cập nhật ở ngoài cùng bên phải.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không gắn handler tác vụ cho nút `Thao tác khác`; nó chỉ mở popover.",
+          "quote": "Không gắn handler tác vụ cho nút Thao tác khác; nó chỉ mở popover."
+        },
+        {
+          "kind": "info",
+          "text": "“Thứ ba” là thứ tự ưu tiên, không phải tọa độ trái/phải; action chính vẫn ở ngoài cùng bên phải theo convention header."
+        },
+        {
+          "kind": "tip",
+          "text": "Kiểm tra mở bằng click/bàn phím, Escape trả focus về trigger và từng handler chỉ chạy một lần."
+        }
+      ]
+    },
+    {
+      "title": "Section và value",
+      "ref": "angular-portal/ui-patterns.md#các-bố-cục-đã-chốt",
+      "text": "Các `sd-section` xếp dọc. Bên trong là nhóm `sd-view` cho hồ sơ nhiều trường ngắn, hoặc các hàng `sd-section-item` (nhãn trái, value phải) cho dữ liệu dạng thuộc tính, nội dung dài hoặc value cần template riêng. Hai cách có thể phối hợp ở những nhóm khác nhau.",
+      "file": "detail-body",
+      "lines": [4, 6, 12, 13],
+      "focus": [1, 2],
+      "result": "Mỗi nhóm thông tin có header/body của section.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Tránh render lặp cùng field chỉ để dùng đủ component.",
+          "quote": "tránh render lặp cùng field chỉ để dùng đủ component"
+        },
+        {
+          "kind": "warn",
+          "text": "Detail 360°: không mặc định tải tất cả tab trước khi mở detail; từng vùng liên quan có loading/empty/error riêng.",
+          "quote": "không mặc định tải tất cả tab trước khi mở detail"
+        }
+      ]
+    },
+    {
+      "title": "Relation qua pipe",
+      "ref": "angular-portal/ui-patterns.md#relation-dùng-pipe-entitydetail",
+      "text": "Mỗi entity có pipe detail chuẩn: `<entity>Detail` trong template, class `<Entity>DetailPipe`, file `pipes/<entity>-detail.pipe.ts`. Với `customerId`, dùng `@let customer = entity().customerId | customerDetail | async;` rồi chọn `customer?.name`. Pipe phụ thuộc service đúng entity, ví dụ `CustomerService.detail(id)`; dùng ngoài route của entity thì consumer phải cấp service/configuration trong chuỗi injector nơi pipe chạy.",
+      "file": "customer-pipe",
+      "lines": [7, 10, 15, 16, 19],
+      "focus": [3],
+      "must": { "quote": "Khi dùng pipe bên ngoài route của entity, consumer phải cấp service/configuration trong chuỗi injector nơi pipe chạy" },
+      "result": "View hiển thị tên/mã relation thay cho ID thô.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không gọi hàm tải/tra tên từ HTML hoặc lặp logic lookup trong từng page.",
+          "quote": "Không gọi hàm tải/tra tên từ HTML hoặc lặp logic lookup trong từng page."
+        },
+        {
+          "kind": "warn",
+          "text": "Service sở hữu truy cập dữ liệu, cache và chia sẻ request; pipe chuyển dữ liệu cho view, không tự gọi HTTP/generic API service.",
+          "quote": "pipe chuyển dữ liệu cho view, không tự gọi HTTP/generic API service"
+        },
+        {
+          "kind": "info",
+          "text": "ID `null`/`undefined` không gọi API, trả dữ liệu rỗng. Pipe trả `Promise` hoặc `Observable` theo service của consumer và kết hợp `async`."
+        }
+      ]
+    },
+    {
+      "title": "Giá trị rỗng",
+      "ref": "angular-portal/ui-patterns.md#giá-trị-rỗng-dùng-placeholder-của-core",
+      "text": "Giá trị `null`/`undefined` hiển thị `--` qua API/constant rỗng của Core. Với `sd-section-item`, cell hoặc text tự render, dùng `sdEmpty` ở điểm hiển thị. Với `sd-view`, truyền giá trị vào `display`; template mặc định của Core đã dùng `sdView`.",
+      "file": "empty-value",
+      "lines": [4, 8],
+      "focus": [2],
+      "result": "Field rỗng hiển thị cùng placeholder của Core.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Giữ nguyên ý nghĩa của `0` và `false`; không dùng `value || fallback`.",
+          "quote": "Giữ nguyên ý nghĩa của 0 và false; không dùng value || fallback."
+        },
+        {
+          "kind": "warn",
+          "text": "Không hardcode `--` rải rác hoặc tự thay bằng “Chưa khai báo”/“Chưa chọn” cho field rỗng thông thường.",
+          "quote": "không hardcode -- rải rác hoặc tự thay bằng “Chưa khai báo”/“Chưa chọn” cho field rỗng thông thường"
+        },
+        {
+          "kind": "info",
+          "text": "Core {core}: `SdEmptyPipe`/`SdViewPipe` export từ `@sdcorejs/angular/pipes`; cả hai dùng `EMPTY_STR = '--'` từ `@sdcorejs/utils/constants`. Luôn dùng public API của version consumer đang cài."
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "{{ customer?.name | sdEmpty }}",
+    "ref": "angular-portal/ui-patterns.md#giá-trị-rỗng-dùng-placeholder-của-core"
+  },
+  "dont": {
+    "text": "{{ value || '--' }} tự viết trong template",
+    "ref": "angular-portal/ui-patterns.md#giá-trị-rỗng-dùng-placeholder-của-core",
+    "quote": "không dùng value || fallback"
+  },
+  "lint": [
+    { "status": "external", "note": "Header, section/value, relation và placeholder rỗng kiểm bằng review UI" }
+  ],
+  "demo": null
+}

@@ -1,0 +1,1090 @@
+{
+  "comparedAt": "2026-11-06",
+  "repo": "sdcorejs/sdcorejs-blueprint",
+  "branch": "main",
+  "groups": [
+    {
+      "id": "start",
+      "no": "01",
+      "name": "Bắt đầu",
+      "pages": [
+        "bp-overview"
+      ]
+    },
+    {
+      "id": "project-structure",
+      "no": "02",
+      "name": "Project structure",
+      "pages": [
+        "bp-tree",
+        "bp-ui-naming",
+        "bp-config",
+        "bp-routes",
+        "bp-integration",
+        "bp-services",
+        "bp-entity",
+        "bp-assets",
+        "bp-testing"
+      ]
+    },
+    {
+      "id": "ui-patterns",
+      "no": "03",
+      "name": "UI patterns",
+      "pages": [
+        "bp-ui-common",
+        "bp-list",
+        "bp-detail",
+        "bp-create-update",
+        "bp-drawer"
+      ]
+    },
+    {
+      "id": "conventions",
+      "no": "04",
+      "name": "Quy ước code",
+      "pages": [
+        "bp-naming",
+        "bp-signals",
+        "bp-permission",
+        "bp-a11y"
+      ]
+    },
+    {
+      "id": "verification",
+      "no": "05",
+      "name": "Kiểm chứng",
+      "pages": [
+        "bp-lint"
+      ]
+    }
+  ],
+  "pages": {
+    "bp-overview": {
+      "no": "BP-01",
+      "title": "Tổng quan Angular Portal",
+      "layout": "doc",
+      "sources": [
+        "angular-portal/README.md",
+        "angular-portal/README.md#đọc-theo-công-việc",
+        "angular-portal/README.md#quy-tắc-chung"
+      ],
+      "checklist": null,
+      "files": {
+        "mdm-index": {
+          "example": "src/modules/mdm/index.ts"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "example:src/modules/mdm/index.ts": "sha256-944499216e1cf233",
+        "section:angular-portal/README.md": "sha256-94f17ab1cafef7e9",
+        "section:angular-portal/README.md#code-mẫu-và-kiểm-chứng": "sha256-25b856e9295aa152",
+        "section:angular-portal/README.md#đọc-theo-công-việc": "sha256-5b15bdce5315d42f",
+        "section:angular-portal/README.md#phạm-vi": "sha256-3b94236f99b11aea",
+        "section:angular-portal/README.md#quy-tắc-chung": "sha256-1364ef3703c55db7"
+      }
+    },
+    "bp-tree": {
+      "no": "BP-02",
+      "title": "Cây thư mục & quyền sở hữu",
+      "layout": "explorer",
+      "sources": [
+        "angular-portal/project-structure/README.md#cấu-trúc-tổng-thể",
+        "angular-portal/project-structure/README.md#quyền-sở-hữu",
+        "angular-portal/project-structure/README.md#test-và-test-support"
+      ],
+      "checklist": "angular-portal/project-structure/README.md#kiểm-tra-trước-bàn-giao",
+      "files": {
+        "tree": {
+          "block": "angular-portal/project-structure/README.md#cấu-trúc-tổng-thể",
+          "index": 0,
+          "name": "Cấu trúc tổng thể",
+          "note": "Cây thư mục trong project-structure/README.md"
+        },
+        "root-e2e-dir": {
+          "role": "Navigation/shell và flow tích hợp xuyên module của Portal",
+          "owner": "Portal",
+          "path": "e2e/",
+          "ref": "angular-portal/project-structure/README.md#quyền-sở-hữu"
+        },
+        "app-dir": {
+          "role": "Bố cục chính, navigation, auth integration, cấu hình triển khai",
+          "owner": "Portal",
+          "path": "src/app/",
+          "ref": "angular-portal/project-structure/README.md#quyền-sở-hữu"
+        },
+        "app-routes": {
+          "example": "src/app/app.routes.ts"
+        },
+        "mdm-dir": {
+          "role": "Nghiệp vụ, tài nguyên, public entry, configuration và routes",
+          "owner": "Module",
+          "path": "src/modules/mdm/",
+          "ref": "angular-portal/project-structure/README.md#quyền-sở-hữu"
+        },
+        "mdm-index": {
+          "example": "src/modules/mdm/index.ts"
+        },
+        "mdm-routes": {
+          "example": "src/modules/mdm/routes.ts"
+        },
+        "mdm-config": {
+          "example": "src/modules/mdm/configurations/mdm.configuration.ts"
+        },
+        "mdm-provide": {
+          "example": "src/modules/mdm/configurations/provide-mdm-configuration.ts"
+        },
+        "mdm-services-dir": {
+          "role": "Service/model dùng chung cho các feature của module",
+          "owner": "Module",
+          "path": "src/modules/mdm/services/",
+          "ref": "angular-portal/project-structure/README.md#quyền-sở-hữu"
+        },
+        "base-api": {
+          "example": "src/modules/mdm/services/base-api.service.ts"
+        },
+        "mdm-testing-dir": {
+          "role": "Fixture/mock/helper và integration spec trong phạm vi module",
+          "owner": "Module",
+          "path": "src/modules/mdm/testing/",
+          "ref": "angular-portal/project-structure/README.md#quyền-sở-hữu"
+        },
+        "mdm-e2e-dir": {
+          "role": "Flow browser thuộc nghiệp vụ module",
+          "owner": "Module",
+          "path": "src/modules/mdm/e2e/",
+          "ref": "angular-portal/project-structure/README.md#quyền-sở-hữu"
+        },
+        "product-dir": {
+          "role": "Một entity hoặc nhóm tác vụ nghiệp vụ; không bắt buộc tương ứng một bảng database",
+          "owner": "Feature",
+          "path": "src/modules/mdm/features/product/",
+          "ref": "angular-portal/project-structure/README.md#quyền-sở-hữu"
+        },
+        "p-routes": {
+          "example": "src/modules/mdm/features/product/routes.ts"
+        },
+        "p-pages-dir": {
+          "role": "Container có route; điều phối ID, tải/lưu, navigation",
+          "owner": "Feature",
+          "path": "src/modules/mdm/features/product/pages/",
+          "ref": "angular-portal/project-structure/README.md#quyền-sở-hữu"
+        },
+        "p-components-dir": {
+          "role": "Thành phần thuộc feature, bao gồm drawer và các phần form/view",
+          "owner": "Feature",
+          "path": "src/modules/mdm/features/product/components/",
+          "ref": "angular-portal/project-structure/README.md#quyền-sở-hữu"
+        },
+        "p-model": {
+          "example": "src/modules/mdm/features/product/services/product.model.ts"
+        },
+        "p-service": {
+          "example": "src/modules/mdm/features/product/services/product.service.ts"
+        },
+        "p-testing-dir": {
+          "role": "Fixture/mock/helper và integration spec trong phạm vi feature",
+          "owner": "Feature",
+          "path": "src/modules/mdm/features/product/testing/",
+          "ref": "angular-portal/project-structure/README.md#quyền-sở-hữu"
+        },
+        "p-e2e-dir": {
+          "role": "Flow browser thuộc nghiệp vụ feature",
+          "owner": "Feature",
+          "path": "src/modules/mdm/features/product/e2e/",
+          "ref": "angular-portal/project-structure/README.md#quyền-sở-hữu"
+        },
+        "e2e-owner": {
+          "block": "angular-portal/project-structure/testing.md#e2e-theo-owner",
+          "index": 0,
+          "name": "E2E theo owner",
+          "note": "Cây E2E trong testing.md"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/project-structure/README.md#cấu-trúc-tổng-thể[0]": "sha256-f306467d53dca522",
+        "block:angular-portal/project-structure/testing.md#e2e-theo-owner[0]": "sha256-dfc043352b0893c5",
+        "example:src/app/app.routes.ts": "sha256-84494e346ec35207",
+        "example:src/modules/mdm/configurations/mdm.configuration.ts": "sha256-f0d8592a50e86b9f",
+        "example:src/modules/mdm/configurations/provide-mdm-configuration.ts": "sha256-ce3fea1253cad935",
+        "example:src/modules/mdm/features/product/routes.ts": "sha256-642a37a9037919fc",
+        "example:src/modules/mdm/features/product/services/product.model.ts": "sha256-c5fcbf2c768d9c82",
+        "example:src/modules/mdm/features/product/services/product.service.ts": "sha256-1026063c61ae2ad6",
+        "example:src/modules/mdm/index.ts": "sha256-944499216e1cf233",
+        "example:src/modules/mdm/routes.ts": "sha256-6e3b879bb65ea10a",
+        "example:src/modules/mdm/services/base-api.service.ts": "sha256-48cda26aab516c96",
+        "section:angular-portal/project-structure/README.md#cấu-trúc-tổng-thể": "sha256-ea3042cfd331bf84",
+        "section:angular-portal/project-structure/README.md#kiểm-tra-trước-bàn-giao": "sha256-ec06f7ca220dbf96",
+        "section:angular-portal/project-structure/README.md#quyền-sở-hữu": "sha256-bdae7b58cf450644",
+        "section:angular-portal/project-structure/README.md#service-và-model": "sha256-4b01e10aa12cc055",
+        "section:angular-portal/project-structure/README.md#test-và-test-support": "sha256-b9031f4a2dfe613c",
+        "section:angular-portal/project-structure/routes.md#quy-tắc": "sha256-276cf3c893a7f90e",
+        "section:angular-portal/README.md#quy-tắc-chung": "sha256-1364ef3703c55db7"
+      }
+    },
+    "bp-ui-naming": {
+      "no": "BP-03",
+      "title": "Tên & trách nhiệm UI",
+      "layout": "doc",
+      "sources": [
+        "angular-portal/project-structure/README.md#tên-và-trách-nhiệm-ui"
+      ],
+      "checklist": "angular-portal/project-structure/README.md#kiểm-tra-trước-bàn-giao",
+      "files": {
+        "tree": {
+          "block": "angular-portal/project-structure/README.md#cấu-trúc-tổng-thể",
+          "index": 0,
+          "name": "Cấu trúc tổng thể",
+          "note": "Cây thư mục trong project-structure/README.md"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/project-structure/README.md#cấu-trúc-tổng-thể[0]": "sha256-f306467d53dca522",
+        "section:angular-portal/project-structure/README.md#kiểm-tra-trước-bàn-giao": "sha256-ec06f7ca220dbf96",
+        "section:angular-portal/project-structure/README.md#select-của-entity-và-enumconst": "sha256-fbcb7de89ca54622",
+        "section:angular-portal/project-structure/README.md#tên-và-trách-nhiệm-ui": "sha256-51bb0c487008b96a",
+        "section:angular-portal/project-structure/routes.md#quy-tắc": "sha256-276cf3c893a7f90e"
+      }
+    },
+    "bp-config": {
+      "no": "BP-04",
+      "title": "Configuration & provider scope",
+      "layout": "explorer",
+      "sources": [
+        "angular-portal/project-structure/configuration.md",
+        "angular-portal/project-structure/configuration.md#provider-scope",
+        "angular-portal/project-structure/README.md#public-api-và-configuration"
+      ],
+      "checklist": "angular-portal/project-structure/README.md#kiểm-tra-trước-bàn-giao",
+      "files": {
+        "main": {
+          "example": "src/main.ts"
+        },
+        "app-routes": {
+          "example": "src/app/app.routes.ts"
+        },
+        "environment": {
+          "example": "src/environments/environment.ts"
+        },
+        "mdm-index": {
+          "example": "src/modules/mdm/index.ts"
+        },
+        "mdm-config": {
+          "example": "src/modules/mdm/configurations/mdm.configuration.ts"
+        },
+        "provide-config": {
+          "example": "src/modules/mdm/configurations/provide-mdm-configuration.ts"
+        },
+        "asset-service": {
+          "example": "src/modules/mdm/services/asset.service.ts"
+        },
+        "base-api": {
+          "example": "src/modules/mdm/services/base-api.service.ts"
+        },
+        "p-routes": {
+          "example": "src/modules/mdm/features/product/routes.ts"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "example:src/app/app.routes.ts": "sha256-84494e346ec35207",
+        "example:src/environments/environment.ts": "sha256-58db70fafeb968b3",
+        "example:src/main.ts": "sha256-08c6edd55fd7bf39",
+        "example:src/modules/mdm/configurations/mdm.configuration.ts": "sha256-f0d8592a50e86b9f",
+        "example:src/modules/mdm/configurations/provide-mdm-configuration.ts": "sha256-ce3fea1253cad935",
+        "example:src/modules/mdm/features/product/routes.ts": "sha256-642a37a9037919fc",
+        "example:src/modules/mdm/index.ts": "sha256-944499216e1cf233",
+        "example:src/modules/mdm/services/asset.service.ts": "sha256-96780d47407e4adc",
+        "example:src/modules/mdm/services/base-api.service.ts": "sha256-48cda26aab516c96",
+        "section:angular-portal/project-structure/configuration.md": "sha256-7f03d94db2951b6f",
+        "section:angular-portal/project-structure/configuration.md#contract": "sha256-97e16f8aa2d98952",
+        "section:angular-portal/project-structure/configuration.md#provider-scope": "sha256-a866072b6d8b57d2",
+        "section:angular-portal/project-structure/configuration.md#srcmodulesmdmconfigurationsmdmconfigurationts": "sha256-e1197beb7e93f404",
+        "section:angular-portal/project-structure/configuration.md#srcmodulesmdmconfigurationsprovide-mdm-configurationts": "sha256-6b3dca457048e486",
+        "section:angular-portal/project-structure/configuration.md#srcmodulesmdmindexts": "sha256-b1f7d985a7a0d66f",
+        "section:angular-portal/project-structure/configuration.md#tích-hợp": "sha256-a767b692efb2bce7",
+        "section:angular-portal/project-structure/README.md#kiểm-tra-trước-bàn-giao": "sha256-ec06f7ca220dbf96",
+        "section:angular-portal/project-structure/README.md#public-api-và-configuration": "sha256-0aa14751da23745e",
+        "section:angular-portal/project-structure/routes.md#host-cấp-configuration-trong-lazy-module-boundary": "sha256-b38138588e0e375a"
+      }
+    },
+    "bp-routes": {
+      "no": "BP-05",
+      "title": "Routes & route có ID",
+      "layout": "explorer",
+      "sources": [
+        "angular-portal/project-structure/routes.md",
+        "angular-portal/project-structure/routes.md#contract-vào-route-có-id",
+        "angular-portal/project-structure/routes.md#lỗi-trước-activation"
+      ],
+      "checklist": "angular-portal/project-structure/README.md#kiểm-tra-trước-bàn-giao",
+      "files": {
+        "mdm-index": {
+          "example": "src/modules/mdm/index.ts"
+        },
+        "mdm-routes": {
+          "example": "src/modules/mdm/routes.ts"
+        },
+        "p-routes": {
+          "example": "src/modules/mdm/features/product/routes.ts"
+        },
+        "p-service": {
+          "example": "src/modules/mdm/features/product/services/product.service.ts"
+        },
+        "detail-route": {
+          "block": "angular-portal/project-structure/routes.md#permission-theo-consumer",
+          "index": 0,
+          "name": "detail-route.ts",
+          "note": "Mã giả trong routes.md"
+        },
+        "resolver-call": {
+          "block": "angular-portal/project-structure/routes.md#permission-theo-consumer",
+          "index": 1,
+          "name": "entity.resolver.ts",
+          "note": "Trích đoạn trong routes.md"
+        },
+        "p-detail-ts": {
+          "illustrative": "illustrative/bp-routes/detail.component.ts",
+          "path": "src/modules/mdm/features/product/pages/detail/detail.component.ts"
+        }
+      },
+      "illustrative": [
+        "p-detail-ts"
+      ],
+      "locks": {
+        "block:angular-portal/project-structure/routes.md#permission-theo-consumer[0]": "sha256-f4916a6e2db7051c",
+        "block:angular-portal/project-structure/routes.md#permission-theo-consumer[1]": "sha256-6626267c090a714a",
+        "example:src/modules/mdm/features/product/routes.ts": "sha256-642a37a9037919fc",
+        "example:src/modules/mdm/features/product/services/product.service.ts": "sha256-1026063c61ae2ad6",
+        "example:src/modules/mdm/index.ts": "sha256-944499216e1cf233",
+        "example:src/modules/mdm/routes.ts": "sha256-6e3b879bb65ea10a",
+        "section:angular-portal/project-structure/README.md#kiểm-tra-trước-bàn-giao": "sha256-ec06f7ca220dbf96",
+        "section:angular-portal/project-structure/routes.md": "sha256-f6e960b160d04b48",
+        "section:angular-portal/project-structure/routes.md#bàn-giao-entity-cho-page": "sha256-0e9f029a3f04f3d0",
+        "section:angular-portal/project-structure/routes.md#contract-vào-route-có-id": "sha256-1e271e1296a5e795",
+        "section:angular-portal/project-structure/routes.md#feature-routes": "sha256-7958c634ea43d1c4",
+        "section:angular-portal/project-structure/routes.md#lỗi-trước-activation": "sha256-b3cb5a9d022d86d7",
+        "section:angular-portal/project-structure/routes.md#permission-theo-consumer": "sha256-05308f6e022cd103",
+        "section:angular-portal/project-structure/routes.md#quy-tắc": "sha256-276cf3c893a7f90e"
+      }
+    },
+    "bp-integration": {
+      "no": "BP-06",
+      "title": "Tích hợp module vào host",
+      "layout": "explorer",
+      "sources": [
+        "angular-portal/project-structure/routes.md#host-cấp-configuration-trong-lazy-module-boundary",
+        "angular-portal/project-structure/routes.md#url-và-hành-vi"
+      ],
+      "checklist": "angular-portal/project-structure/README.md#kiểm-tra-trước-bàn-giao",
+      "files": {
+        "main": {
+          "example": "src/main.ts"
+        },
+        "app-routes": {
+          "example": "src/app/app.routes.ts"
+        },
+        "environment": {
+          "example": "src/environments/environment.ts"
+        },
+        "mdm-index": {
+          "example": "src/modules/mdm/index.ts"
+        },
+        "mdm-routes": {
+          "example": "src/modules/mdm/routes.ts"
+        },
+        "provide-config": {
+          "example": "src/modules/mdm/configurations/provide-mdm-configuration.ts"
+        },
+        "p-routes": {
+          "example": "src/modules/mdm/features/product/routes.ts"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "example:src/app/app.routes.ts": "sha256-84494e346ec35207",
+        "example:src/environments/environment.ts": "sha256-58db70fafeb968b3",
+        "example:src/main.ts": "sha256-08c6edd55fd7bf39",
+        "example:src/modules/mdm/configurations/provide-mdm-configuration.ts": "sha256-ce3fea1253cad935",
+        "example:src/modules/mdm/features/product/routes.ts": "sha256-642a37a9037919fc",
+        "example:src/modules/mdm/index.ts": "sha256-944499216e1cf233",
+        "example:src/modules/mdm/routes.ts": "sha256-6e3b879bb65ea10a",
+        "section:angular-portal/project-structure/configuration.md#tích-hợp": "sha256-a767b692efb2bce7",
+        "section:angular-portal/project-structure/README.md#kiểm-tra-trước-bàn-giao": "sha256-ec06f7ca220dbf96",
+        "section:angular-portal/project-structure/routes.md#host-cấp-configuration-trong-lazy-module-boundary": "sha256-b38138588e0e375a",
+        "section:angular-portal/project-structure/routes.md#module-routes": "sha256-258f0b0e9c341172",
+        "section:angular-portal/project-structure/routes.md#url-và-hành-vi": "sha256-7d6a76a0b2892f78"
+      }
+    },
+    "bp-services": {
+      "no": "BP-07",
+      "title": "Services & model",
+      "layout": "explorer",
+      "sources": [
+        "angular-portal/project-structure/services.md",
+        "angular-portal/project-structure/services.md#core-filters--pagingreq--http-request",
+        "angular-portal/project-structure/README.md#service-và-model"
+      ],
+      "checklist": "angular-portal/project-structure/services.md#nghiệm-thu",
+      "files": {
+        "resource-url": {
+          "example": "src/modules/mdm/utils/resource-url.ts"
+        },
+        "base-api": {
+          "example": "src/modules/mdm/services/base-api.service.ts"
+        },
+        "asset-service": {
+          "example": "src/modules/mdm/services/asset.service.ts"
+        },
+        "p-model": {
+          "example": "src/modules/mdm/features/product/services/product.model.ts"
+        },
+        "p-service": {
+          "example": "src/modules/mdm/features/product/services/product.service.ts"
+        },
+        "p-list": {
+          "block": "angular-portal/ui-patterns.md#list-đơn-giản--ts-và-html",
+          "index": 1,
+          "path": "src/modules/mdm/features/product/pages/list/list.component.ts",
+          "note": "Mã giả trong ui-patterns.md"
+        },
+        "bulk-sig": {
+          "block": "angular-portal/project-structure/services.md#delete-approve-và-reject-cho-một-hoặc-nhiều-bản-ghi",
+          "index": 0,
+          "name": "delete-approve-reject.ts",
+          "note": "Mã giả trong services.md: model vào product.model.ts, chữ ký vào product.service.ts"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/project-structure/services.md#delete-approve-và-reject-cho-một-hoặc-nhiều-bản-ghi[0]": "sha256-74552496aac23bfd",
+        "block:angular-portal/ui-patterns.md#list-đơn-giản--ts-và-html[1]": "sha256-58dac1e471465d3b",
+        "example:src/modules/mdm/features/product/services/product.model.ts": "sha256-c5fcbf2c768d9c82",
+        "example:src/modules/mdm/features/product/services/product.service.ts": "sha256-1026063c61ae2ad6",
+        "example:src/modules/mdm/services/asset.service.ts": "sha256-96780d47407e4adc",
+        "example:src/modules/mdm/services/base-api.service.ts": "sha256-48cda26aab516c96",
+        "example:src/modules/mdm/utils/resource-url.ts": "sha256-c6cd1413b632fcfa",
+        "section:angular-portal/project-structure/README.md#service-và-model": "sha256-4b01e10aa12cc055",
+        "section:angular-portal/project-structure/services.md": "sha256-30ca7d46dfe31b2e",
+        "section:angular-portal/project-structure/services.md#base-api-service": "sha256-9d14d84952f119cc",
+        "section:angular-portal/project-structure/services.md#convention-tên-file-class-và-hàm": "sha256-eb8e268c916997b1",
+        "section:angular-portal/project-structure/services.md#core-filters--pagingreq--http-request": "sha256-98fb7dfe3cf2836c",
+        "section:angular-portal/project-structure/services.md#delete-approve-và-reject-cho-một-hoặc-nhiều-bản-ghi": "sha256-9c0dadbd34292aff",
+        "section:angular-portal/project-structure/services.md#feature-api-service": "sha256-1fb4a7f7d31f736c",
+        "section:angular-portal/project-structure/services.md#helper-dùng-chung-trong-module": "sha256-a1040ac1a75e3a79",
+        "section:angular-portal/project-structure/services.md#nghiệm-thu": "sha256-89ab76a7d1871606",
+        "section:angular-portal/project-structure/services.md#ownership-của-services-và-model": "sha256-adf98453d5a46185"
+      }
+    },
+    "bp-entity": {
+      "no": "BP-08",
+      "title": "Pipe detail & select của entity",
+      "layout": "explorer",
+      "sources": [
+        "angular-portal/project-structure/README.md#pipe-detail-của-entity",
+        "angular-portal/project-structure/README.md#select-của-entity-và-enumconst",
+        "angular-portal/ui-patterns.md#relation-dùng-pipe-entitydetail",
+        "angular-portal/ui-patterns.md#select-wrapper--entity-và-enumconst"
+      ],
+      "checklist": "angular-portal/project-structure/README.md#kiểm-tra-trước-bàn-giao",
+      "files": {
+        "customer-pipe": {
+          "block": "angular-portal/ui-patterns.md#giá-trị-rỗng-dùng-placeholder-của-core",
+          "index": 1,
+          "path": "features/customer/pipes/customer-detail.pipe.ts",
+          "note": "Mã giả trong ui-patterns.md"
+        },
+        "customer-service": {
+          "role": "Service của entity Customer: sở hữu truy cập dữ liệu, cache và chia sẻ request; pipe detail và select gọi qua service này",
+          "owner": "Feature Customer",
+          "path": "features/customer/services/customer.service.ts",
+          "ref": "angular-portal/ui-patterns.md#relation-dùng-pipe-entitydetail"
+        },
+        "customer-select": {
+          "role": "Bọc select của Core; sở hữu việc gọi service entity, search/load option, filter mặc định và cách render item/giá trị đã chọn",
+          "owner": "Feature Customer",
+          "path": "features/customer/components/customer-select/",
+          "ref": "angular-portal/project-structure/README.md#select-của-entity-và-enumconst"
+        },
+        "relation-html": {
+          "block": "angular-portal/ui-patterns.md#giá-trị-rỗng-dùng-placeholder-của-core",
+          "index": 0,
+          "name": "detail-relation.html",
+          "note": "Mã giả trong ui-patterns.md"
+        },
+        "select-usage": {
+          "block": "angular-portal/ui-patterns.md#option-có-thông-tin-nhận-diện--tối-đa-hai-dòng",
+          "index": 0,
+          "name": "customer-select-usage.html",
+          "note": "Mã giả ở Order trong ui-patterns.md"
+        },
+        "order-form": {
+          "block": "angular-portal/ui-patterns.md#dropdown-enumconst-và-cách-dùng-trong-createupdate",
+          "index": 0,
+          "name": "create-update.html",
+          "note": "Mã giả create/update của Order trong ui-patterns.md"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/ui-patterns.md#dropdown-enumconst-và-cách-dùng-trong-createupdate[0]": "sha256-4fcb18ce92ae0cfd",
+        "block:angular-portal/ui-patterns.md#giá-trị-rỗng-dùng-placeholder-của-core[0]": "sha256-64b9675a715f6e31",
+        "block:angular-portal/ui-patterns.md#giá-trị-rỗng-dùng-placeholder-của-core[1]": "sha256-89211b140f29b9ff",
+        "block:angular-portal/ui-patterns.md#option-có-thông-tin-nhận-diện--tối-đa-hai-dòng[0]": "sha256-49eed2501f6b2d89",
+        "section:angular-portal/project-structure/README.md#kiểm-tra-trước-bàn-giao": "sha256-ec06f7ca220dbf96",
+        "section:angular-portal/project-structure/README.md#pipe-detail-của-entity": "sha256-a9fb2c05d951c898",
+        "section:angular-portal/project-structure/README.md#select-của-entity-và-enumconst": "sha256-fbcb7de89ca54622",
+        "section:angular-portal/ui-patterns.md#contract-của-component": "sha256-7d1d7888b75b0087",
+        "section:angular-portal/ui-patterns.md#dropdown-enumconst-và-cách-dùng-trong-createupdate": "sha256-c26e3b5cf4ae92e2",
+        "section:angular-portal/ui-patterns.md#giá-trị-rỗng-dùng-placeholder-của-core": "sha256-099460a7180d4f68",
+        "section:angular-portal/ui-patterns.md#giữ-giá-trị-đã-chọn-khi-edit": "sha256-a95971b139e477b7",
+        "section:angular-portal/ui-patterns.md#option-có-thông-tin-nhận-diện--tối-đa-hai-dòng": "sha256-dd8565e95e7e3b11",
+        "section:angular-portal/ui-patterns.md#relation-dùng-pipe-entitydetail": "sha256-9ab94664f1da6dbb",
+        "section:angular-portal/ui-patterns.md#select-wrapper--entity-và-enumconst": "sha256-e723125b7721382b"
+      }
+    },
+    "bp-assets": {
+      "no": "BP-09",
+      "title": "Assets & style",
+      "layout": "explorer",
+      "sources": [
+        "angular-portal/project-structure/assets.md",
+        "angular-portal/project-structure/README.md#assets-và-style"
+      ],
+      "checklist": "angular-portal/project-structure/README.md#kiểm-tra-trước-bàn-giao",
+      "files": {
+        "asset-service": {
+          "example": "src/modules/mdm/services/asset.service.ts"
+        },
+        "scss-variables": {
+          "example": "src/modules/mdm/assets/styles/_variables.scss"
+        },
+        "scss-mixins": {
+          "example": "src/modules/mdm/assets/styles/_mixins.scss"
+        },
+        "scss-index": {
+          "example": "src/modules/mdm/assets/styles/_index.scss"
+        },
+        "angular-json": {
+          "block": "angular-portal/project-structure/assets.md#build-copy--đoạn-ghép-vào-angularjson",
+          "index": 0,
+          "path": "angular.json",
+          "note": "Fragment ghép vào build.options trong assets.md"
+        },
+        "mdm-templates": {
+          "role": "File mẫu nghiệp vụ, ví dụ Excel import hoặc Word",
+          "owner": "Module MDM",
+          "path": "src/modules/mdm/assets/templates/",
+          "ref": "angular-portal/project-structure/assets.md#cấu-trúc"
+        },
+        "product-assets": {
+          "role": "Cùng quy ước nhóm với module/assets: images, icons, fonts, styles, templates, documents; chỉ tạo nhóm có tài nguyên thực",
+          "owner": "Feature Product",
+          "path": "src/modules/mdm/features/product/assets/",
+          "ref": "angular-portal/project-structure/assets.md#cấu-trúc"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/project-structure/assets.md#build-copy--đoạn-ghép-vào-angularjson[0]": "sha256-877404d8e6d46835",
+        "example:src/modules/mdm/assets/styles/_index.scss": "sha256-7b098bb890a42402",
+        "example:src/modules/mdm/assets/styles/_mixins.scss": "sha256-67bf1e50dc54d760",
+        "example:src/modules/mdm/assets/styles/_variables.scss": "sha256-6e2d48ba185a2f71",
+        "example:src/modules/mdm/services/asset.service.ts": "sha256-96780d47407e4adc",
+        "section:angular-portal/conventions/eslint.md#trạng-thái-rule": "sha256-f5e61d45671dcbb9",
+        "section:angular-portal/project-structure/assets.md": "sha256-297ddd402b371947",
+        "section:angular-portal/project-structure/assets.md#build-copy--đoạn-ghép-vào-angularjson": "sha256-0f2c5f566c5fd12b",
+        "section:angular-portal/project-structure/assets.md#cấu-trúc": "sha256-ba662dcfaa5557cb",
+        "section:angular-portal/project-structure/assets.md#namespace-url": "sha256-46917eea7081cd9a",
+        "section:angular-portal/project-structure/assets.md#scss-dùng-chung": "sha256-9296d33cf43e655c",
+        "section:angular-portal/project-structure/README.md#assets-và-style": "sha256-c85c794f24c27eca",
+        "section:angular-portal/project-structure/README.md#kiểm-tra-trước-bàn-giao": "sha256-ec06f7ca220dbf96",
+        "section:angular-portal/project-structure/services.md#asset-service-của-module": "sha256-7e13099449ce5229"
+      }
+    },
+    "bp-testing": {
+      "no": "BP-10",
+      "title": "Testing",
+      "layout": "explorer",
+      "sources": [
+        "angular-portal/project-structure/testing.md",
+        "angular-portal/project-structure/testing.md#route-detailupdate-có-id",
+        "angular-portal/project-structure/README.md#test-và-test-support"
+      ],
+      "checklist": "angular-portal/project-structure/testing.md#nghiệm-thu",
+      "files": {
+        "unit-layout": {
+          "block": "angular-portal/project-structure/testing.md#unitcomponentservice-spec",
+          "index": 0,
+          "name": "colocated-specs.txt",
+          "note": "Cây thư mục trong testing.md"
+        },
+        "integration-layout": {
+          "block": "angular-portal/project-structure/testing.md#integration-spec",
+          "index": 0,
+          "name": "integration-specs.txt",
+          "note": "Cây thư mục trong testing.md"
+        },
+        "e2e-layout": {
+          "block": "angular-portal/project-structure/testing.md#e2e-theo-owner",
+          "index": 0,
+          "name": "e2e-owners.txt",
+          "note": "Cây thư mục trong testing.md"
+        },
+        "tsconfig-app": {
+          "block": "angular-portal/project-structure/testing.md#config-và-runner-discovery",
+          "index": 0,
+          "path": "tsconfig.app.json",
+          "note": "Fragment gợi ý trong testing.md"
+        },
+        "tsconfig-spec": {
+          "block": "angular-portal/project-structure/testing.md#config-và-runner-discovery",
+          "index": 1,
+          "path": "tsconfig.spec.json",
+          "note": "Fragment gợi ý trong testing.md"
+        },
+        "playwright-root": {
+          "role": "Điều phối projects/suite Portal và các module được đăng ký",
+          "owner": "Portal",
+          "path": "playwright.config.ts",
+          "ref": "angular-portal/project-structure/testing.md#config-và-runner-discovery"
+        },
+        "portal-e2e": {
+          "role": "Shell/navigation, tích hợp module và flow xuyên module",
+          "owner": "Portal",
+          "path": "e2e/",
+          "ref": "angular-portal/project-structure/testing.md#e2e-theo-owner"
+        },
+        "mdm-playwright": {
+          "role": "Cho phép chạy suite module độc lập với root config",
+          "owner": "Module MDM",
+          "path": "src/modules/mdm/e2e/playwright.config.ts",
+          "ref": "angular-portal/project-structure/testing.md#config-và-runner-discovery"
+        },
+        "product-e2e": {
+          "role": "Flow browser chỉ thuộc Product",
+          "owner": "Feature Product",
+          "path": "src/modules/mdm/features/product/e2e/",
+          "ref": "angular-portal/project-structure/testing.md#e2e-theo-owner"
+        },
+        "product-testing": {
+          "role": "Fixture/mock/helper và integration spec trong phạm vi Product",
+          "owner": "Feature Product",
+          "path": "src/modules/mdm/features/product/testing/",
+          "ref": "angular-portal/project-structure/testing.md#test-support"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/project-structure/testing.md#config-và-runner-discovery[0]": "sha256-6071e5328f4c251a",
+        "block:angular-portal/project-structure/testing.md#config-và-runner-discovery[1]": "sha256-0cce8cf5a4dedda2",
+        "block:angular-portal/project-structure/testing.md#e2e-theo-owner[0]": "sha256-dfc043352b0893c5",
+        "block:angular-portal/project-structure/testing.md#integration-spec[0]": "sha256-940a6d099b6806d4",
+        "block:angular-portal/project-structure/testing.md#unitcomponentservice-spec[0]": "sha256-b003f1c88f60e3c0",
+        "section:angular-portal/project-structure/README.md#test-và-test-support": "sha256-b9031f4a2dfe613c",
+        "section:angular-portal/project-structure/testing.md": "sha256-814b847ebb4a96c1",
+        "section:angular-portal/project-structure/testing.md#config-và-runner-discovery": "sha256-ba1bdccea2237ed1",
+        "section:angular-portal/project-structure/testing.md#e2e-theo-owner": "sha256-f70175bad25a1c87",
+        "section:angular-portal/project-structure/testing.md#integration-spec": "sha256-58eace0c7f458673",
+        "section:angular-portal/project-structure/testing.md#naming": "sha256-c2b042daacae066a",
+        "section:angular-portal/project-structure/testing.md#nghiệm-thu": "sha256-ec6bcc6d3e805540",
+        "section:angular-portal/project-structure/testing.md#output-sinh-ra": "sha256-8abd811f45fe01b7",
+        "section:angular-portal/project-structure/testing.md#route-detailupdate-có-id": "sha256-fd71d4e66fce7f4f",
+        "section:angular-portal/project-structure/testing.md#test-support": "sha256-06b6713cb6f3e4a3",
+        "section:angular-portal/project-structure/testing.md#unitcomponentservice-spec": "sha256-517019180462a545"
+      }
+    },
+    "bp-ui-common": {
+      "no": "BP-11",
+      "title": "Quy tắc UI chung & action",
+      "layout": "doc",
+      "sources": [
+        "angular-portal/ui-patterns.md#quy-tắc-ui-dùng-chung",
+        "angular-portal/ui-patterns.md#giới-hạn-commandaction-trên-list-và-detail"
+      ],
+      "checklist": null,
+      "files": {
+        "action-group": {
+          "block": "angular-portal/ui-patterns.md#giới-hạn-commandaction-trên-list-và-detail",
+          "index": 0,
+          "name": "list.component.ts",
+          "note": "Mã giả trong ui-patterns.md · fragment option của sd-table"
+        },
+        "detail-header": {
+          "block": "angular-portal/ui-patterns.md#header",
+          "index": 0,
+          "name": "detail.component.html",
+          "note": "Fragment mã giả trong ui-patterns.md"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/ui-patterns.md#giới-hạn-commandaction-trên-list-và-detail[0]": "sha256-72a8a3efa193a856",
+        "block:angular-portal/ui-patterns.md#header[0]": "sha256-3f2987a6b64e4919",
+        "section:angular-portal/ui-patterns.md#giới-hạn-commandaction-trên-list-và-detail": "sha256-826a67706359894e",
+        "section:angular-portal/ui-patterns.md#header": "sha256-7abe487f1986fae5",
+        "section:angular-portal/ui-patterns.md#header-section-và-hướng-dẫn": "sha256-206d7dbd63b17976",
+        "section:angular-portal/ui-patterns.md#phạm-vi-và-bố-cục": "sha256-f4d11fd213be323d",
+        "section:angular-portal/ui-patterns.md#quy-tắc-ui-dùng-chung": "sha256-10d968822c4e35f6"
+      }
+    },
+    "bp-list": {
+      "no": "BP-12",
+      "title": "List",
+      "layout": "doc",
+      "sources": [
+        "angular-portal/ui-patterns.md#list--bố-cục-chuẩn"
+      ],
+      "checklist": null,
+      "files": {
+        "list-layout": {
+          "block": "angular-portal/ui-patterns.md#list--bố-cục-chuẩn",
+          "index": 0,
+          "name": "list-layout.txt",
+          "note": "Bố cục logic trong ui-patterns.md, không phải cấu trúc file"
+        },
+        "list-ts": {
+          "block": "angular-portal/ui-patterns.md#list-đơn-giản--ts-và-html",
+          "index": 1,
+          "name": "list.component.ts",
+          "path": "src/modules/mdm/features/product/pages/list/list.component.ts",
+          "note": "Mã giả trong ui-patterns.md, không có marker example"
+        },
+        "list-html": {
+          "block": "angular-portal/ui-patterns.md#list-đơn-giản--ts-và-html",
+          "index": 2,
+          "name": "list.component.html",
+          "path": "src/modules/mdm/features/product/pages/list/list.component.html",
+          "note": "Mã giả trong ui-patterns.md, không có marker example"
+        },
+        "header-menu": {
+          "block": "angular-portal/ui-patterns.md#header-có-nhiều-action-và-menu",
+          "index": 0,
+          "name": "list.component.html",
+          "note": "Fragment mã giả thay vùng headerRight trong ui-patterns.md"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/ui-patterns.md#header-có-nhiều-action-và-menu[0]": "sha256-58830cf81e95d362",
+        "block:angular-portal/ui-patterns.md#list--bố-cục-chuẩn[0]": "sha256-266dde275161cf4b",
+        "block:angular-portal/ui-patterns.md#list-đơn-giản--ts-và-html[1]": "sha256-58dac1e471465d3b",
+        "block:angular-portal/ui-patterns.md#list-đơn-giản--ts-và-html[2]": "sha256-4755710dfeff4fcf",
+        "section:angular-portal/ui-patterns.md#chiều-cao-và-quyền-sở-hữu-scroll": "sha256-f5a9f3db50c99469",
+        "section:angular-portal/ui-patterns.md#đối-chiếu-core-và-mẫu-tham-khảo": "sha256-7e9924e48f4a0df9",
+        "section:angular-portal/ui-patterns.md#giới-hạn-commandaction-trên-list-và-detail": "sha256-826a67706359894e",
+        "section:angular-portal/ui-patterns.md#header-có-nhiều-action-và-menu": "sha256-8f471e58c133ebc6",
+        "section:angular-portal/ui-patterns.md#list--bố-cục-chuẩn": "sha256-6239465cba7e88a3",
+        "section:angular-portal/ui-patterns.md#list-đơn-giản--ts-và-html": "sha256-86ed7abfaa9faeac",
+        "section:angular-portal/ui-patterns.md#search-và-filter": "sha256-0d63b3fa47d59945"
+      }
+    },
+    "bp-detail": {
+      "no": "BP-13",
+      "title": "Detail",
+      "layout": "doc",
+      "sources": [
+        "angular-portal/ui-patterns.md#detail--bố-cục-header-và-action",
+        "angular-portal/ui-patterns.md#detail--dữ-liệu-relation-và-giá-trị-rỗng"
+      ],
+      "checklist": null,
+      "files": {
+        "detail-header": {
+          "block": "angular-portal/ui-patterns.md#header",
+          "index": 0,
+          "name": "detail.component.html",
+          "note": "Fragment mã giả trong ui-patterns.md"
+        },
+        "detail-body": {
+          "block": "angular-portal/ui-patterns.md#value-thường-gặp",
+          "index": 0,
+          "name": "detail.component.html",
+          "note": "Mã giả body detail trong ui-patterns.md; hai biến thể thay thế nhau"
+        },
+        "customer-pipe": {
+          "block": "angular-portal/ui-patterns.md#giá-trị-rỗng-dùng-placeholder-của-core",
+          "index": 1,
+          "name": "customer-detail.pipe.ts",
+          "path": "features/customer/pipes/customer-detail.pipe.ts",
+          "note": "Mã giả trong ui-patterns.md, trường hợp service trả Promise"
+        },
+        "empty-value": {
+          "block": "angular-portal/ui-patterns.md#giá-trị-rỗng-dùng-placeholder-của-core",
+          "index": 0,
+          "name": "detail.component.html",
+          "note": "Mã giả trong ui-patterns.md, chưa qua AOT/browser; hai dạng thay thế nhau"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/ui-patterns.md#giá-trị-rỗng-dùng-placeholder-của-core[0]": "sha256-64b9675a715f6e31",
+        "block:angular-portal/ui-patterns.md#giá-trị-rỗng-dùng-placeholder-của-core[1]": "sha256-89211b140f29b9ff",
+        "block:angular-portal/ui-patterns.md#header[0]": "sha256-3f2987a6b64e4919",
+        "block:angular-portal/ui-patterns.md#value-thường-gặp[0]": "sha256-589470995a869f9e",
+        "section:angular-portal/ui-patterns.md#các-bố-cục-đã-chốt": "sha256-ba503f6588576fd8",
+        "section:angular-portal/ui-patterns.md#detail--bố-cục-header-và-action": "sha256-fe65ddd4e5e9cd2a",
+        "section:angular-portal/ui-patterns.md#detail--dữ-liệu-relation-và-giá-trị-rỗng": "sha256-bd18928f74ffb9cf",
+        "section:angular-portal/ui-patterns.md#giá-trị-rỗng-dùng-placeholder-của-core": "sha256-099460a7180d4f68",
+        "section:angular-portal/ui-patterns.md#header": "sha256-7abe487f1986fae5",
+        "section:angular-portal/ui-patterns.md#relation-dùng-pipe-entitydetail": "sha256-9ab94664f1da6dbb"
+      }
+    },
+    "bp-create-update": {
+      "no": "BP-14",
+      "title": "Create/update & thay đổi chưa lưu",
+      "layout": "doc",
+      "sources": [
+        "angular-portal/ui-patterns.md#createupdate--bố-cục-và-nhập-liệu",
+        "angular-portal/ui-patterns.md#bảo-vệ-thay-đổi-chưa-lưu-trên-page-createupdate"
+      ],
+      "checklist": null,
+      "files": {
+        "form-sections": {
+          "block": "angular-portal/ui-patterns.md#header-section-và-hướng-dẫn",
+          "index": 0,
+          "name": "create.component.html",
+          "note": "Fragment mã giả create/update trong ui-patterns.md"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/ui-patterns.md#header-section-và-hướng-dẫn[0]": "sha256-4a4265414f671e62",
+        "section:angular-portal/project-structure/README.md#tên-và-trách-nhiệm-ui": "sha256-51bb0c487008b96a",
+        "section:angular-portal/ui-patterns.md#bảo-vệ-thay-đổi-chưa-lưu-trên-page-createupdate": "sha256-64214fd5841404ab",
+        "section:angular-portal/ui-patterns.md#các-bố-cục-đã-chốt-1": "sha256-5f7a2813528c27cc",
+        "section:angular-portal/ui-patterns.md#createupdate--bố-cục-và-nhập-liệu": "sha256-abc275926622b5a7",
+        "section:angular-portal/ui-patterns.md#draft-và-steps": "sha256-00881b260d7750bc",
+        "section:angular-portal/ui-patterns.md#header-section-và-hướng-dẫn": "sha256-206d7dbd63b17976"
+      }
+    },
+    "bp-drawer": {
+      "no": "BP-15",
+      "title": "Side drawer",
+      "layout": "doc",
+      "sources": [
+        "angular-portal/ui-patterns.md#side-drawer--detailcreateupdate"
+      ],
+      "checklist": null,
+      "files": {
+        "drawer-footer": {
+          "block": "angular-portal/ui-patterns.md#detail-có-duyệttừ-chốicập-nhật",
+          "index": 0,
+          "name": "detail-side-drawer.component.html",
+          "note": "Fragment mã giả trong ui-patterns.md, chưa phải implementation hoàn chỉnh"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/ui-patterns.md#detail-có-duyệttừ-chốicập-nhật[0]": "sha256-26f3a60d83200559",
+        "section:angular-portal/ui-patterns.md#chuẩn-bị-dữ-liệu-trước-khi-mở": "sha256-6922d51763029d51",
+        "section:angular-portal/ui-patterns.md#detail-có-duyệttừ-chốicập-nhật": "sha256-c50c3aa1ed8bae89",
+        "section:angular-portal/ui-patterns.md#đóng-drawer-dirty-và-kết-quả": "sha256-c59440b0f994c1a1",
+        "section:angular-portal/ui-patterns.md#phạm-vi-và-bố-cục": "sha256-f4d11fd213be323d",
+        "section:angular-portal/ui-patterns.md#side-drawer--detailcreateupdate": "sha256-c99550920a2b4b6b"
+      }
+    },
+    "bp-naming": {
+      "no": "BP-16",
+      "title": "Naming & TypeScript",
+      "layout": "doc",
+      "sources": [
+        "angular-portal/conventions/naming.md",
+        "angular-portal/project-structure/README.md#service-và-model"
+      ],
+      "checklist": "angular-portal/conventions/naming.md#nghiệm-thu",
+      "files": {
+        "product-model": {
+          "block": "angular-portal/conventions/naming.md#type-model-và-enum",
+          "index": 0,
+          "note": "Trích đoạn product.model.ts trong naming.md"
+        },
+        "user-role": {
+          "block": "angular-portal/conventions/naming.md#type-model-và-enum",
+          "index": 1,
+          "name": "user.model.ts",
+          "note": "Mẫu enum trong naming.md"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/conventions/naming.md#type-model-và-enum[0]": "sha256-258dad0c82280bc0",
+        "block:angular-portal/conventions/naming.md#type-model-và-enum[1]": "sha256-c5b9e0a942bbe13b",
+        "section:angular-portal/conventions/eslint.md#lưu-ý": "sha256-e2f746d5f5c4b7bb",
+        "section:angular-portal/conventions/naming.md": "sha256-9e44ed98bc428f9f",
+        "section:angular-portal/conventions/naming.md#array-và-object": "sha256-3ec1dbc6e59e8e0b",
+        "section:angular-portal/conventions/naming.md#boolean": "sha256-fe8ba485ed608101",
+        "section:angular-portal/conventions/naming.md#hàm-và-method": "sha256-c3365d871d640434",
+        "section:angular-portal/conventions/naming.md#kiểm-tra-tự-động": "sha256-5f5671cc70ce85b1",
+        "section:angular-portal/conventions/naming.md#nghiệm-thu": "sha256-15311c775750c35a",
+        "section:angular-portal/conventions/naming.md#number-và-string": "sha256-bce8405ac2939e94",
+        "section:angular-portal/conventions/naming.md#quy-tắc": "sha256-af6e51752f17ef34",
+        "section:angular-portal/conventions/naming.md#type-model-và-enum": "sha256-f0f551c65ce8c17c",
+        "section:angular-portal/project-structure/README.md#service-và-model": "sha256-4b01e10aa12cc055"
+      }
+    },
+    "bp-signals": {
+      "no": "BP-17",
+      "title": "Signals & Component APIs",
+      "layout": "explorer",
+      "sources": [
+        "angular-portal/conventions/signals.md"
+      ],
+      "checklist": "angular-portal/conventions/signals.md#nghiệm-thu",
+      "files": {
+        "order-line-ts": {
+          "example": "src/modules/mdm/features/order/components/order-line/order-line.component.ts"
+        },
+        "parent-html": {
+          "block": "angular-portal/conventions/signals.md#mẫu",
+          "index": 1,
+          "name": "parent.component.html",
+          "note": "Mẫu trong signals.md"
+        },
+        "eslint-config": {
+          "block": "angular-portal/conventions/eslint.md#phần-bổ-sung-cho-eslintconfigjs",
+          "index": 0,
+          "name": "eslint.config.js",
+          "path": "eslint.config.js",
+          "note": "Phần bổ sung trong eslint.md"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/conventions/eslint.md#phần-bổ-sung-cho-eslintconfigjs[0]": "sha256-5cdf7af85cce7179",
+        "block:angular-portal/conventions/signals.md#mẫu[1]": "sha256-8b8320f4796eb7bf",
+        "example:src/modules/mdm/features/order/components/order-line/order-line.component.ts": "sha256-b21b3eed92b0093c",
+        "section:angular-portal/conventions/eslint.md#eslint-cho-quy-ước-blueprint": "sha256-b367b9d4fd9eb556",
+        "section:angular-portal/conventions/naming.md#quy-tắc": "sha256-af6e51752f17ef34",
+        "section:angular-portal/conventions/signals.md": "sha256-82890ce2d6fd1ca1",
+        "section:angular-portal/conventions/signals.md#đúng--sai": "sha256-d6c4116bbd7a4e72",
+        "section:angular-portal/conventions/signals.md#kiểm-tra-tự-động": "sha256-becc3cd68f0bd7fc",
+        "section:angular-portal/conventions/signals.md#mẫu": "sha256-12e7296e57b75304",
+        "section:angular-portal/conventions/signals.md#nghiệm-thu": "sha256-6ef6615535756b5f",
+        "section:angular-portal/conventions/signals.md#quy-tắc": "sha256-e1f7fb4e9c4bf61e"
+      }
+    },
+    "bp-permission": {
+      "no": "BP-18",
+      "title": "Phân quyền: G/C/A & phạm vi dữ liệu",
+      "layout": "doc",
+      "sources": [
+        "angular-portal/conventions/permission.md",
+        "angular-portal/project-structure/routes.md#permission-theo-consumer"
+      ],
+      "checklist": "angular-portal/conventions/permission.md#nghiệm-thu",
+      "files": {
+        "permission-tree": {
+          "block": "angular-portal/conventions/permission.md#mã-quyền",
+          "index": 0,
+          "name": "role-permission.txt",
+          "note": "Sơ đồ trong permission.md"
+        },
+        "detail-route": {
+          "block": "angular-portal/project-structure/routes.md#permission-theo-consumer",
+          "index": 0,
+          "name": "detail-route.ts",
+          "note": "Mã giả trong routes.md"
+        },
+        "scope-check": {
+          "block": "angular-portal/conventions/permission.md#phạm-vi-dữ-liệu",
+          "index": 0,
+          "name": "backend-policy.txt",
+          "note": "Mã giả trong permission.md"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/conventions/permission.md#mã-quyền[0]": "sha256-c973e44500b2a17f",
+        "block:angular-portal/conventions/permission.md#phạm-vi-dữ-liệu[0]": "sha256-5090753cf00acba6",
+        "block:angular-portal/project-structure/routes.md#permission-theo-consumer[0]": "sha256-f4916a6e2db7051c",
+        "section:angular-portal/conventions/permission.md": "sha256-2896a86bdfc5d472",
+        "section:angular-portal/conventions/permission.md#kiểm-tra-tự-động": "sha256-610f085e2ec337d6",
+        "section:angular-portal/conventions/permission.md#mã-quyền": "sha256-8f38d8fa2b2095fd",
+        "section:angular-portal/conventions/permission.md#nghiệm-thu": "sha256-451ae177a0b9a58a",
+        "section:angular-portal/conventions/permission.md#phạm-vi-dữ-liệu": "sha256-0f8ee45aab651487",
+        "section:angular-portal/conventions/permission.md#quy-tắc": "sha256-bbf59add80728f48",
+        "section:angular-portal/project-structure/routes.md#permission-theo-consumer": "sha256-05308f6e022cd103"
+      }
+    },
+    "bp-a11y": {
+      "no": "BP-19",
+      "title": "Accessibility",
+      "layout": "doc",
+      "sources": [
+        "angular-portal/conventions/accessibility.md"
+      ],
+      "checklist": "angular-portal/conventions/accessibility.md#nghiệm-thu",
+      "files": {
+        "a11y-markup": {
+          "block": "angular-portal/conventions/accessibility.md#mẫu",
+          "index": 0,
+          "name": "component.html",
+          "note": "Mẫu trong accessibility.md"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/conventions/accessibility.md#mẫu[0]": "sha256-707e683ba03ff8be",
+        "section:angular-portal/conventions/accessibility.md": "sha256-6891db6b2e849ad7",
+        "section:angular-portal/conventions/accessibility.md#kiểm-tra-tự-động": "sha256-24484b05e58ab3b3",
+        "section:angular-portal/conventions/accessibility.md#mẫu": "sha256-5be3ad3e7894ca06",
+        "section:angular-portal/conventions/accessibility.md#nghiệm-thu": "sha256-95b9ae11ad81b9e6",
+        "section:angular-portal/conventions/accessibility.md#quy-tắc": "sha256-3999864ccc5ee661"
+      }
+    },
+    "bp-lint": {
+      "no": "BP-20",
+      "title": "ESLint & kiểm chứng",
+      "layout": "doc",
+      "sources": [
+        "angular-portal/conventions/eslint.md",
+        "angular-portal/README.md#code-mẫu-và-kiểm-chứng"
+      ],
+      "checklist": null,
+      "files": {
+        "eslint-config": {
+          "block": "angular-portal/conventions/eslint.md#phần-bổ-sung-cho-eslintconfigjs",
+          "index": 0,
+          "name": "eslint.config.js",
+          "note": "Phần bổ sung trong eslint.md"
+        }
+      },
+      "illustrative": [],
+      "locks": {
+        "block:angular-portal/conventions/eslint.md#phần-bổ-sung-cho-eslintconfigjs[0]": "sha256-5cdf7af85cce7179",
+        "section:angular-portal/conventions/eslint.md": "sha256-b367b9d4fd9eb556",
+        "section:angular-portal/conventions/eslint.md#eslint-cho-quy-ước-blueprint": "sha256-b367b9d4fd9eb556",
+        "section:angular-portal/conventions/eslint.md#kiểm-chứng": "sha256-219a6de44a1a82ce",
+        "section:angular-portal/conventions/eslint.md#lưu-ý": "sha256-e2f746d5f5c4b7bb",
+        "section:angular-portal/README.md#code-mẫu-và-kiểm-chứng": "sha256-25b856e9295aa152"
+      }
+    }
+  },
+  "hidden": [],
+  "images": {
+    "assets/img/portal-list.png": {
+      "source": "portal-template · màn list khách hàng doanh nghiệp (gói blueprint-handoff)",
+      "capturedAt": "2026-11-05",
+      "stale": false
+    },
+    "assets/img/a11y-demo.png": {
+      "source": "portal-template · /instruction/coding-convention/quality (gói blueprint-handoff)",
+      "capturedAt": "2026-11-05",
+      "stale": false
+    },
+    "assets/img/signals-demo.png": {
+      "source": "portal-template · /instruction/modern-angular/signals (gói blueprint-handoff)",
+      "capturedAt": "2026-11-05",
+      "stale": false
+    },
+    "assets/img/spacing-demo.png": {
+      "source": "portal-template · /instruction/coding-convention/scss (gói blueprint-handoff)",
+      "capturedAt": "2026-11-05",
+      "stale": true,
+      "staleNote": "Ảnh cũ: form mẫu còn dùng p-20."
+    }
+  }
+}

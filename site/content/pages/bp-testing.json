@@ -1,0 +1,176 @@
+{
+  "desc": "Spec cạnh source, integration theo owner, E2E trong e2e/ của feature, module hoặc Portal.",
+  "minutes": 7,
+  "movedFrom": null,
+  "tldr": [
+    "`.spec.ts` · `.integration.spec.ts` · `.e2e-spec.ts`",
+    "Test support không vào public entry runtime",
+    "Tách discovery của Angular spec và Playwright E2E"
+  ],
+  "hero": {
+    "type": "tree",
+    "label": "Test theo owner",
+    "items": [
+      { "t": "features/product/pages/list/list.component.spec.ts" },
+      { "t": "features/product/testing/integration/record-flow.integration.spec.ts" },
+      { "t": "features/product/e2e/specs/create.e2e-spec.ts" },
+      { "t": "mdm/e2e/specs/cross-feature-flow.e2e-spec.ts" },
+      { "t": "e2e/specs/navigation.e2e-spec.ts            ← Portal" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Tên và vị trí",
+      "ref": "angular-portal/project-structure/testing.md#naming",
+      "text": "Unit/service/component spec dùng `.spec.ts`, integration `.integration.spec.ts`, browser E2E `.e2e-spec.ts`; page object `.page.ts`, dữ liệu/builder test `.fixture.ts`, test double `.mock.ts`. Không lặp tên feature trong file khi context đã nằm ở đường dẫn.",
+      "file": "unit-layout",
+      "lines": [6, 9, 13, 15],
+      "focus": [0],
+      "must": { "quote": "Playwright phải được cấu hình testMatch tương ứng" },
+      "result": "Tìm được spec theo đường dẫn của source.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Spec đặt cạnh code được kiểm tra; không gom unit spec vào một thư mục tests/specs chung xa owner.",
+          "ref": "angular-portal/project-structure/testing.md#unitcomponentservice-spec",
+          "quote": "Không gom unit spec vào một thư mục tests/specs chung xa owner."
+        },
+        {
+          "kind": "tip",
+          "text": "Model/type thuần không bắt buộc có spec riêng nếu không có hành vi runtime cần kiểm tra.",
+          "ref": "angular-portal/project-structure/testing.md#unitcomponentservice-spec"
+        }
+      ]
+    },
+    {
+      "title": "Integration theo owner",
+      "ref": "angular-portal/project-structure/testing.md#integration-spec",
+      "text": "Chỉ phối hợp một phần code thì đặt `.integration.spec.ts` cạnh owner đó. Phối hợp nhiều service/component/routes thì đặt tại `testing/integration` trong feature/module sở hữu tình huống.",
+      "file": "integration-layout",
+      "lines": [4, 8],
+      "focus": [1],
+      "result": "Mỗi tình huống có đúng một owner.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không đặt cùng một tình huống ở cả hai nơi.",
+          "quote": "Không đặt cùng một tình huống ở cả hai nơi."
+        },
+        {
+          "kind": "info",
+          "text": "Integration spec dùng DI/router/HTTP test double có thể chạy bằng runner spec của project; không tự động đồng nghĩa browser E2E."
+        }
+      ]
+    },
+    {
+      "title": "Route có ID",
+      "ref": "angular-portal/project-structure/testing.md#route-detailupdate-có-id",
+      "text": "Router integration ở feature chứng minh contract Routes: API đang pending thì page chưa kích hoạt; guard từ chối thì không gọi API tải entity; đổi ID thì tải lại; navigation cũ không ghi đè entity mới; page không phát sinh request trùng.",
+      "file": "integration-layout",
+      "lines": [5, 6, 7],
+      "focus": [1],
+      "result": "Contract route có ID được kiểm bằng guard/resolver thật.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Dùng guard/resolver thật của consumer với API điều khiển được; kiểm tra trạng thái activation và số request, không chỉ gọi resolver như một hàm riêng.",
+          "quote": "không chỉ gọi resolver như một hàm riêng"
+        },
+        {
+          "kind": "warn",
+          "text": "404/401/403/5xx chuyển đúng đích theo mapping consumer; không chuyển mọi lỗi về not-found.",
+          "quote": "không chuyển mọi lỗi về not-found"
+        },
+        {
+          "kind": "info",
+          "text": "Bảng case quy định những gì cần có, chưa phải suite đã được triển khai/chạy trong repo Blueprint."
+        }
+      ]
+    },
+    {
+      "title": "Test support",
+      "ref": "angular-portal/project-structure/testing.md#test-support",
+      "text": "Feature dùng test support của chính nó hoặc module: `testing/fixtures`, `mocks`, `helpers`, `integration`. Nếu nhiều feature thật sự dùng chung thì nâng lên `module/testing`; support chỉ dùng một spec có thể nằm ngay cạnh spec đó.",
+      "file": "product-testing",
+      "focus": [1],
+      "result": "Module không phụ thuộc test nội bộ của Portal hay module khác.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không export test support qua `index.ts` runtime; external test consumer cần helper thì công bố test-only entry riêng.",
+          "quote": "Không export test support qua index.ts runtime."
+        },
+        {
+          "kind": "warn",
+          "text": "Không đưa test fixture/mock vào assets hay public entry runtime.",
+          "ref": "angular-portal/project-structure/README.md#test-và-test-support",
+          "quote": "Không đưa test fixture/mock vào assets hay public entry runtime."
+        }
+      ]
+    },
+    {
+      "title": "E2E theo owner",
+      "ref": "angular-portal/project-structure/testing.md#e2e-theo-owner",
+      "text": "Flow browser chỉ thuộc Product ở `features/product/e2e`; flow phối hợp nhiều feature trong MDM ở `mdm/e2e`; shell/navigation, tích hợp module và flow xuyên module ở `e2e/` của project. Chỉ tạo những thư mục có consumer thực.",
+      "file": "e2e-layout",
+      "lines": [3, 11, 12, 19],
+      "focus": [2, 3, 4],
+      "result": "Flow của Product không bị chép vào root.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Một flow thuộc Product không được chép thêm vào `root/e2e` chỉ vì suite Portal cũng cần chạy nó.",
+          "quote": "Một flow thuộc Product không được chép thêm vào root/e2e chỉ vì suite Portal cũng cần chạy nó."
+        },
+        {
+          "kind": "warn",
+          "text": "E2E của module nhận baseURL/auth/test data qua cấu hình test hoặc fixture của module; không import private component, environment hay fixture của Portal.",
+          "quote": "không import private component, environment hay fixture của Portal để làm module chạy được"
+        },
+        {
+          "kind": "tip",
+          "text": "`mdm/e2e/playwright.config.ts` cho phép chạy suite module độc lập với root config.",
+          "ref": "angular-portal/project-structure/testing.md#config-và-runner-discovery"
+        }
+      ]
+    },
+    {
+      "title": "Runner discovery",
+      "ref": "angular-portal/project-structure/testing.md#config-và-runner-discovery",
+      "text": "Angular spec discovery dùng `**/*.spec.ts` và loại E2E, output khỏi target. Playwright dùng `**/e2e/specs/**/*.e2e-spec.ts`. `tsconfig.app.json` loại spec, testing và e2e khỏi source ứng dụng.",
+      "file": "tsconfig-app",
+      "lines": [3, 4, 5, 6],
+      "focus": [0, 2, 4],
+      "result": "Không suite nào bị discover nhầm hoặc chạy trùng.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không dùng một `testMatch` bao trùm mọi `.spec.ts`; không chạy một suite hai lần ngoài chủ đích.",
+          "quote": "không dùng một testMatch bao trùm mọi .spec.ts"
+        },
+        {
+          "kind": "info",
+          "text": "Exclude điều khiển discovery, không phải hàng rào ngăn import; runtime code vẫn không được import test support."
+        },
+        {
+          "kind": "tip",
+          "text": "`coverage/`, `test-results/`, `playwright-report/`, `blob-report/` và `e2e/.auth/` là output; đưa vào ignore ở mọi scope tương ứng.",
+          "ref": "angular-portal/project-structure/testing.md#output-sinh-ra"
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "Playwright testMatch: **/e2e/specs/**/*.e2e-spec.ts",
+    "ref": "angular-portal/project-structure/testing.md#config-và-runner-discovery"
+  },
+  "dont": {
+    "text": "testMatch bao trùm mọi .spec.ts",
+    "ref": "angular-portal/project-structure/testing.md#config-và-runner-discovery",
+    "quote": "không dùng một testMatch bao trùm mọi .spec.ts"
+  },
+  "lint": [
+    { "status": "external", "note": "Discovery kiểm bằng cấu hình runner và CI" }
+  ],
+  "demo": null
+}

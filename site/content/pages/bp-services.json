@@ -1,0 +1,152 @@
+{
+  "desc": "Base API service, PagingReq/PagingRes, service entity và model theo tên entity.",
+  "minutes": 7,
+  "movedFrom": "I-05",
+  "tldr": [
+    "`<entity>.model.ts` · `<entity>.service.ts`",
+    "Hàm `list` · `detail` · `create` · `update` · `delete`; `approve`/`reject` khi có",
+    "Truyền nguyên `PagingReq` của Core; không bỏ filter/sort hay viết lại utility Core"
+  ],
+  "hero": {
+    "type": "flow",
+    "label": "Core filters → PagingReq → HTTP request",
+    "items": [
+      { "t": "sd-table", "s": "PagingReq<T>" },
+      { "t": "ProductService.list(req)", "s": "service entity" },
+      { "t": "buildPagingReq", "s": "BaseApiService" },
+      { "t": "HTTP", "s": "GET /products" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Model và tên kiểu",
+      "ref": "angular-portal/project-structure/services.md#convention-tên-file-class-và-hàm",
+      "text": "Mặc định gom const, enum, type/interface, DTO và Req/Res của entity vào `<entity>.model.ts`. Request dùng hậu tố `Req`, response dùng `Res`; DTO entity vẫn là `ProductDto`.",
+      "file": "p-model",
+      "lines": [3, 5, 10, 18, 19, 21],
+      "focus": [1],
+      "result": "Feature có ít model chỉ cần một file model.",
+      "callouts": [
+        {
+          "kind": "tip",
+          "text": "Không bắt buộc tạo thêm kiểu `Res` nếu response chính là DTO hoặc không có body."
+        },
+        {
+          "kind": "warn",
+          "text": "Chỉ tách file theo nhóm liên quan khi nội dung lớn; không mặc định tạo một file cho mỗi model/const/enum hay thư mục constants/enums/models riêng.",
+          "quote": "không mặc định tạo một file cho mỗi model/const/enum hay thêm các thư mục constants/enums/models riêng"
+        }
+      ]
+    },
+    {
+      "title": "Service entity",
+      "ref": "angular-portal/project-structure/services.md#convention-tên-file-class-và-hàm",
+      "text": "`ProductService` nằm trong `features/product/services`, hàm CRUD là `list(req)`, `detail(id)`, `create(req)`, `update(id, req)`, `delete(idOrIds)`. Tác vụ nghiệp vụ như `approve`/`reject` chỉ thêm khi consumer thực sự có.",
+      "file": "p-service",
+      "lines": [11, 12, 13, 19, 23, 27],
+      "focus": [1],
+      "result": "Tên `detail` thống nhất với route `:id/detail`.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "`ProductService` không đặt `providedIn: 'root'`; đăng ký ở route feature theo Routes.",
+          "ref": "angular-portal/project-structure/services.md#feature-api-service"
+        },
+        {
+          "kind": "warn",
+          "text": "Không dùng `providedIn: 'root'` cho service phụ thuộc configuration nằm ở injector con.",
+          "ref": "angular-portal/project-structure/services.md#ownership-của-services-và-model",
+          "quote": "Không dùng providedIn: 'root' cho service phụ thuộc configuration nằm ở injector con."
+        }
+      ]
+    },
+    {
+      "title": "PagingReq từ Core",
+      "ref": "angular-portal/project-structure/services.md#core-filters--pagingreq--http-request",
+      "text": "Với `sd-table` server, callback `items` đã nhận `PagingReq<T>` ở tham số thứ hai. Truyền nguyên request đó vào service; Core đổi quick search, filter và sort thành `PagingReq`.",
+      "file": "p-list",
+      "lines": [3, 31],
+      "focus": [0, 1],
+      "result": "Quick search, filter, sort và đổi trang gửi đúng request.",
+      "callouts": [
+        {
+          "kind": "tip",
+          "text": "Caller chỉ có `SdTableFilterRequest` thì dùng `SdConvertToPagingReq` từ `@sdcorejs/angular/components/table`; không convert lần hai một `PagingReq` đã có."
+        },
+        {
+          "kind": "warn",
+          "text": "Không viết thêm bộ duyệt/đổi operator của Core trong từng page/service.",
+          "quote": "Không viết thêm bộ duyệt/đổi operator của Core trong từng page/service."
+        }
+      ]
+    },
+    {
+      "title": "Base service map sang HTTP",
+      "ref": "angular-portal/project-structure/services.md#base-api-service",
+      "text": "`BaseApiService` cung cấp HttpClient/config, `apiUrl` và `buildPagingReq`. Hàm mapping giữ nguyên `Filter` của Core, `orders`, `fields` và giá trị `0`/`false`; không mutate request. `pageNumber` bắt đầu từ **0**.",
+      "file": "base-api",
+      "lines": [12, 17, 19, 20, 21, 22],
+      "focus": [2, 3],
+      "result": "Query đi qua `HttpParams`; filter lồng nhau, sort và `0`/`false` không bị mất.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không đăng ký abstract base làm provider và không đưa toàn bộ CRUD/workflow vào base.",
+          "quote": "Không đăng ký abstract base làm provider và không đưa toàn bộ CRUD/workflow vào base."
+        },
+        {
+          "kind": "warn",
+          "text": "Mỗi đối số của `resourceUrl` là một segment; không truyền `'products/' + id` thành một segment.",
+          "ref": "angular-portal/project-structure/services.md#helper-dùng-chung-trong-module",
+          "quote": "Không truyền 'products/' + id thành một segment."
+        },
+        {
+          "kind": "info",
+          "text": "`pageNumber`/`pageSize` là query scalar, `filters`/`orders`/`fields` là JSON trong từng query parameter: đây là transport của consumer kiểm chứng, không phải wire format do `PagingReq` áp đặt."
+        }
+      ]
+    },
+    {
+      "title": "Lỗi và bulk",
+      "ref": "angular-portal/project-structure/services.md#delete-approve-và-reject-cho-một-hoặc-nhiều-bản-ghi",
+      "text": "`delete` nhận một ID hoặc mảng ID; `approve`/`reject` nhận một Req hoặc mảng Req. Service chuẩn hóa đầu vào đơn thành mảng nội bộ, chặn mảng rỗng và không sửa mảng/object của caller.",
+      "file": "bulk-sig",
+      "lines": [13, 14, 15],
+      "focus": [3],
+      "must": { "quote": "Res phải giữ đủ kết quả theo ID của API để caller xử lý" },
+      "result": "Không báo thành công khi còn bản ghi lỗi.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Đây là mã giả, chưa nằm trong các block HTTP được kiểm chứng; contract của consumer quyết định kiểu ID, dữ liệu tác vụ và kết quả."
+        },
+        {
+          "kind": "warn",
+          "text": "Service trả lỗi HTTP cho consumer/interceptor xử lý, không đổi lỗi thành mảng rỗng hoặc success giả.",
+          "ref": "angular-portal/project-structure/services.md#feature-api-service",
+          "quote": "không đổi lỗi thành mảng rỗng hoặc success giả"
+        },
+        {
+          "kind": "warn",
+          "text": "Không báo thành công toàn bộ khi còn bản ghi thất bại.",
+          "quote": "Không báo thành công toàn bộ khi còn bản ghi thất bại."
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "items: (_, req) => firstValueFrom(productService.list(req))",
+    "ref": "angular-portal/project-structure/services.md#core-filters--pagingreq--http-request"
+  },
+  "dont": {
+    "text": "Chỉ lấy keyword từ tham số filter thô, bỏ filter/sort của Core",
+    "ref": "angular-portal/project-structure/services.md#core-filters--pagingreq--http-request",
+    "quote": "không chỉ lấy keyword từ tham số filter thô"
+  },
+  "lint": [
+    { "rule": "@typescript-eslint/naming-convention", "status": "config", "note": "hàm bắt đầu bằng list/detail/create/update/delete/approve/reject" },
+    { "rule": "@typescript-eslint/no-floating-promises", "status": "config", "note": "Promise phải được xử lý" },
+    { "status": "external", "note": "PagingReq đi nguyên tới request và lỗi HTTP được giữ — kiểm bằng review và browser test list" }
+  ],
+  "demo": null
+}

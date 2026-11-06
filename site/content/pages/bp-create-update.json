@@ -1,0 +1,146 @@
+{
+  "desc": "Create/update theo section, có thể dùng chung form; rời trang khi còn draft phải confirm, Hủy giữ draft.",
+  "minutes": 8,
+  "movedFrom": null,
+  "tldr": [
+    "Create/update có thể dùng chung `-form`, không copy form",
+    "Rời trang có draft: confirm, Hủy giữ draft",
+    "Dirty chỉ xóa khi lưu thành công hoặc đồng ý bỏ thay đổi"
+  ],
+  "hero": {
+    "type": "flow",
+    "label": "Rời trang khi có draft",
+    "items": [
+      { "t": "Back · menu · Back/Forward", "s": "canDeactivate · sdUnsavedChangesGuard" },
+      { "t": "Reload · đóng tab", "s": "beforeunload" },
+      { "t": "Ở lại/Hủy", "s": "giữ draft" },
+      { "t": "Thoát", "s": "bỏ thay đổi, không tự lưu" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "Bố cục form",
+      "ref": "angular-portal/ui-patterns.md#các-bố-cục-đã-chốt-1",
+      "text": "Chọn bố cục theo dữ liệu: form gọn một `sd-section`, nhiều section xếp dọc (dùng lại component `-form` khi có trách nhiệm đủ rõ), section kết hợp `sd-anchor`, chứng từ có dòng chi tiết, form có tabs, steps ngang hoặc dọc. Body không bắt buộc chiếm hết chiều rộng màn lớn; form dài cuộn trong vùng body được Portal/Core cấp.",
+      "focus": [],
+      "result": "Section xếp dọc, không trồi sụt giữa hai cột.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không dùng bố cục section chính/phụ ở hai cột làm mặc định; field ngắn trong cùng section vẫn có thể chia cột khi phù hợp.",
+          "quote": "Không dùng bố cục section chính/phụ ở hai cột làm mặc định"
+        },
+        {
+          "kind": "tip",
+          "text": "Dùng layout/utility Core và scope style có sẵn trước khi tạo SCSS."
+        }
+      ]
+    },
+    {
+      "title": "Header và section",
+      "ref": "angular-portal/ui-patterns.md#header-section-và-hướng-dẫn",
+      "text": "Title theo tác vụ: `Tạo mới <entity>` hoặc `Cập nhật <entity>`; page có back ở `headerLeft`. Nhóm Thông tin chung, Liên hệ và ghi chú… dùng `sd-section`. Dropdown entity và enum/const dùng wrapper đã chuẩn bị như `customer-select`; page vẫn sở hữu form, validation và API lưu.",
+      "file": "form-sections",
+      "lines": [1, 3, 9, 16],
+      "focus": [],
+      "result": "Không copy form giữa create và update.",
+      "callouts": [
+        {
+          "kind": "tip",
+          "text": "Create/update có thể dùng chung component `-form`; không copy toàn bộ form.",
+          "ref": "angular-portal/project-structure/README.md#tên-và-trách-nhiệm-ui"
+        },
+        {
+          "kind": "info",
+          "text": "Hướng dẫn toàn form/section dùng `sd-inform`; mẹo ngắn gần field/nhóm dùng `type=\"tip\"`."
+        },
+        {
+          "kind": "warn",
+          "text": "Một nơi chứa action lưu chính; không thêm nút “Hủy thay đổi” cạnh action lưu vì đã có đường quay lại.",
+          "quote": "không thêm nút “Hủy thay đổi” cạnh action lưu vì đã có đường quay lại"
+        }
+      ]
+    },
+    {
+      "title": "Draft và dirty",
+      "ref": "angular-portal/ui-patterns.md#draft-và-steps",
+      "text": "Update khởi tạo draft từ entity đã preload. Chuyển tab/bước hoặc quay lại bước trước vẫn giữ dữ liệu đã nhập. Dirty chỉ được xóa sau lưu thành công hoặc khi người dùng thực sự đồng ý bỏ thay đổi; đã sửa rồi hoàn tác thì dirty xác định theo giá trị/contract form.",
+      "focus": [],
+      "result": "Draft không mất khi chuyển tab/bước hoặc khi lưu lỗi.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Khi dùng Core `[form]` + `name`, không đồng thời tạo FormControl khác cùng tên trong FormGroup.",
+          "quote": "không đồng thời tạo FormControl khác cùng tên trong FormGroup"
+        },
+        {
+          "kind": "info",
+          "text": "Core {core} `registerSdUnsavedChangesForm` theo `form.dirty`, không tự so sánh với baseline; consumer dùng `SdUnsavedChangesService.register` với dirty computed theo các field của form."
+        },
+        {
+          "kind": "tip",
+          "text": "Lưu đang pending không tạo request trùng; lỗi lưu giữ draft để sửa/thử lại."
+        }
+      ]
+    },
+    {
+      "title": "Bảo vệ khi rời trang",
+      "ref": "angular-portal/ui-patterns.md#bảo-vệ-thay-đổi-chưa-lưu-trên-page-createupdate",
+      "text": "Mọi đường rời page có thể làm mất draft đều đi qua cùng trạng thái dirty. Route create/update gắn `canDeactivate: [sdUnsavedChangesGuard]` cho nút Quay lại, menu/link và Back/Forward trong ứng dụng; reload, đóng tab dùng `beforeunload`. Page đăng ký `SdUnsavedChangesService.register({ id, scope, isDirty, ... })` và hủy registration bằng `DestroyRef`.",
+      "focus": [0, 1],
+      "must": { "quote": "Đây là năng lực chung bắt buộc khi page create/update có draft khác dữ liệu ban đầu hoặc lần lưu thành công gần nhất." },
+      "result": "Không mất draft khi lỡ rời trang.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không triển khai chỉ ở nút Quay lại; không gắn confirm riêng vào từng button bên cạnh route guard.",
+          "quote": "Không gắn confirm riêng vào từng button bên cạnh route guard"
+        },
+        {
+          "kind": "info",
+          "text": "Core {core} dùng registry chung và tự bật/tắt listener `beforeunload` theo dirty; không tạo thêm listener/service song song trong mỗi feature."
+        },
+        {
+          "kind": "info",
+          "text": "Host consumer dùng `withRouterConfig({ canceledNavigationResolution: 'computed' })` để khôi phục history index khi hủy; feature không tự sửa history."
+        }
+      ]
+    },
+    {
+      "title": "Hủy và thoát",
+      "ref": "angular-portal/ui-patterns.md#bảo-vệ-thay-đổi-chưa-lưu-trên-page-createupdate",
+      "text": "**Ở lại/Hủy**: không rời page, không reset form, không xóa dirty. **Thoát/Bỏ thay đổi**: cho phép đường thoát, không tự gọi API lưu. Chưa sửa, đã hoàn tác về baseline hoặc đã lưu thành công thì không hỏi lại; form invalid nhưng đã thay đổi vẫn cần bảo vệ.",
+      "focus": [2, 3],
+      "result": "Prompt chỉ hiện khi thật sự có thay đổi.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không xóa dirty khi bấm Lưu, khi validation thất bại, khi request đang pending hoặc khi API trả lỗi.",
+          "quote": "Không xóa dirty khi bấm Lưu, khi validation thất bại, khi request đang pending hoặc khi API trả lỗi."
+        },
+        {
+          "kind": "warn",
+          "text": "Không hỏi hai lần cho cùng một lần thoát.",
+          "quote": "Không hỏi hai lần cho cùng một lần thoát."
+        },
+        {
+          "kind": "info",
+          "text": "Đóng/reload tab dùng thông báo và nhãn nút do browser quyết định; `beforeunload` không bảo đảm chạy khi ứng dụng bị kill/crash hoặc trên một số luồng mobile."
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "canDeactivate: [sdUnsavedChangesGuard] + SdUnsavedChangesService.register(…)",
+    "ref": "angular-portal/ui-patterns.md#bảo-vệ-thay-đổi-chưa-lưu-trên-page-createupdate"
+  },
+  "dont": {
+    "text": "Gắn confirm riêng vào từng button bên cạnh route guard",
+    "ref": "angular-portal/ui-patterns.md#bảo-vệ-thay-đổi-chưa-lưu-trên-page-createupdate",
+    "quote": "Không gắn confirm riêng vào từng button bên cạnh route guard"
+  },
+  "lint": [
+    { "status": "external", "note": "Kiểm bằng E2E thay đổi chưa lưu: Hủy/Thoát với Back, menu, Back/Forward, reload và đóng tab" }
+  ],
+  "demo": null
+}

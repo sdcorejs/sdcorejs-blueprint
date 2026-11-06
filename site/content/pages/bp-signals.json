@@ -1,0 +1,123 @@
+{
+  "desc": "Dữ liệu đi xuống bằng input, sự kiện đi lên bằng output; computed giữ giá trị dẫn xuất.",
+  "minutes": 6,
+  "movedFrom": "I-08",
+  "tldr": [
+    "Giá trị dẫn xuất dùng `computed()`, không dùng `effect()`",
+    "`output()` là emitter, không phải Signal",
+    "`viewChild()` có thể chưa có phần tử: kiểm tra trước khi dùng"
+  ],
+  "hero": {
+    "type": "flow",
+    "label": "Dữ liệu xuống, sự kiện lên",
+    "items": [
+      { "t": "input", "s": "unitPrice ↓" },
+      { "t": "model", "s": "quantity ⇅" },
+      { "t": "computed", "s": "total" },
+      { "t": "output", "s": "added ↑" }
+    ]
+  },
+  "steps": [
+    {
+      "title": "input và model",
+      "ref": "angular-portal/conventions/signals.md#quy-tắc",
+      "text": "Dữ liệu đi xuống bằng `input()`: `unitPrice` là input bắt buộc. `model()` dùng khi cần two-way binding giữa parent và child: `quantity` bắt đầu bằng 1.",
+      "file": "order-line-ts",
+      "lines": [8, 9],
+      "focus": [0, 1],
+      "result": "Parent đổi đơn giá, child nhận giá trị mới qua input.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không sửa object của input tại chỗ rồi kỳ vọng signal nhận thay đổi.",
+          "quote": "Không sửa object của input tại chỗ rồi kỳ vọng signal nhận thay đổi."
+        }
+      ]
+    },
+    {
+      "title": "computed",
+      "ref": "angular-portal/conventions/signals.md#quy-tắc",
+      "text": "Giá trị dẫn xuất dùng `computed()`: `total` tính từ `unitPrice()` và `quantity()`.",
+      "file": "order-line-ts",
+      "lines": [10],
+      "focus": [2],
+      "result": "`total` luôn bằng đơn giá × số lượng.",
+      "callouts": [
+        {
+          "kind": "warn",
+          "text": "Không dùng `effect()` để đồng bộ một giá trị tính được.",
+          "quote": "không dùng effect() để đồng bộ một giá trị tính được"
+        }
+      ]
+    },
+    {
+      "title": "output phát sự kiện",
+      "ref": "angular-portal/conventions/signals.md#quy-tắc",
+      "text": "Sự kiện đi lên bằng `output()`. `output()` là emitter, không phải Signal: `onAdd()` gọi `added.emit(this.total())`.",
+      "file": "order-line-ts",
+      "lines": [11, 14, 15, 16],
+      "focus": [3],
+      "result": "Parent nhận tổng tại thời điểm phát sự kiện."
+    },
+    {
+      "title": "Parent dùng component",
+      "ref": "angular-portal/conventions/signals.md#mẫu",
+      "text": "Parent truyền đơn giá, giữ số lượng qua two-way binding và nhận sự kiện: `[unitPrice]`, `[(quantity)]`, `(added)`.",
+      "file": "parent-html",
+      "lines": [1],
+      "focus": [0, 1, 3],
+      "result": "Số lượng đồng bộ hai chiều; parent nhận tổng qua `onAdded($event)`."
+    },
+    {
+      "title": "viewChild có guard",
+      "ref": "angular-portal/conventions/signals.md#quy-tắc",
+      "text": "`viewChild()`/`viewChildren()` là signal query nhưng vẫn có thể chưa có phần tử: `focusQuantity()` dùng `?.` trước khi gọi `nativeElement`.",
+      "file": "order-line-ts",
+      "lines": [12, 18, 19, 20],
+      "must": { "quote": "vẫn có thể chưa có phần tử, phải kiểm tra trước khi dùng" },
+      "result": "Gọi `focusQuantity()` khi chưa có phần tử không gây lỗi.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Query là private member nên dùng cú pháp `#`: `#quantityInput`.",
+          "ref": "angular-portal/conventions/naming.md#quy-tắc"
+        }
+      ]
+    },
+    {
+      "title": "Kiểm tra tự động",
+      "ref": "angular-portal/conventions/signals.md#kiểm-tra-tự-động",
+      "text": "`@angular-eslint/prefer-signals`, `@angular-eslint/prefer-output-readonly` và custom rule `local/no-set-in-effect` (warn).",
+      "file": "eslint-config",
+      "lines": [23, 24, 34],
+      "result": "`.set()` trong `effect()` bị cảnh báo khi lint.",
+      "callouts": [
+        {
+          "kind": "info",
+          "text": "Blueprint liệt kê rule; consumer ghép vào `eslint.config.js` của mình. Rule mới bật ở mức `warn`, sửa code hiện có cho sạch rồi mới nâng `error`.",
+          "ref": "angular-portal/conventions/eslint.md#eslint-cho-quy-ước-blueprint"
+        }
+      ]
+    }
+  ],
+  "do": {
+    "text": "total = computed(() => price() * quantity())",
+    "ref": "angular-portal/conventions/signals.md#đúng--sai"
+  },
+  "dont": {
+    "text": "effect(() => total.set(price() * quantity()))",
+    "ref": "angular-portal/conventions/signals.md#quy-tắc",
+    "quote": "không dùng effect() để đồng bộ một giá trị tính được",
+    "rule": "local/no-set-in-effect"
+  },
+  "lint": [
+    { "rule": "@angular-eslint/prefer-signals", "status": "config", "note": "input/query dạng signal" },
+    { "rule": "@angular-eslint/prefer-output-readonly", "status": "config", "note": "output readonly" },
+    { "rule": "local/no-set-in-effect", "status": "custom", "note": "warn khi .set() trong effect()" }
+  ],
+  "demo": {
+    "url": "https://sdcorejs.github.io/portal-template/instruction/modern-angular/signals",
+    "label": "Demo chạy thật trong portal-template: parent/child với input, model, computed và output.",
+    "img": "assets/img/signals-demo.png"
+  }
+}
