@@ -15,6 +15,7 @@ Nhánh `feat/blueprint-site`, PR vào `main`. Làm theo gói thiết kế `bluep
 Kiểm tra đã chạy thật trên Node 24.22.1 (Windows):
 
 - `validation/angular-foundation` `npm run check`: PASS — 16 tài liệu Markdown, 86 liên kết, 14 mẫu TypeScript (thêm `order-line.component.ts` của signals.md), 3 SCSS.
+- `validation/angular-consumer` `npm run check`: PASS — e2e type-check, 12 Angular spec (6 file), production build + bundle check, 43 Playwright. Assertion đếm block example trong `scripts/prepare.mjs` đổi 16 → 17 có ghi chú: mẫu signals chỉ được trích, không nằm trong đồ thị import của `main.ts`; assertion vẫn so khớp chính xác.
 - `site`: `npm run check:sync` PASS (20 trang, 13 Markdown, 17 block example); `npm test` 14/14 PASS, gồm kịch bản đổi heading, sửa một dòng block example, sửa câu quy tắc, thêm Markdown chưa map, rule ESLint lạ, quote Tránh sai, phiên bản viết cứng → FAIL đúng file và trang; `npm run build` PASS; Playwright 49/49 PASS (20 trang mở bằng deep link `#/<id>/buoc-2`, không cuộn ngang ở 390px, contrast chữ ≥ 4.5:1 cả Light+/Dark+, phím ← →, cây ARIA, tab, checklist/theme lưu localStorage, tìm không dấu).
 - Sửa thử `title: 'Tạo sản phẩm'` trong block `routes.ts` → `check:sync` FAIL tại `routes.md:117` cho BP-04, BP-05, BP-06; khôi phục → PASS.
 
