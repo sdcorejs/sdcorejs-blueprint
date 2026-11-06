@@ -209,6 +209,40 @@ for (const viewport of [{ width: 1440, height: 900 }, { width: 1280, height: 720
   });
 }
 
+test('font tự host: Be Vietnam Pro cho chữ, JetBrains Mono cho code, có subset tiếng Việt, không gọi host ngoài', async ({ page, baseURL }) => {
+  const external = [];
+  page.on('request', request => {
+    if (!request.url().startsWith(baseURL) && !request.url().startsWith('data:')) external.push(request.url());
+  });
+  await page.goto(`#/${docId}`);
+  await expect(page.locator('h1')).toHaveText(data.pages[docId].title);
+  const fonts = await page.evaluate(async () => {
+    await document.fonts.ready;
+    const family = selector => getComputedStyle(document.querySelector(selector)).fontFamily.split(',')[0].replace(/["']/gu, '').trim();
+    const loaded = [...document.fonts].filter(face => face.status === 'loaded');
+    return {
+      body: family('.page-desc'),
+      label: family('.section-label'),
+      code: family('.code-lines'),
+      // U+1EA0–1EF9: chữ Việt có dấu (ạ, ế, ữ…) nằm trong subset vietnamese.
+      vietnameseSans: loaded.some(face => face.family.replace(/["']/gu, '') === 'Be Vietnam Pro' && /U\+1EA0/iu.test(face.unicodeRange)),
+      vietnameseMono: [...document.fonts].some(face => face.family.replace(/["']/gu, '') === 'JetBrains Mono' && /U\+1EA0/iu.test(face.unicodeRange)),
+      sansReady: document.fonts.check('16px "Be Vietnam Pro"', 'Tiếng Việt có dấu: ạ ế ữ'),
+      monoReady: document.fonts.check('13px "JetBrains Mono"', 'const ữ = 1;'),
+    };
+  });
+  expect(fonts).toEqual({
+    body: 'Be Vietnam Pro',
+    label: 'Be Vietnam Pro',
+    code: 'JetBrains Mono',
+    vietnameseSans: true,
+    vietnameseMono: true,
+    sansReady: true,
+    monoReady: true,
+  });
+  expect(external, 'site gọi tài nguyên ngoài lúc chạy').toEqual([]);
+});
+
 test('trang chủ và trang không tồn tại', async ({ page }) => {
   await page.goto('#/');
   await expect(page.locator('h1')).toContainText('Angular Portal');
