@@ -83,12 +83,14 @@ export function mountDoc(root, data, page, initialStep) {
     document.getElementById(anchor.dataset.anchor)?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
   });
 
-  function goStep(n, { focus = true } = {}) {
+  let destroyed = false;
+
+  function goStep(n, { focus = true, smooth = true } = {}) {
     const target = sections[n - 1];
-    if (!target) return;
+    if (!target || destroyed) return;
     lockUntil = performance.now() + 1200;
     mark(n);
-    target.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+    target.scrollIntoView({ behavior: smooth && !reducedMotion() ? 'smooth' : 'auto', block: 'start' });
     if (focus) {
       const heading = target.querySelector('h3');
       heading.setAttribute('tabindex', '-1');
@@ -97,13 +99,17 @@ export function mountDoc(root, data, page, initialStep) {
     history.replaceState(null, '', stepHash(page.id, n));
   }
 
-  if (initialStep) window.requestAnimationFrame(() => goStep(initialStep, { focus: false }));
+  // Deep link: cuộn ngay, không animate (animation còn chạy sau khi đổi trang sẽ kéo lệch trang mới).
+  if (initialStep) window.requestAnimationFrame(() => goStep(initialStep, { focus: false, smooth: false }));
   else mark(1);
 
   return {
     get step() { return current || 1; },
     count: page.steps.length,
     goStep,
-    destroy() { observer.disconnect(); },
+    destroy() {
+      destroyed = true;
+      observer.disconnect();
+    },
   };
 }

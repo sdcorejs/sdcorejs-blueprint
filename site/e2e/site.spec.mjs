@@ -86,6 +86,129 @@ for (const id of data.order) {
   });
 }
 
+/** Vị trí tiêu đề trang so với header sticky và khung Explorer. */
+async function titleLayout(page) {
+  return page.evaluate(() => {
+    const header = document.querySelector('.topbar').getBoundingClientRect();
+    const title = document.querySelector('h1').getBoundingClientRect();
+    const frame = document.querySelector('.ex');
+    const left = document.querySelector('.ex-left');
+    return {
+      titleTop: Math.round(title.top),
+      titleBottom: Math.round(title.bottom),
+      headerBottom: Math.round(header.bottom),
+      leftTop: left ? Math.round(left.getBoundingClientRect().top) : null,
+      leftScrollTop: left ? left.scrollTop : 0,
+      frameScrollTop: frame ? frame.scrollTop : 0,
+      windowScrollY: Math.round(window.scrollY),
+    };
+  });
+}
+
+/** Phần tử nằm trọn trong vùng nhìn thấy: dưới header và trong khung cuộn chứa nó (nếu có). */
+async function fullyVisible(locator) {
+  return locator.evaluate(element => {
+    const rect = element.getBoundingClientRect();
+    let top = document.querySelector('.topbar').getBoundingClientRect().bottom;
+    let bottom = window.innerHeight;
+    for (let node = element.parentElement; node; node = node.parentElement) {
+      const style = getComputedStyle(node);
+      if (/(auto|scroll|hidden|clip)/u.test(style.overflowY) && node !== document.body && node !== document.documentElement) {
+        const box = node.getBoundingClientRect();
+        top = Math.max(top, box.top);
+        bottom = Math.min(bottom, box.bottom);
+      }
+    }
+    return rect.top >= top - 1 && rect.bottom <= bottom + 1;
+  });
+}
+
+for (const viewport of [{ width: 1440, height: 900 }, { width: 1280, height: 720 }, { width: 1100, height: 640 }]) {
+  test(`tiêu đề trang không bị cắt khi mở trang (${viewport.width}×${viewport.height})`, async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'mobile có test riêng');
+    test.setTimeout(120_000);
+    await page.setViewportSize(viewport);
+    for (const id of data.order) {
+      await page.goto(`#/${id}`);
+      await expect(page.locator('h1')).toHaveText(data.pages[id].title);
+      const layout = await titleLayout(page);
+      expect(layout.frameScrollTop, `${id}: khung Explorer bị cuộn`).toBe(0);
+      expect(layout.leftScrollTop, `${id}: cột bước bị cuộn khi mở trang`).toBe(0);
+      expect(layout.windowScrollY, `${id}: trang bị cuộn khi mở trang`).toBe(0);
+      expect(layout.titleTop, `${id}: tiêu đề nằm dưới header`).toBeGreaterThanOrEqual(layout.headerBottom);
+      if (layout.leftTop !== null) expect(layout.titleTop, `${id}: tiêu đề bị cắt bởi cột bước`).toBeGreaterThanOrEqual(layout.leftTop);
+      await expect.poll(() => fullyVisible(page.locator('h1')), { message: `${id}: tiêu đề không hiện đủ` }).toBe(true);
+    }
+  });
+}
+
+test('deep link tới bước cuối hiện đủ tiêu đề bước, không cuộn khung Explorer', async ({ page }, testInfo) => {
+  test.setTimeout(120_000);
+  if (testInfo.project.name === 'desktop') await page.setViewportSize({ width: 1280, height: 720 });
+  for (const id of data.order) {
+    const last = data.pages[id].steps.length;
+    await page.goto(`#/${id}/buoc-${last}`);
+    await expect(page.locator('h1')).toHaveText(data.pages[id].title);
+    const head = data.pages[id].layout === 'explorer'
+      ? page.locator(`#ex-step-head-${last}`)
+      : page.locator(`#buoc-${last}-title`);
+    await expect.poll(() => fullyVisible(head), { message: `${id}: bước ${last} không hiện đủ` }).toBe(true);
+    expect((await titleLayout(page)).frameScrollTop, `${id}: khung Explorer bị cuộn`).toBe(0);
+  }
+});
+
+test('← → giữ tiêu đề bước trong vùng nhìn thấy', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'phím dành cho desktop');
+  test.setTimeout(120_000);
+  await page.setViewportSize({ width: 1280, height: 720 });
+  for (const id of data.order.filter(key => data.pages[key].layout === 'explorer')) {
+    await page.goto(`#/${id}`);
+    await page.locator('h1').click();
+    for (let n = 2; n <= data.pages[id].steps.length; n++) {
+      await page.keyboard.press('ArrowRight');
+      await expect(page).toHaveURL(new RegExp(`#/${id}/buoc-${n}$`));
+      await expect.poll(() => fullyVisible(page.locator(`#ex-step-head-${n}`)), { message: `${id}: bước ${n}` }).toBe(true);
+    }
+    expect((await titleLayout(page)).frameScrollTop, `${id}: khung Explorer bị cuộn`).toBe(0);
+  }
+});
+
+/**
+ * Vùng cuộn (overflow-x auto/scroll/hidden) có nội dung rộng hơn khung. Khối code, tab editor và cây ASCII
+ * được phép cuộn ngang trong khối của nó (accessibility.md: code block dài cuộn trong khối).
+ */
+async function horizontalOverflow(page) {
+  return page.evaluate(() => {
+    const allowed = '.code-scroll, .ex-code, .ex-tabs, .hero-tree, .hero-compare-scroll';
+    const out = [];
+    for (const element of document.querySelectorAll('#app *')) {
+      // .visually-hidden cố ý cắt nội dung 1px cho trình đọc màn hình.
+      if (!element.getClientRects().length || element.closest(allowed) || element.closest('.visually-hidden')) continue;
+      const style = getComputedStyle(element);
+      // Tên file/đường dẫn dài cố ý cắt bằng dấu “…”: không phải cuộn ngang.
+      if (style.textOverflow === 'ellipsis' || !/(auto|scroll|hidden|clip)/u.test(style.overflowX)) continue;
+      if (element.scrollWidth > element.clientWidth + 1) out.push(`.${element.className} tràn ${element.scrollWidth - element.clientWidth}px`);
+    }
+    if (document.documentElement.scrollWidth > window.innerWidth + 1) out.push('trang cuộn ngang');
+    return out;
+  });
+}
+
+for (const viewport of [{ width: 1440, height: 900 }, { width: 1280, height: 720 }, { width: 1100, height: 720 }, { width: 960, height: 720 }, { width: 390, height: 844 }]) {
+  test(`không cuộn ngang trong cột bước, rail, sidebar ở mọi bước (${viewport.width}px)`, async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'desktop', 'đã đặt viewport trong test');
+    test.setTimeout(240_000);
+    await page.setViewportSize(viewport);
+    for (const id of data.order) {
+      for (let n = 1; n <= data.pages[id].steps.length; n++) {
+        await page.goto(`#/${id}/buoc-${n}`);
+        await expect(page.locator('h1')).toHaveText(data.pages[id].title);
+        expect(await horizontalOverflow(page), `${id} bước ${n}`).toEqual([]);
+      }
+    }
+  });
+}
+
 test('trang chủ và trang không tồn tại', async ({ page }) => {
   await page.goto('#/');
   await expect(page.locator('h1')).toContainText('Angular Portal');
