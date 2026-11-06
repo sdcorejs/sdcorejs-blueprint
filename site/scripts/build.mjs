@@ -261,7 +261,7 @@ function fontFaces(pkg, weights) {
 fs.rmSync(dist, { recursive: true, force: true });
 fs.mkdirSync(path.join(dist, 'fonts'), { recursive: true });
 const fontCss = [];
-for (const [pkg, weights] of [['ibm-plex-sans', [400, 500, 600, 700]], ['ibm-plex-mono', [400, 500, 600]]]) {
+for (const [pkg, weights] of [['be-vietnam-pro', [400, 500, 600, 700]], ['jetbrains-mono', [400, 500, 600]]]) {
   const { faces, copies, directory } = fontFaces(pkg, weights);
   fontCss.push(...faces);
   for (const file of copies) fs.copyFileSync(path.join(directory, 'files', file), path.join(dist, 'fonts', file));

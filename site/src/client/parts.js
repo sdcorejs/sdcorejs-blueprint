@@ -70,10 +70,19 @@ export function hero(data, page, focus = [], { mini = false } = {}) {
   } else if (model.type === 'tree') {
     body = `<ul class="hero-tree">${items.map((item, index) => `<li class="${on(index).trim()}" data-hero-index="${index}">${esc(item.t)}</li>`).join('')}</ul>`;
   } else if (model.type === 'compare') {
-    body = `<div class="code-scroll-plain" style="overflow-x:auto"><table class="hero-compare">
-      <thead><tr><th scope="col">Loại</th><th scope="col">✓ Đúng</th><th scope="col">✕ Sai</th></tr></thead>
-      <tbody>${items.map((item, index) => `<tr class="${on(index).trim()}" data-hero-index="${index}"><th scope="row">${esc(item.role)}</th><td class="ok">${esc(item.ok)}</td><td class="bad">${esc(item.bad)}</td></tr>`).join('')}</tbody>
-    </table></div>`;
+    // Mỗi giá trị “a · b · c” tách thành token không bẻ giữa từ; chỉ xuống dòng giữa các token.
+    const tokens = value => String(value ?? '').split(/\s+·\s+/u).map(token => `<span class="cmp-token">${esc(token)}</span>`).join('<span class="cmp-sep" aria-hidden="true"> · </span>');
+    body = mini
+      // Rail hẹp (280px): xếp dọc thay vì bảng 3 cột.
+      ? `<ul class="hero-compare-list">${items.map((item, index) => `<li class="${on(index).trim()}" data-hero-index="${index}">
+          <b>${esc(item.role)}</b>
+          <p class="ok"><span aria-hidden="true">✓</span><span class="visually-hidden">Đúng:</span> ${tokens(item.ok)}</p>
+          <p class="bad"><span aria-hidden="true">✕</span><span class="visually-hidden">Sai:</span> ${tokens(item.bad)}</p>
+        </li>`).join('')}</ul>`
+      : `<div class="hero-compare-scroll"><table class="hero-compare">
+          <thead><tr><th scope="col">Loại</th><th scope="col">✓ Đúng</th><th scope="col">✕ Sai</th></tr></thead>
+          <tbody>${items.map((item, index) => `<tr class="${on(index).trim()}" data-hero-index="${index}"><th scope="row">${esc(item.role)}</th><td class="ok">${tokens(item.ok)}</td><td class="bad">${tokens(item.bad)}</td></tr>`).join('')}</tbody>
+        </table></div>`;
   } else if (model.type === 'shot') {
     body = `<div class="hero-shot" style="aspect-ratio:${esc(model.ratio ?? 'auto')}">
         <img src="${esc(model.img)}" alt="${esc(model.alt ?? '')}" loading="lazy">
@@ -82,7 +91,7 @@ export function hero(data, page, focus = [], { mini = false } = {}) {
       <ol class="pin-legend">${items.map((item, index) => `<li class="${on(index).trim()}" data-hero-index="${index}"><span class="n" aria-hidden="true">${index + 1}</span><span>${esc(item.t)}</span></li>`).join('')}</ol>
       ${mini ? '' : imageCaption(data, model.img)}`;
   }
-  return `<figure class="hero hero-${model.type}"><figcaption class="hero-label">${mini ? 'Sơ đồ' : 'Hình chính'} · ${esc(model.label)}</figcaption>${body}</figure>`;
+  return `<figure class="hero hero-kind-${model.type}"><figcaption class="hero-label">${mini ? 'Sơ đồ' : 'Hình chính'} · ${esc(model.label)}</figcaption>${body}</figure>`;
 }
 
 export function setHeroFocus(root, focus) {

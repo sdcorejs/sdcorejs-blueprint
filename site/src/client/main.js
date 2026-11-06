@@ -118,6 +118,8 @@ function route() {
   }
   controller?.destroy();
   controller = null;
+  // Dừng smooth scroll của trang trước (← → trên layout Doc) để không kéo lệch trang mới.
+  window.scrollTo({ top: window.scrollY, behavior: 'instant' });
   currentId = id;
   setActiveNav(id);
   if (invalid || (id && !data.pages[id])) {
@@ -130,15 +132,12 @@ function route() {
     const page = data.pages[id];
     document.title = `${page.no} ${page.title} · SDCoreJS Blueprint`;
     const target = step ? Math.min(Math.max(step, 1), page.steps.length) : null;
-    if (page.layout === 'explorer') {
-      main.innerHTML = renderExplorer(data, page);
-      controller = mountExplorer(main, data, page, target);
-    } else {
-      main.innerHTML = renderDoc(data, page);
-      controller = mountDoc(main, data, page, target);
-    }
+    main.innerHTML = page.layout === 'explorer' ? renderExplorer(data, page) : renderDoc(data, page);
+    // Trang mới luôn bắt đầu từ đầu; deep link tự cuộn tới bước sau khi mount.
+    window.scrollTo(0, 0);
+    controller = page.layout === 'explorer' ? mountExplorer(main, data, page, target) : mountDoc(main, data, page, target);
   }
-  if (!step) window.scrollTo(0, 0);
+  if (!controller) window.scrollTo(0, 0);
   main.querySelector('#page-title')?.focus({ preventScroll: true });
 }
 

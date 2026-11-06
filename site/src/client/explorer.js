@@ -194,7 +194,26 @@ export function mountExplorer(root, data, page, initialStep) {
     (next ?? codeEl).focus();
   }
 
-  function goStep(n, { focus = false } = {}) {
+  /**
+   * Đưa tiêu đề bước vào vùng nhìn thấy mà không dùng scrollIntoView: scrollIntoView cuộn mọi tổ tiên,
+   * kể cả khung .ex, làm tiêu đề trang bị đẩy khuất dưới header. Chỉ cuộn cột bước (desktop) hoặc cửa sổ (≤ 1099px).
+   */
+  function revealStep(n) {
+    const head = root.querySelector(`#ex-step-head-${n}`);
+    if (!head) return;
+    const column = root.querySelector('.ex-left');
+    const margin = 12;
+    const rect = head.getBoundingClientRect();
+    if (column.scrollHeight > column.clientHeight && getComputedStyle(column).overflowY !== 'visible') {
+      const box = column.getBoundingClientRect();
+      if (rect.top < box.top + margin || rect.bottom > box.bottom - margin) column.scrollTop += rect.top - box.top - margin;
+      return;
+    }
+    const top = document.querySelector('.topbar')?.getBoundingClientRect().bottom ?? 0;
+    if (rect.top < top + margin || rect.bottom > window.innerHeight - margin) window.scrollBy(0, rect.top - top - margin);
+  }
+
+  function goStep(n, { focus = false, reveal = true } = {}) {
     const step = page.steps[n - 1];
     if (!step) return;
     state.step = n;
@@ -207,9 +226,8 @@ export function mountExplorer(root, data, page, initialStep) {
     if (step.file) openFile(step.file);
     else renderEditor();
     history.replaceState(null, '', stepHash(page.id, n));
-    if (focus) root.querySelector(`#ex-step-head-${n}`)?.focus();
-    const head = root.querySelector(`#ex-step-head-${n}`);
-    if (head && window.matchMedia('(min-width: 1100px)').matches) head.closest('.ex-step').scrollIntoView({ block: 'nearest' });
+    if (focus) root.querySelector(`#ex-step-head-${n}`)?.focus({ preventScroll: true });
+    if (reveal) revealStep(n);
   }
 
   // ---- Bước ----
@@ -296,8 +314,8 @@ export function mountExplorer(root, data, page, initialStep) {
 
   selectEl?.addEventListener('change', () => openFile(selectEl.value));
 
-  goStep(initialStep || 1);
-  if (initialStep) root.querySelector(`#ex-step-head-${initialStep}`)?.scrollIntoView({ block: 'nearest' });
+  // Mở trang không có deep link: giữ tiêu đề trang ở đầu, không cuộn tới bước 1.
+  goStep(initialStep || 1, { reveal: Boolean(initialStep) });
 
   return {
     get step() { return state.step; },
